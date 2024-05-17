@@ -13,6 +13,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,11 +26,15 @@ public class ConfigServiceImpl implements ConfigService{
     private MongoTemplate mongoTemplate;
 
     @Override
-    public List<Config> findAll() {
-    List<Config> configList =configRepository.findAll();
-        return configList;
+    public List<Config> findAll(String configId) {
+        Query query=new Query();
+        List<Config> configList = new ArrayList<>();
+        if (configId != null && !configId.isEmpty()) {
+            query.addCriteria(Criteria.where("configId").is(configId));
+        }
+        query.addCriteria(Criteria.where("configType").ne(ConfigType.SYSTEM));
+        return mongoTemplate.find(query, Config.class);
     }
-
     @Override
     public Config save(ConfigReq configReq) {
         try {
@@ -37,8 +43,8 @@ public class ConfigServiceImpl implements ConfigService{
             if (configReq.getConfiguration()==null||configReq.getConfiguration().isEmpty())
                 throw new InvalidDataException("Cannot Empty The Config Value");
             config.setConfiguration(configReq.getConfiguration());
-            config.setDefaultValue(configReq.getDefaultValue());
             config.setConfigType(ConfigType.USER);
+            config.setDefaultValue(configReq.getDefaultValue());
             return configRepository.save(config);
         }catch (Exception e){
             throw new InvalidDataException("Invalid Request Check Request Object");
@@ -59,6 +65,9 @@ public class ConfigServiceImpl implements ConfigService{
         Config config = configRepository.findConfigByConfigId(configId);
         if (config==null)
             throw new DataNotFoundException("Config Not Found This ID:"+configId);
+        if (config.getConfigType()==ConfigType.NON_EDIT){
+            throw new UnsupportedOperationException("Can't Edit ONLY ADD");
+        }
         config.setConfigId(configReq.getConfigId());
         config.setConfiguration(configReq.getConfiguration());
         config.setDefaultValue(configReq.getDefaultValue());

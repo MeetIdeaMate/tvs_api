@@ -8,7 +8,7 @@ import com.techlambdas.delearmanagementapp.request.ConfigReq;
 import java.util.List;
 
 public interface ConfigService {
-    List<Config> findAll();
+    List<Config> findAll(String configId);
 
     Config save(ConfigReq configReq);
 
@@ -20,6 +20,5 @@ public interface ConfigService {
     Config addConfigValue(String configId, String configValue);
 
     Config removeConfigValue(String configId, String configValue);
-
 
 }

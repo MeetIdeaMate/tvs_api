@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.techlambdas.delearmanagementapp.response.AppResponse.successResponse;
+
 @RestController
 @RequestMapping("/config")
 public class ConfigController {
@@ -20,33 +22,34 @@ public class ConfigController {
     @PostMapping
     public ResponseEntity feedConfigData(@RequestBody ConfigReq configReq){
         Config savedConfig= configService.save(configReq);
-        return new ResponseEntity(savedConfig,HttpStatus.CREATED);
+        return successResponse(HttpStatus.CREATED,"config",savedConfig);
     }
 
     @GetMapping("/{configId}")
     public ResponseEntity getConfigurationByConfigId(@PathVariable String configId){
-    Config config=configService.findConfigByConfigId(configId);
-    return ResponseEntity.ok(config);
+        Config config=configService.findConfigByConfigId(configId);
+        return successResponse(HttpStatus.OK,"config",config);
+
     }
     @PutMapping("/edit/{configId}")
     public ResponseEntity updateConfigurationTable(@PathVariable String configId, @RequestBody ConfigReq configReq){
         Config savedConfig= configService.updateConfig(configId,configReq);
-        return new ResponseEntity(savedConfig,HttpStatus.OK);
+        return successResponse(HttpStatus.OK,"config",savedConfig);
     }
     @GetMapping("/getAll")
-    public ResponseEntity<List<Config>> getAllConfiguration() {
-        List<Config> config = configService.findAll();
-        return new ResponseEntity<>(config, HttpStatus.OK);
+    public ResponseEntity<List<Config>> getAllConfiguration(@RequestParam (required = false)String configId) {
+        List<Config> config = configService.findAll(configId);
+        return successResponse(HttpStatus.OK,"configList",config);
     }
     @PatchMapping("/push/{configId}")
-    public ResponseEntity<String> addConfigurationTable(@PathVariable String configId, @RequestParam String configValue ) {
+    public ResponseEntity<Config> addConfigurationTable(@PathVariable String configId, @RequestParam String configValue ) {
         Config existingConfig = configService.addConfigValue(configId, configValue);
-        return ResponseEntity.ok("Added values in table Successfully");
-        }
+        return successResponse(HttpStatus.OK,"config",existingConfig);
+    }
     @PatchMapping("/pop/{configId}")
-    public ResponseEntity<String> deleteConfigurationTableValue(@PathVariable String configId, @RequestParam String configValue){
-     Config existingConfig = configService.removeConfigValue(configId,configValue);
-     return ResponseEntity.ok("Removed Values From Table Successfully");
+    public ResponseEntity<Config> deleteConfigurationTableValue(@PathVariable String configId, @RequestParam String configValue){
+        Config existingConfig = configService.removeConfigValue(configId,configValue);
+        return successResponse(HttpStatus.OK,"config",existingConfig);
     }
 
 }

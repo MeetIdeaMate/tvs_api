@@ -30,6 +30,7 @@ public class UserController {
         userService.changePassword(userPwdChangReq);
         return successResponse(HttpStatus.OK,"success","changedSuccessFully");
     }
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> authenticateUser(@RequestBody LoginReq loginReq){
        LoginResponse loginResponse= userService.authenticateUser(loginReq);
