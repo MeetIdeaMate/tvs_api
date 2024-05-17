@@ -1,6 +1,7 @@
 package com.techlambdas.delearmanagementapp.repository;
 
-import com.techlambdas.hospitalmanagement.model.User;
+
+import com.techlambdas.delearmanagementapp.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,7 +21,7 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public Page<User> getAllUsersWithPage(String userName, String mobileNumber, String designation,Pageable pageable) {
+    public Page<User> getAllUsersWithPage(String userName, String mobileNumber, String designation, Pageable pageable) {
         Query query = new Query();
         if (userName!=null) {
 

@@ -1,6 +1,7 @@
 package com.techlambdas.delearmanagementapp.repository;
 
-import com.techlambdas.hospitalmanagement.model.User;
+
+import com.techlambdas.delearmanagementapp.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

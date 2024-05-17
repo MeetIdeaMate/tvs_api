@@ -1,11 +1,12 @@
 package com.techlambdas.delearmanagementapp.service;
-import com.techlambdas.hospitalmanagement.constant.UserStatus;
-import com.techlambdas.hospitalmanagement.model.User;
-import com.techlambdas.hospitalmanagement.request.LoginReq;
-import com.techlambdas.hospitalmanagement.request.UserPwdChangReq;
-import com.techlambdas.hospitalmanagement.request.UserReq;
-import com.techlambdas.hospitalmanagement.request.UserUpdateReq;
-import com.techlambdas.hospitalmanagement.response.LoginResponse;
+
+import com.techlambdas.delearmanagementapp.constant.UserStatus;
+import com.techlambdas.delearmanagementapp.model.User;
+import com.techlambdas.delearmanagementapp.request.LoginReq;
+import com.techlambdas.delearmanagementapp.request.UserPwdChangReq;
+import com.techlambdas.delearmanagementapp.request.UserReq;
+import com.techlambdas.delearmanagementapp.request.UserUpdateReq;
+import com.techlambdas.delearmanagementapp.response.LoginResponse;
 import org.springframework.data.domain.Page;
 
 import java.util.List;

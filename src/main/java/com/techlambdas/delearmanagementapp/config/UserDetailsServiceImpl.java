@@ -1,7 +1,7 @@
 package com.techlambdas.delearmanagementapp.config;
 
-import com.techlambdas.hospitalmanagement.model.User;
-import com.techlambdas.hospitalmanagement.repository.UserRepository;
+import com.techlambdas.delearmanagementapp.model.User;
+import com.techlambdas.delearmanagementapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

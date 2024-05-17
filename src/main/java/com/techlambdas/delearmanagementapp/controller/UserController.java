@@ -1,13 +1,13 @@
 package com.techlambdas.delearmanagementapp.controller;
 
-import com.techlambdas.hospitalmanagement.constant.UserStatus;
-import com.techlambdas.hospitalmanagement.model.User;
-import com.techlambdas.hospitalmanagement.request.LoginReq;
-import com.techlambdas.hospitalmanagement.request.UserPwdChangReq;
-import com.techlambdas.hospitalmanagement.request.UserReq;
-import com.techlambdas.hospitalmanagement.request.UserUpdateReq;
-import com.techlambdas.hospitalmanagement.response.LoginResponse;
-import com.techlambdas.hospitalmanagement.service.UserService;
+import com.techlambdas.delearmanagementapp.constant.UserStatus;
+import com.techlambdas.delearmanagementapp.model.User;
+import com.techlambdas.delearmanagementapp.request.LoginReq;
+import com.techlambdas.delearmanagementapp.request.UserPwdChangReq;
+import com.techlambdas.delearmanagementapp.request.UserReq;
+import com.techlambdas.delearmanagementapp.request.UserUpdateReq;
+import com.techlambdas.delearmanagementapp.response.LoginResponse;
+import com.techlambdas.delearmanagementapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.techlambdas.hospitalmanagement.response.AppResponse.successResponse;
+import static com.techlambdas.delearmanagementapp.response.AppResponse.successResponse;
 
 
 @RestController

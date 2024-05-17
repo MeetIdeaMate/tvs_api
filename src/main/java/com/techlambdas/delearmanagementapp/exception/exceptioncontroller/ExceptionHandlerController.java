@@ -1,9 +1,10 @@
 package com.techlambdas.delearmanagementapp.exception.exceptioncontroller;
 
-import com.techlambdas.master.api.exception.AlreadyExistException;
-import com.techlambdas.master.api.exception.DataNotFoundException;
-import com.techlambdas.master.api.exception.ErrorResponse;
-import com.techlambdas.master.api.exception.InvalidDataException;
+
+import com.techlambdas.delearmanagementapp.exception.AlreadyExistException;
+import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
+import com.techlambdas.delearmanagementapp.exception.ErrorResponse;
+import com.techlambdas.delearmanagementapp.exception.InvalidDataException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
