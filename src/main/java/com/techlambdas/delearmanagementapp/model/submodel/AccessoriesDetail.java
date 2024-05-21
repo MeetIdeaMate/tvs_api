@@ -4,10 +4,8 @@ import lombok.Data;
 
 @Data
 public class AccessoriesDetail {
-    private String partNumber;
-    private String vehicleName;
-    private String variant;
-    private String color;
+    private String materialNumber;
+    private String materialName;
     private String hsnSacCode;
     private double unitRate;
     private int quantity;
@@ -16,9 +14,5 @@ public class AccessoriesDetail {
     private double cgstPercentage;
     private double sgstPercentage;
     private double igstPercentage;
-    private double tcsValue;
-    private double invValue;
-    private double incentive;
-    private double stateIncentive;
     private double totalAmount;
 }

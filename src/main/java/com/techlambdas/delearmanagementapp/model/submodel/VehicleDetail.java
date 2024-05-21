@@ -2,6 +2,8 @@ package com.techlambdas.delearmanagementapp.model.submodel;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class VehicleDetail {
     private String partNumber;
@@ -11,6 +13,7 @@ public class VehicleDetail {
     private String hsnSacCode;
     private double unitRate;
     private int quantity;
+    private List<EngineDetail>engineDetails;
     private double amount;
     private double discount;
     private double cgstPercentage;
