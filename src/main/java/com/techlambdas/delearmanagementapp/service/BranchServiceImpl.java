@@ -10,9 +10,11 @@ import com.techlambdas.delearmanagementapp.response.SubBranch;
 import com.techlambdas.delearmanagementapp.utils.RandomIdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BranchServiceImpl implements BranchService {
@@ -37,14 +39,19 @@ public class BranchServiceImpl implements BranchService {
 
     @Override
     public List<BranchResponse> getAllBranches(String branchId, String branchName, String mobileNo, String city) {
-        List<BranchResponse>branches=customBranchRepository.getAllBranches(branchId,branchName,mobileNo,city);
-        return branches;
+        List<Branch> branches=customBranchRepository.getAllBranches(branchId,branchName,mobileNo,city);
+        return branches.stream()
+                .map(branch -> mapBranchResponseWithBranch(branch))
+                .collect(Collectors.toList());
     }
 
     @Override
     public Page<BranchResponse> getAllBranchesWithPage(String branchId, String branchName, String mobileNo, String city, Pageable pageable) {
-        Page<BranchResponse>branches=customBranchRepository.getAllBranchesWithPage(branchId,branchName,mobileNo,city);
-       return branches;
+        Page<Branch>branches=customBranchRepository.getAllBranchesWithPage(branchId,branchName,mobileNo,city,pageable);
+       List<BranchResponse>branchResponses= branches.getContent().stream()
+               .map(branch -> mapBranchResponseWithBranch(branch))
+               .collect(Collectors.toList());
+        return new PageImpl<>(branchResponses, pageable,branches.getTotalElements() );
     }
 
     @Override
