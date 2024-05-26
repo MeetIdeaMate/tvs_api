@@ -10,17 +10,14 @@ import java.time.LocalDateTime;
 @Document(collection = "vendors")
 public class Vendor {
     @Id
+    private String id;
     private String vendorId;
     private String vendorName;
     private String mobileNo;
     private String accountNo;
-    private String accountHolderName;
-    private String bankName;
-    private String branch;
     private String ifscCode;
     private String city;
     private String emailId;
-    private String panNumber;
     private String gstNumber;
     @CreatedDate
     private LocalDateTime createdDateTime;
