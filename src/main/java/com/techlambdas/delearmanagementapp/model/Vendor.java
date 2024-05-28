@@ -19,6 +19,7 @@ public class Vendor {
     private String city;
     private String emailId;
     private String gstNumber;
+    private String address;
     @CreatedDate
     private LocalDateTime createdDateTime;
     @CreatedBy
