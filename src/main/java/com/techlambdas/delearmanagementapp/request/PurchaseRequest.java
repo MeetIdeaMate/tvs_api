@@ -1,18 +1,14 @@
-package com.techlambdas.delearmanagementapp.model;
+package com.techlambdas.delearmanagementapp.request;
 
+import com.techlambdas.delearmanagementapp.model.GstType;
+import com.techlambdas.delearmanagementapp.model.ItemDetail;
 import lombok.Data;
-import org.springframework.data.annotation.*;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@Document(collection = "purchases")
-public class Purchase {
-    @Id
-    private String id;
+public class PurchaseRequest {
     private String purchaseNo;
     private String vendorId;
     private String branchId;
@@ -28,12 +24,4 @@ public class Purchase {
     private double totalIncentiveAmount;
     private double totalInvoiceAmount;
     private double finalTotalInvoiceAmount;
-    @CreatedDate
-    private LocalDateTime createdDateTime;
-    @CreatedBy
-    private String createdBy;
-    @LastModifiedDate
-    private LocalDateTime updatedDateTime;
-    @LastModifiedBy
-    private String updatedBy;
 }
