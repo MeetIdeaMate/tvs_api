@@ -1,6 +1,6 @@
 package com.techlambdas.delearmanagementapp.repository;
 
-import com.techlambdas.delearmanagementapp.model.Customer;
+import com.techlambdas.delearmanagementapp.model.Vendor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -14,41 +14,41 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 @Repository
-public class CustomCustomerRepositoryImpl implements CustomCustomerRepository{
+public class CustomVendorRespositoryImpl implements CustomVendorRepository{
+
     @Autowired
     private MongoTemplate mongoTemplate;
-
     @Override
-    public List<Customer> getAllCustomers(String customerId, String customerName, String mobileNo, String city) {
+    public List<Vendor> getAllVendors(String vendorId,String vendorName, String mobileNo, String city) {
 
         Query query=new Query();
-        if (customerId!=null)
-            query.addCriteria(Criteria.where("customerId").is(customerId));
-        if (customerName != null)
-            query.addCriteria(Criteria.where("customerName").regex(Pattern.compile(customerName, Pattern.CASE_INSENSITIVE)));
+        if (vendorId!=null)
+            query.addCriteria(Criteria.where("vendorId").is(vendorId));
+        if (vendorName != null)
+            query.addCriteria(Criteria.where("vendorName").regex(Pattern.compile(vendorName, Pattern.CASE_INSENSITIVE)));
         if (mobileNo!=null)
             query.addCriteria(Criteria.where("mobileNo").regex(mobileNo));
         if (city!=null)
             query.addCriteria(Criteria.where("city").regex(Pattern.compile(city,Pattern.CASE_INSENSITIVE)));
-        return mongoTemplate.find(query, Customer.class);
+        return mongoTemplate.find(query, Vendor.class);
     }
 
     @Override
-    public Page<Customer> getAllCustomersWithPage(String customerId, String customerName, String mobileNo, String city, Pageable pageable) {
+    public Page<Vendor> getAllVendorsWithPage(String vendorId, String vendorName, String mobileNo,String city, Pageable pageable) {
         Query query=new Query();
-        if (customerId!=null)
-            query.addCriteria(Criteria.where("customerId").is(customerId));
-        if (customerName != null)
-            query.addCriteria(Criteria.where("customerName").regex(Pattern.compile(customerName, Pattern.CASE_INSENSITIVE)));
+        if (vendorId!=null)
+            query.addCriteria(Criteria.where("vendorId").is(vendorId));
+        if (vendorName != null)
+            query.addCriteria(Criteria.where("vendorName").regex(Pattern.compile(vendorName, Pattern.CASE_INSENSITIVE)));
         if (mobileNo!=null)
             query.addCriteria(Criteria.where("mobileNo").regex(mobileNo));
         if (city!=null)
             query.addCriteria(Criteria.where("city").regex(Pattern.compile(city,Pattern.CASE_INSENSITIVE)));
-        long count = mongoTemplate.count(query, Customer.class);
+        long count = mongoTemplate.count(query, Vendor.class);
         query.with(pageable);
-        List<Customer> customers = mongoTemplate.find(query, Customer.class);
+        List<Vendor> vendors = mongoTemplate.find(query, Vendor.class);
 
-        return new PageImpl<>(customers, pageable, count);
+        return new PageImpl<>(vendors, pageable, count);
     }
-}
 
+}
