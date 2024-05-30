@@ -2,6 +2,7 @@ package com.techlambdas.delearmanagementapp.service;
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.mapper.BranchMapper;
 import com.techlambdas.delearmanagementapp.model.Branch;
+import com.techlambdas.delearmanagementapp.model.Vendor;
 import com.techlambdas.delearmanagementapp.repository.BranchRepository;
 import com.techlambdas.delearmanagementapp.repository.CustomBranchRepository;
 import com.techlambdas.delearmanagementapp.request.BranchRequest;
@@ -75,10 +76,17 @@ public class BranchServiceImpl implements BranchService {
 
     @Override
     public Branch updateBranch(String branchId, BranchRequest branchRequest) {
-        Branch branch=branchRepository.findByBranchId(branchId);
-        if (branch==null)
-            throw new DataNotFoundException("Branch not found");
-        return branchRepository.save(branch);
+        try {
+            Branch existingBranch = branchRepository.findByBranchId(branchId);
+            if (existingBranch == null)
+                throw new DataNotFoundException("vendor not found with ID: " + branchId);
+            branchMapper.updateBranchFromRequest(branchRequest, existingBranch);
+            return branchRepository.save(existingBranch);
+        }catch (DataNotFoundException ex) {
+            throw new DataNotFoundException("Data not found --" + ex.getMessage());
+        } catch (Exception ex) {
+            throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex.getCause());
+        }
     }
 
     @Override
