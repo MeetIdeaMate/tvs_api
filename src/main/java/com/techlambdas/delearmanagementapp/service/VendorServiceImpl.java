@@ -2,6 +2,7 @@ package com.techlambdas.delearmanagementapp.service;
 
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.mapper.VendorMapper;
+import com.techlambdas.delearmanagementapp.model.Customer;
 import com.techlambdas.delearmanagementapp.model.Vendor;
 import com.techlambdas.delearmanagementapp.repository.CustomVendorRepository;
 import com.techlambdas.delearmanagementapp.request.VendorRequest;
@@ -55,5 +56,13 @@ public class VendorServiceImpl implements VendorService {
     @Override
     public Page<Vendor> getAllVendorsWithPage(String vendorId, String vendorName, String mobileNo, String city,  Pageable pageable) {
         return customVendorRepository.getAllVendorsWithPage(vendorId,vendorName,mobileNo,city,  pageable);
+    }
+
+    @Override
+    public Vendor getVendorByVendorId(String vendorId) {
+        Vendor vendor=vendorRepository.findByVendorId(vendorId);
+        if (vendor==null)
+            throw new DataNotFoundException("Customer not found with ID: " + vendorId);
+        return vendor;
     }
 }

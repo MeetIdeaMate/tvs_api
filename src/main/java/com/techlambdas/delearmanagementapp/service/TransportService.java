@@ -14,4 +14,5 @@ public interface TransportService {
     List<Transport> getAllTransports(String transportId, String transportName, String mobileNo, String city);
     Transport updateTransport(String transportId, TransportRequest transportRequest);
     Page<Transport> getAllTransportsWithPage(String transportId, String transportName, String mobileNo, String city, Pageable pageable);
+    Transport getTransportByTransportId(String transportId);
 }

@@ -43,7 +43,7 @@ public class TransportServiceImpl implements TransportService{
     @Override
     public Transport updateTransport(String transportId, TransportRequest transportRequest) {
         try {
-            Transport existingTransport = transportRepository.findBytransportId(transportId);
+            Transport existingTransport = transportRepository.findByTransportId(transportId);
             if (existingTransport == null)
                 throw new DataNotFoundException("transport not found with ID: " + transportId);
             transportMapper.updateVendorFromRequest(transportRequest, existingTransport);
@@ -58,5 +58,13 @@ public class TransportServiceImpl implements TransportService{
     @Override
     public Page<Transport> getAllTransportsWithPage(String transportId, String transportName, String mobileNo, String city, Pageable pageable) {
         return customTransportRepository.getAllTransportsWithPage(transportId,transportName,mobileNo,city,  pageable);
+    }
+
+    @Override
+    public Transport getTransportByTransportId(String transportId) {
+        Transport transport=transportRepository.findByTransportId(transportId);
+        if (transport==null)
+            throw new DataNotFoundException("Customer not found with ID: " + transportId);
+        return transport;
     }
 }

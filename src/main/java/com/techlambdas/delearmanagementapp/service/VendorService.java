@@ -13,4 +13,6 @@ public interface VendorService {
     List<Vendor> getAllVendors(String vendorId, String vendorName, String mobileNo, String city);
     Vendor updateVendor(String vendorId, VendorRequest vendorRequest);
     Page<Vendor> getAllVendorsWithPage(String vendorId, String vendorName, String mobileNo, String city, Pageable pageable);
+
+    Vendor getVendorByVendorId(String vendorId);
 }

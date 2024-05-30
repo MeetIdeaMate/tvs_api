@@ -1,5 +1,6 @@
 package com.techlambdas.delearmanagementapp.controller;
 
+import com.techlambdas.delearmanagementapp.model.Customer;
 import com.techlambdas.delearmanagementapp.model.Vendor;
 import com.techlambdas.delearmanagementapp.request.VendorRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +32,12 @@ public class VendorController {
                                                        @RequestParam(required = false) String mobileNo,
                                                        @RequestParam(required = false) String city){
         List<Vendor> vendors=vendorService.getAllVendors(vendorId,vendorName,mobileNo,city);
-        return new ResponseEntity<>(vendors, HttpStatus.OK);
+        return successResponse(HttpStatus.OK,"vendors",vendors);
     }
     @PutMapping("/{vendorId}")
     public ResponseEntity<Vendor> updateVendor(@PathVariable String vendorId,@RequestBody VendorRequest vendorRequest){
         Vendor vendor=vendorService.updateVendor(vendorId,vendorRequest);
-        return new ResponseEntity<>(vendor, HttpStatus.OK);
+        return successResponse(HttpStatus.OK,"VendorWithPage",vendor);
     }
     @GetMapping("/page")
     public ResponseEntity<Page<Vendor>> getAllVendorWithPage(
@@ -49,7 +50,11 @@ public class VendorController {
 
         Pageable pageable = PageRequest.of(page, size);
         Page<Vendor> vendorsPage = vendorService.getAllVendorsWithPage(vendorId, vendorName, mobileNo, city, pageable);
-
         return successResponse(HttpStatus.OK,"vendorsWithPage",vendorsPage);
+    }
+    @GetMapping("/{vendorId}")
+    public ResponseEntity<Vendor> getVendorById(@PathVariable String vendorId){
+        Vendor vendor=vendorService.getVendorByVendorId(vendorId);
+        return successResponse(HttpStatus.OK,"vendor",vendor);
     }
 }
