@@ -1,6 +1,7 @@
 package com.techlambdas.delearmanagementapp.controller;
 
 import com.techlambdas.delearmanagementapp.model.Transport;
+import com.techlambdas.delearmanagementapp.model.Vendor;
 import com.techlambdas.delearmanagementapp.request.TransportRequest;
 import com.techlambdas.delearmanagementapp.service.TransportService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class TransportController {
                                                      @RequestParam(required = false) String mobileNo,
                                                      @RequestParam(required = false) String city){
         List<Transport> transports=transportService.getAllTransports(transportId,transportName,mobileNo,city);
-        return new ResponseEntity<>(transports, HttpStatus.OK);
+        return successResponse(HttpStatus.OK,"transports",transports);
     }
     @PutMapping("/{transportId}")
     public ResponseEntity<Transport> updateTransport(@PathVariable String transportId,@RequestBody TransportRequest transportRequest){
@@ -51,5 +52,11 @@ public class TransportController {
         Page<Transport> transportsPage = transportService.getAllTransportsWithPage(transportId, transportName, mobileNo, city, pageable);
 
         return successResponse(HttpStatus.OK,"transportsWithPage",transportsPage);
+    }
+    @GetMapping("/{transportId}")
+    public ResponseEntity<Transport> getTransportById(@PathVariable String transportId){
+        Transport transport=transportService.getTransportByTransportId(transportId);
+        return successResponse(HttpStatus.OK,"transport",transport);
+
     }
 }
