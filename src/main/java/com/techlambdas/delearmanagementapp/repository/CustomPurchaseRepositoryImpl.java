@@ -48,15 +48,11 @@ public class CustomPurchaseRepositoryImpl implements CustomPurchaseRepository{
 
     @Override
     public Purchase findLastPurchaseItemDetailsByPartNo(String partNo) {
-        Query query=new Query();
-        if (partNo!=null)
-            query.addCriteria(Criteria.where("itemDetails.partNo").is(partNo));
-        query.with(Sort.by(Sort.Order.desc("p_invoiceDate")));
-        List<Purchase> purchases = mongoTemplate.find(query, Purchase.class);
-        if (purchases!=null && !purchases.isEmpty())
-            return purchases.get(0);
-        else
-            return null;
+            Query query = new Query()
+                    .addCriteria(Criteria.where("itemDetails.partNo").is(partNo))
+                    .with(Sort.by(Sort.Order.desc("p_invoiceDate")))
+                    .limit(1);
+        return mongoTemplate.findOne(query, Purchase.class);
 
     }
 }
