@@ -1,4 +1,5 @@
 package com.techlambdas.delearmanagementapp.request;
+import com.techlambdas.delearmanagementapp.model.Branch;
 import lombok.Data;
 
 import java.time.LocalDate;

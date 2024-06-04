@@ -4,10 +4,12 @@ package com.techlambdas.delearmanagementapp.service;
 import com.techlambdas.delearmanagementapp.exception.AlreadyExistException;
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.mapper.EmployeeMapper;
+import com.techlambdas.delearmanagementapp.model.Branch;
 import com.techlambdas.delearmanagementapp.model.Employee;
 import com.techlambdas.delearmanagementapp.repository.EmployeeCustomRepository;
 import com.techlambdas.delearmanagementapp.repository.EmployeeRepository;
 import com.techlambdas.delearmanagementapp.request.EmployeeReq;
+import com.techlambdas.delearmanagementapp.response.BranchResponse;
 import com.techlambdas.delearmanagementapp.response.EmployeeResponse;
 import com.techlambdas.delearmanagementapp.utils.RandomIdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +21,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService{
@@ -31,6 +35,8 @@ public class EmployeeServiceImpl implements EmployeeService{
     private EmployeeCustomRepository employeeCustomRepository;
     @Autowired
     private MongoTemplate mongoTemplate;
+    @Autowired
+    private  BranchService branchService;
 
 //    @Value("${app.image.upload-dir:./employeeImages}")
 //    private String uploadFolder;
@@ -53,24 +59,41 @@ public class EmployeeServiceImpl implements EmployeeService{
     @Override
     public Page<EmployeeResponse> getEmployeesByPagination(String employeeName, String mobileNumber, String designation,String branchId,String branchName, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page,pageSize);
-        Page<Employee> employeeList = employeeCustomRepository.getAllEmployeesWithPage(employeeName,mobileNumber,designation,branchId,branchName,pageable);
-        List<EmployeeResponse>employeeResponses=employeeMapper.mapEmployeeResponseListWithEmployees(employeeList.getContent());
+        Page<Employee> employees = employeeCustomRepository.getAllEmployeesWithPage(employeeName,mobileNumber,designation,branchId,branchName,pageable);
+        List<EmployeeResponse>employeeResponses= employees.getContent().stream().map(this::mapEmployeeResponseWithEntity).collect(Collectors.toList());
        for (EmployeeResponse employeeResponse:employeeResponses){
            if (employeeResponse.getDateOfBirth()!=null)
            updateAgeInEmployeeResponse(employeeResponse);
        }
-        return new PageImpl<>(employeeResponses, pageable, employeeList.getTotalElements());
+        return new PageImpl<>(employeeResponses, pageable, employees.getTotalElements());
     }
     @Override
     public List<EmployeeResponse> getAllEmployees(String employeeName, String mobileNumber) {
         List<Employee> employees= findAllEmployees(employeeName,mobileNumber);
-        List<EmployeeResponse>employeeResponses=employeeMapper.mapEmployeeResponseListWithEmployees(employees);
-        for (EmployeeResponse employeeResponse:employeeResponses){
-            if (employeeResponse.getDateOfBirth()!=null)
-                updateAgeInEmployeeResponse(employeeResponse);
+        List<EmployeeResponse>employeeResponses=new ArrayList<>();
+        for (Employee employee:employees){
+            EmployeeResponse employeeResponse=mapEmployeeResponseWithEntity(employee);
+            employeeResponses.add(employeeResponse);
         }
         return employeeResponses;
-
+    }
+    private EmployeeResponse mapEmployeeResponseWithEntity(Employee employee) {
+        EmployeeResponse employeeResponse =new EmployeeResponse();
+        employeeResponse.setId(employee.getId());
+        employeeResponse.setAddress(employee.getAddress());
+        employeeResponse.setBranchId(employee.getBranchId());
+        employeeResponse.setCity(employee.getCity());
+        employeeResponse.setDateOfBirth(employee.getDateOfBirth());
+        employeeResponse.setDesignation(employee.getDesignation());
+        employeeResponse.setEmailId(employee.getEmailId());
+        employeeResponse.setEmployeeId(employee.getEmployeeId());
+        employeeResponse.setEmployeeName(employee.getEmployeeName());
+        employeeResponse.setGender(employee.getGender());
+        employeeResponse.setMobileNumber(employee.getMobileNumber());
+        employeeResponse.setAge(employee.getAge());
+        BranchResponse branch = branchService.getBranchByBranchId(employee.getBranchId());
+        employeeResponse.setBranchName(branch.getBranchName());
+        return employeeResponse;
     }
 
     @Override

@@ -5,9 +5,11 @@ import com.techlambdas.delearmanagementapp.request.BranchRequest;
 import com.techlambdas.delearmanagementapp.response.BranchResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public interface BranchService {
     Branch createBranch(BranchRequest branchRequest);
     List<BranchResponse> getAllBranches(String branchId, String branchName, String mobileNo, String city);

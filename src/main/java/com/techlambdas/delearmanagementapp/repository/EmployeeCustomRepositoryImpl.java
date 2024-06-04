@@ -29,11 +29,6 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository{
             Criteria criteria = Criteria.where("branchName").regex("^" + branchName, "i");
             query.addCriteria(criteria);
         }
-        if (employeeName != null) {
-            Criteria criteria = Criteria.where("employeeName").regex("^" + employeeName, "i");
-            query.addCriteria(criteria);
-        }
-
             if (mobileNumber!=null) {
                 query.addCriteria(Criteria.where("mobileNumber").regex("^.*" + mobileNumber + ".*", "i"));
             }

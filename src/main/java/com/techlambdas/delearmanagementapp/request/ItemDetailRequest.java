@@ -1,12 +1,16 @@
-package com.techlambdas.delearmanagementapp.model;
+package com.techlambdas.delearmanagementapp.request;
 
+import com.techlambdas.delearmanagementapp.model.GstDetail;
+import com.techlambdas.delearmanagementapp.model.Incentive;
+import com.techlambdas.delearmanagementapp.model.Taxes;
 import lombok.Data;
 
 import java.util.List;
 import java.util.Map;
 
 @Data
-public class ItemDetail {
+public class ItemDetailRequest
+{
     private String partNo;
     private String categoryId;
     private Map<String,String> mainSpecValue;
@@ -22,4 +26,3 @@ public class ItemDetail {
     private double invoiceValue;
     private double finalInvoiceValue;
 }
-
