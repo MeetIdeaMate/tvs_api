@@ -10,4 +10,5 @@ public class LoginResponse {
     private String designation;
     private String useRefId;
     private boolean isPasswordReset;
+    private String branchId;
 }
