@@ -18,4 +18,6 @@ public interface ItemService
     Item updateItem(String itemId, ItemRequest itemRequest);
 
     Page<Item> getAllItemsWithPage(String itemId, String itemName, String partNo, Pageable pageable);
+
+    Item getItemByIdCategoryIdPartNo(String categoryId, String partNo);
 }

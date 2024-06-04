@@ -1,8 +1,8 @@
 package com.techlambdas.delearmanagementapp.service;
+
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.mapper.BranchMapper;
 import com.techlambdas.delearmanagementapp.model.Branch;
-import com.techlambdas.delearmanagementapp.model.Vendor;
 import com.techlambdas.delearmanagementapp.repository.BranchRepository;
 import com.techlambdas.delearmanagementapp.repository.CustomBranchRepository;
 import com.techlambdas.delearmanagementapp.request.BranchRequest;
@@ -14,11 +14,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class BranchServiceImpl implements BranchService {
+public class BranchServiceImpl implements BranchService{
 
     @Autowired
     private BranchRepository branchRepository;
@@ -30,10 +31,10 @@ public class BranchServiceImpl implements BranchService {
     @Override
     public Branch createBranch(BranchRequest branchRequest) {
         try {
-        Branch branch =   branchMapper.mapBranchRequestToBranch(branchRequest);
-        branch.setBranchId(RandomIdGenerator.getRandomId());
-        return branchRepository.save(branch);
-         } catch (Exception ex) {
+            Branch branch =   branchMapper.mapBranchRequestToBranch(branchRequest);
+            branch.setBranchId(RandomIdGenerator.getRandomId());
+            return branchRepository.save(branch);
+        } catch (Exception ex) {
             throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex.getCause());
         }
     }
@@ -45,13 +46,12 @@ public class BranchServiceImpl implements BranchService {
                 .map(branch -> mapBranchResponseWithBranch(branch))
                 .collect(Collectors.toList());
     }
-
     @Override
     public Page<BranchResponse> getAllBranchesWithPage(String branchId, String branchName, String mobileNo, String city, Pageable pageable) {
         Page<Branch>branches=customBranchRepository.getAllBranchesWithPage(branchId,branchName,mobileNo,city,pageable);
-       List<BranchResponse>branchResponses= branches.getContent().stream()
-               .map(branch -> mapBranchResponseWithBranch(branch))
-               .collect(Collectors.toList());
+        List<BranchResponse>branchResponses= branches.getContent().stream()
+                .map(branch -> mapBranchResponseWithBranch(branch))
+                .collect(Collectors.toList());
         return new PageImpl<>(branchResponses, pageable,branches.getTotalElements() );
     }
 

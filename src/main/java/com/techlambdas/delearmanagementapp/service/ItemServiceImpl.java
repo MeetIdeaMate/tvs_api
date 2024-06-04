@@ -3,6 +3,7 @@ package com.techlambdas.delearmanagementapp.service;
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.mapper.ItemMapper;
 import com.techlambdas.delearmanagementapp.model.Category;
+import com.techlambdas.delearmanagementapp.model.Customer;
 import com.techlambdas.delearmanagementapp.model.Item;
 import com.techlambdas.delearmanagementapp.model.Vendor;
 import com.techlambdas.delearmanagementapp.repository.CustomItemRepository;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ItemServiceImpl implements ItemService{
@@ -59,5 +61,11 @@ public class ItemServiceImpl implements ItemService{
     @Override
     public Page<Item> getAllItemsWithPage(String itemId, String itemName, String partNo, Pageable pageable) {
         return customItemRepository.getAllItemsWithPage(itemId,itemName,partNo, pageable);
+    }
+
+    @Override
+    public Item getItemByIdCategoryIdPartNo( String categoryId, String partNo) {
+        Optional<Item> itemOptional = itemRepository.findByCategoryIdAndPartNo(categoryId, partNo);
+        return itemOptional.orElseThrow(() -> new RuntimeException("Item not found"));
     }
 }

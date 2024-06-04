@@ -21,6 +21,7 @@ public class Employee {
     private LocalDate dateOfBirth;
     private String city;
     private String address;
+    private int age;
     @CreatedDate
     private LocalDateTime createdDateTime;
     @CreatedBy

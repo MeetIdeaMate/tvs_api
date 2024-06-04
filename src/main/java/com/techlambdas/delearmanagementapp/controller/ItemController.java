@@ -1,5 +1,6 @@
 package com.techlambdas.delearmanagementapp.controller;
 
+import com.techlambdas.delearmanagementapp.model.Customer;
 import com.techlambdas.delearmanagementapp.model.Item;
 import com.techlambdas.delearmanagementapp.request.ItemRequest;
 import com.techlambdas.delearmanagementapp.service.ItemService;
@@ -49,5 +50,11 @@ public class ItemController {
         Page<Item> itemsPage = itemService.getAllItemsWithPage(itemId, itemName, partNo, pageable);
 
         return successResponse(HttpStatus.OK,"itemsWithPage",itemsPage);
+    }
+    @GetMapping("/categoryId/{categoryId}/partNo/{partNo}")
+    public ResponseEntity<Item> getItemByIdCategoryIdPartNo(@PathVariable String categoryId,
+                                            @PathVariable String partNo){
+        Item item=itemService.getItemByIdCategoryIdPartNo(categoryId,partNo);
+        return new ResponseEntity<>(item, HttpStatus.OK);
     }
 }

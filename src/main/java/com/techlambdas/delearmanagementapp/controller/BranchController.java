@@ -19,6 +19,7 @@ import static com.techlambdas.delearmanagementapp.response.AppResponse.successRe
 @RestController
 @RequestMapping("/branch")
 public class BranchController {
+
     @Autowired
     private BranchService branchService;
 

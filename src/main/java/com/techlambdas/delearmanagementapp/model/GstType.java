@@ -4,5 +4,6 @@ public enum GstType {
     NOGST,
     SGST,
     CGST,
-    IGST
+    IGST,
+    GST
 }

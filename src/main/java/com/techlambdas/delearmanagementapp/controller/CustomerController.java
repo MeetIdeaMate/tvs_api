@@ -32,7 +32,7 @@ public class CustomerController {
                                                          @RequestParam (required = false)String mobileNo,
                                                          @RequestParam (required = false)String city){
         List<Customer> customers=customerService.getAllCustomers(customerId,customerName,mobileNo,city);
-        return new ResponseEntity<>(customers, HttpStatus.OK);
+        return successResponse(HttpStatus.OK,"customers",customers);
     }
     @GetMapping("/page")
     public ResponseEntity<Page<Customer>> getAllCustomersWithPage(
@@ -51,7 +51,7 @@ public class CustomerController {
     @GetMapping("/{customerId}")
     public ResponseEntity<Customer> getCustomerById(@PathVariable String customerId){
         Customer customer=customerService.getCustomerByCustomerId(customerId);
-        return new ResponseEntity<>(customer, HttpStatus.OK);
+        return successResponse(HttpStatus.OK,"customer",customer);
     }
 
 

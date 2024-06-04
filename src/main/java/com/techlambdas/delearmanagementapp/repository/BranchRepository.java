@@ -11,4 +11,10 @@ public interface BranchRepository extends MongoRepository<Branch, String> {
     Branch findByBranchId(String branchId);
 
     List<Branch> findByMainBranchId(String branchId);
+
+    default String getBranchName(String branchId)
+    {
+        Branch branch= findByBranchId(branchId);
+        return (branch !=null)?branch.getBranchName():"unknown Branch";
+    }
 }
