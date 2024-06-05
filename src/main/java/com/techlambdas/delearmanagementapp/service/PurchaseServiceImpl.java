@@ -3,15 +3,14 @@ package com.techlambdas.delearmanagementapp.service;
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.mapper.CommonMapper;
 import com.techlambdas.delearmanagementapp.mapper.PurchaseMapper;
+import com.techlambdas.delearmanagementapp.mapper.StockMapper;
 import com.techlambdas.delearmanagementapp.model.*;
 import com.techlambdas.delearmanagementapp.repository.ItemRepository;
 import com.techlambdas.delearmanagementapp.repository.PurchaseRepository;
-import com.techlambdas.delearmanagementapp.request.ItemDetailRequest;
+import com.techlambdas.delearmanagementapp.repository.StockRepository;
 import com.techlambdas.delearmanagementapp.request.PurchaseRequest;
 import com.techlambdas.delearmanagementapp.response.PurchaseResponse;
 import com.techlambdas.delearmanagementapp.utils.RandomIdGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class PurchaseServiceImpl implements PurchaseService {
-    private static final Logger logger = LoggerFactory.getLogger(PurchaseServiceImpl.class);
     @Autowired
     private PurchaseRepository purchaseRepository;
     @Autowired
