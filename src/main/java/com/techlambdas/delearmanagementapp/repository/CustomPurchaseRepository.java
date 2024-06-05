@@ -1,7 +1,6 @@
 package com.techlambdas.delearmanagementapp.repository;
 
 import com.techlambdas.delearmanagementapp.model.Purchase;
-import com.techlambdas.delearmanagementapp.response.PurchaseResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
