@@ -3,32 +3,25 @@ package com.techlambdas.delearmanagementapp.service;
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.mapper.CommonMapper;
 import com.techlambdas.delearmanagementapp.mapper.PurchaseMapper;
-import com.techlambdas.delearmanagementapp.model.GstDetail;
-import com.techlambdas.delearmanagementapp.model.Incentive;
-import com.techlambdas.delearmanagementapp.model.ItemDetail;
-import com.techlambdas.delearmanagementapp.model.Purchase;
+import com.techlambdas.delearmanagementapp.mapper.StockMapper;
+import com.techlambdas.delearmanagementapp.model.*;
+import com.techlambdas.delearmanagementapp.repository.ItemRepository;
 import com.techlambdas.delearmanagementapp.repository.PurchaseRepository;
+import com.techlambdas.delearmanagementapp.repository.StockRepository;
 import com.techlambdas.delearmanagementapp.request.PurchaseRequest;
-import com.techlambdas.delearmanagementapp.response.ItemDetailsWithPartNoResponse;
 import com.techlambdas.delearmanagementapp.response.PurchaseResponse;
 import com.techlambdas.delearmanagementapp.utils.RandomIdGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.techlambdas.delearmanagementapp.repository.CustomPurchaseRepository;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class PurchaseServiceImpl implements PurchaseService {
-    private static final Logger logger = LoggerFactory.getLogger(PurchaseServiceImpl.class);
     @Autowired
     private PurchaseRepository purchaseRepository;
     @Autowired
@@ -37,6 +30,8 @@ public class PurchaseServiceImpl implements PurchaseService {
     private CustomPurchaseRepository customPurchaseRepository;
     @Autowired
     private CommonMapper commonMapper;
+    @Autowired
+    private ItemRepository itemRepository;
 
     @Override
     public Purchase createPurchase(PurchaseRequest purchaseRequest) {
@@ -76,6 +71,20 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchase.setTotalInvoiceAmount(totalInvoiceAmount);
             purchase.setTotalIncentiveAmount(totalIncentiveAmount);
             purchase.setTotalTaxAmount(totalTaxAmount);
+            for (ItemDetail itemDetail:purchase.getItemDetails())
+            {
+                Item existingItem=itemRepository.findByPartNo(itemDetail.getPartNo());
+                if (existingItem==null)
+                {
+                    Item newItem=new Item();
+                    newItem.setCategoryId(itemDetail.getCategoryId());
+                    newItem.setIncentive(!itemDetail.getIncentives().isEmpty());
+                    newItem.setItemName(itemDetail.getItemName());
+                    newItem.setPartNo(itemDetail.getPartNo());
+                    newItem.setTaxable(itemDetail.getTaxableValue()>0);
+                    itemRepository.save(newItem);
+                }
+            }
             return purchaseRepository.save(purchase);
         } catch (Exception ex) {
             throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex.getCause());
