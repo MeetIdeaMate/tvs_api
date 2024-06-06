@@ -13,10 +13,4 @@ public class PurchaseRequest {
     private String p_orderRefNo;
     private List<ItemDetailRequest> itemDetails;
     private int totalQty;
-    private double totalValue;
-    private double totalGstAmount;
-    private double totalTaxAmount;
-    private double totalIncentiveAmount;
-    private double totalInvoiceAmount;
-    private double finalTotalInvoiceAmount;
 }

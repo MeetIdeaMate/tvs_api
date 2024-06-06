@@ -126,7 +126,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             if (existingItem == null) {
                 Item newItem = new Item();
                 newItem.setCategoryId(itemDetail.getCategoryId());
-                if (Optional.of(itemDetail.getFinalInvoiceValue()).isPresent()&&!itemDetail.getIncentives().isEmpty())
+                if (Optional.of(itemDetail.getIncentives()).isPresent()&&!itemDetail.getIncentives().isEmpty())
                  newItem.setIncentive(true);
                  newItem.setItemName(itemDetail.getItemName());
                  newItem.setPartNo(itemDetail.getPartNo());

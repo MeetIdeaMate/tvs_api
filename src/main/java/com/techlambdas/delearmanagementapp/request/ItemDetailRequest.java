@@ -19,12 +19,8 @@ public class ItemDetailRequest
     private Map<String,String> specificationsValue;
     private double unitRate;
     private int quantity;
-    private double value;
     private double discount;
-    private double taxableValue;
     private List<GstDetail> gstDetails;
     private List<Taxes> taxes;
     private List<Incentive>incentives;
-    private double invoiceValue;
-    private double finalInvoiceValue;
 }
