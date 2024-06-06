@@ -13,6 +13,7 @@ import java.util.List;
 public class Purchase {
     @Id
     private String id;
+    private String purchaseId;
     private String purchaseNo;
     private String vendorId;
     private String branchId;

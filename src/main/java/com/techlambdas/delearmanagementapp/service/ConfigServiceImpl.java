@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -91,5 +92,34 @@ public class ConfigServiceImpl implements ConfigService{
         config.setConfiguration(configuration);
         return configRepository.save(config);
     }
-
+    @Override
+    public String getNextPurchaseNoSequence() {
+        Query query = new Query(Criteria.where("configId").is("purchaseNoSeq"));
+        Config config = mongoTemplate.findOne(query, Config.class);
+        if (config!=null) {
+            List<String> regSeqNo = config.getConfiguration();
+            int currentSequence = Integer.parseInt(regSeqNo.get(0));
+            int nextSeq = currentSequence + 1;
+            config.setConfiguration(Collections.singletonList(Integer.toString(nextSeq)));
+            mongoTemplate.save(config);
+            return String.valueOf(currentSequence);
+        }else {
+            return null;
+        }
+    }
+    @Override
+    public String getNextSalesNoSequence() {
+        Query query = new Query(Criteria.where("configId").is("salesNoSeq"));
+        Config config = mongoTemplate.findOne(query, Config.class);
+        if (config!=null) {
+            List<String> regSeqNo = config.getConfiguration();
+            int currentSequence = Integer.parseInt(regSeqNo.get(0));
+            int nextSeq = currentSequence + 1;
+            config.setConfiguration(Collections.singletonList(Integer.toString(nextSeq)));
+            mongoTemplate.save(config);
+            return String.valueOf(currentSequence);
+        }else {
+            return null;
+        }
+    }
 }

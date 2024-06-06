@@ -20,7 +20,7 @@ public interface PurchaseService {
 
     Purchase updatePurchase(String purchaseNo, PurchaseRequest purchaseRequest);
 
-    Page<Purchase> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable);
+    Page<PurchaseResponse> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable);
 
     ItemDetail getItemDetailsByPartNo(String partNo);
 }

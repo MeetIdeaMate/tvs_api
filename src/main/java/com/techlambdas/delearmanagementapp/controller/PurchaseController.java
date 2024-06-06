@@ -44,7 +44,7 @@ public class PurchaseController
         return successResponse(HttpStatus.CREATED,"Updatepurchase",purchase);
     }
     @GetMapping("/page")
-    public ResponseEntity<Page<Purchase>> getAllPurchaseWithPage(
+    public ResponseEntity<Page<PurchaseResponse>> getAllPurchaseWithPage(
             @RequestParam(required = false) String purchaseNo,
             @RequestParam(required = false) String p_invoiceNo,
             @RequestParam(required = false) String p_orderRefNo,
@@ -52,7 +52,7 @@ public class PurchaseController
             @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<Purchase> purchasesPage = purchaseService.getAllPurchasesWithPage(purchaseNo,p_invoiceNo,p_orderRefNo, pageable);
+        Page<PurchaseResponse> purchasesPage = purchaseService.getAllPurchasesWithPage(purchaseNo,p_invoiceNo,p_orderRefNo, pageable);
 
         return successResponse(HttpStatus.OK,"purchasesWithPage",purchasesPage);
     }
