@@ -196,6 +196,13 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
     private ItemDetailResponse mapItemDetailToItemDetailResponse(List<ItemDetail> itemDetails) {
         ItemDetail itemDetail=itemDetails.get(0);
+        List<MainSpecInfo> mainSpecInfos = itemDetails.stream()
+                .map(it -> {
+                    MainSpecInfo mainSpecInfo = new MainSpecInfo();
+                    mainSpecInfo.setMainSpecValue(it.getMainSpecValue());
+                    return mainSpecInfo;
+                })
+                .collect(Collectors.toList());
         ItemDetailResponse itemDetailResponse =purchaseMapper.mapItemDetailResponseWithItemDetail(itemDetail);
         double itemTotalValue=itemDetails.size()*itemDetail.getUnitRate();
         double gstAmount=0;
@@ -226,6 +233,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         itemDetailResponse.setTaxableValue(itemTotalValue);
         itemDetailResponse.setInvoiceValue(itemTotalValue + gstAmount);
         itemDetailResponse.setFinalInvoiceValue(itemTotalValue+gstAmount+incentiveAmount+taxAmount);
+        itemDetailResponse.setMainSpecInfos(mainSpecInfos);
         return itemDetailResponse;
     }
 
