@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 @Service
 public class PurchaseServiceImpl implements PurchaseService {
@@ -63,10 +63,11 @@ public class PurchaseServiceImpl implements PurchaseService {
             }
             purchase.setTotalGstAmount(totalGstAmount);
             purchase.setTotalInvoiceAmount(totalInvoiceAmount);
+            purchase.setTotalValue(totalInvoiceAmount-totalGstAmount);
             purchase.setTotalIncentiveAmount(totalIncentiveAmount);
             purchase.setTotalTaxAmount(totalTaxAmount);
             purchase.setItemDetails(allItemDetails);
-
+            purchase.setFinalTotalInvoiceAmount(totalInvoiceAmount);
             updateItemRepository(purchaseRequest.getItemDetails());
 
             return purchaseRepository.save(purchase);
@@ -78,9 +79,10 @@ public class PurchaseServiceImpl implements PurchaseService {
         double itemTotalValue = itemDetailRequest.getUnitRate();
         double gstAmount = calculateTotalGstAmount(itemDetailRequest);
         double taxAmount = calculateTotalTaxAmount(itemDetailRequest);
-
+        double totalIncentiveAmount= calculateTotalIncentiveAmount(itemDetailRequest);
         itemDetail.setTaxableValue(itemTotalValue);
-        itemDetail.setInvoiceValue(itemTotalValue + gstAmount + taxAmount);
+        itemDetail.setInvoiceValue(itemTotalValue + gstAmount);
+        itemDetail.setFinalInvoiceValue(itemTotalValue + gstAmount+taxAmount+totalIncentiveAmount);
         itemDetail.setGstDetails(itemDetailRequest.getGstDetails());
         itemDetail.setIncentives(itemDetailRequest.getIncentives());
     }
@@ -121,7 +123,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     private void updateItemRepository(List<ItemDetailRequest> itemDetails) {
         for (ItemDetailRequest itemDetail : itemDetails) {
             Item existingItem = itemRepository.findByPartNo(itemDetail.getPartNo());
-            if (!Optional.of(existingItem).isPresent()) {
+            if (existingItem == null) {
                 Item newItem = new Item();
                 newItem.setCategoryId(itemDetail.getCategoryId());
                 if (Optional.of(itemDetail.getFinalInvoiceValue()).isPresent()&&!itemDetail.getIncentives().isEmpty())
@@ -168,34 +170,25 @@ public class PurchaseServiceImpl implements PurchaseService {
         List<PurchaseResponse>purchaseResponses=new ArrayList<>();
         for (Purchase purchase:purchases){
             PurchaseResponse purchaseResponse=mapPurchaseToPurchaseResponse(purchase);
+            purchaseResponses.add(purchaseResponse);
         }
         return purchaseResponses;
     }
 
     private PurchaseResponse mapPurchaseToPurchaseResponse(Purchase purchase) {
-        PurchaseResponse purchaseResponse=purchaseMapper.mapEntityWithResponse(purchase);
-        Map<String, List<ItemDetail>> itemDetailGroupedByPartNo = purchase.getItemDetails().stream()
+        PurchaseResponse purchaseResponse=commonMapper.toPurchaseResponse(purchase);
+        Map<String, List<ItemDetail>> itemDetailGroupedByPartNo =purchase.getItemDetails().stream()
                 .collect(Collectors.groupingBy(ItemDetail::getPartNo));
         List<ItemDetailResponse> itemDetailResponses = new ArrayList<>();
         for (Map.Entry<String, List<ItemDetail>> entry : itemDetailGroupedByPartNo.entrySet()) {
-            itemDetailResponses.add(mapItemDetailsGroupToItemDetailResponses(entry.getKey(), entry.getValue()));
+            itemDetailResponses.add(mapItemDetailToItemDetailResponse(entry.getValue()));
         }
         purchaseResponse.setItemDetails(itemDetailResponses);
-
         return purchaseResponse;
-    }
-    private ItemDetailResponse mapItemDetailsGroupToItemDetailResponses(String partNo, List<ItemDetail> itemDetails) {
-
-        ItemDetailResponse itemDetailResponse = new ItemDetailResponse();
-
-        itemDetailResponse.setPartNo(partNo);
-
-        itemDetailResponse = mapItemDetailToItemDetailResponse(itemDetails);
-
-        return itemDetailResponse;
     }
     private ItemDetailResponse mapItemDetailToItemDetailResponse(List<ItemDetail> itemDetails) {
         ItemDetail itemDetail=itemDetails.get(0);
+        int quantity=itemDetails.size();
         List<MainSpecInfo> mainSpecInfos = itemDetails.stream()
                 .map(it -> {
                     MainSpecInfo mainSpecInfo = new MainSpecInfo();
@@ -203,8 +196,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                     return mainSpecInfo;
                 })
                 .collect(Collectors.toList());
-        ItemDetailResponse itemDetailResponse =purchaseMapper.mapItemDetailResponseWithItemDetail(itemDetail);
-        double itemTotalValue=itemDetails.size()*itemDetail.getUnitRate();
+        ItemDetailResponse itemDetailResponse =commonMapper.toItemDetailResponse(itemDetail);
+        double itemTotalValue=quantity*itemDetail.getUnitRate();
         double gstAmount=0;
         if (Optional.of(itemDetailResponse.getGstDetails()).isPresent()) {
             for (GstDetail gstDetail : itemDetailResponse.getGstDetails()) {
@@ -234,6 +227,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         itemDetailResponse.setInvoiceValue(itemTotalValue + gstAmount);
         itemDetailResponse.setFinalInvoiceValue(itemTotalValue+gstAmount+incentiveAmount+taxAmount);
         itemDetailResponse.setMainSpecInfos(mainSpecInfos);
+        itemDetailResponse.setValue(quantity*itemDetail.getUnitRate());
+        itemDetailResponse.setQuantity(quantity);
         return itemDetailResponse;
     }
 

@@ -28,12 +28,14 @@ public interface PurchaseMapper {
 
     default List<ItemDetail> mapItemDetailRequestToItemDetails(ItemDetailRequest request) {
         List<ItemDetail> itemDetails = new ArrayList<>();
-        for (int i = 0; i < request.getQuantity(); i++) {
+        for (MainSpecInfo mainSpecInfo : request.getMainSpecInfos()) {
             ItemDetail itemDetail = mapItemDetailRequestToItemDetail(request);
             itemDetail.setQuantity(1);
-            itemDetail.setMainSpecValue(request.getMainSpecInfos().get(i).getMainSpecValue());
+            itemDetail.setValue(request.getUnitRate());
+            itemDetail.setMainSpecValue(mainSpecInfo.getMainSpecValue());
             itemDetails.add(itemDetail);
         }
+
         return itemDetails;
     }
     void updatePurchaseFromRequest(PurchaseRequest purchaseRequest, @MappingTarget Purchase existingPurchase);
