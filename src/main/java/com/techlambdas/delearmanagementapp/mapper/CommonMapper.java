@@ -53,19 +53,9 @@ public abstract class CommonMapper {
         return itemRepository.getItemName(partNo);
     }
 
-    public ItemDetailsWithPartNoResponse toItemDetailsWithPartNoResponse(ItemDetail itemDetail) {
-        // Implement the mapping logic here
-        ItemDetailsWithPartNoResponse response = new ItemDetailsWithPartNoResponse();
-        response.setPartNo(itemDetail.getPartNo());
-        response.setCategoryId(itemDetail.getCategoryId());
-        response.setSpecificationsValue(itemDetail.getSpecificationsValue());
-        response.setUnitRate(itemDetail.getUnitRate());
-        response.setQuantity(itemDetail.getQuantity());
-        response.setValue(itemDetail.getValue());
-        response.setDiscount(itemDetail.getDiscount());
-        response.setTaxableValue(itemDetail.getTaxableValue());
-        response.setInvoiceValue(itemDetail.getInvoiceValue());
-        response.setFinalInvoiceValue(itemDetail.getFinalInvoiceValue());
-        return response;
-    }
+    @Mapping(target = "categoryName", source = "categoryId", qualifiedByName = "mapCategoryName")
+    @Mapping(target = "hsnSacCode", source = "categoryId", qualifiedByName = "mapHsnSacCode")
+    @Mapping(target = "itemName", source = "partNo", qualifiedByName = "mapItemName")
+    @Mapping(target = "branchName", source = "branchId", qualifiedByName = "mapBranchName")
+    public abstract StockResponse toStockResponse(Stock stock);
 }
