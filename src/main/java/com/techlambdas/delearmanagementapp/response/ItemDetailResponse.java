@@ -16,7 +16,7 @@ public class ItemDetailResponse {
     private String categoryId;
     private String categoryName;
     private String hsnSacCode;
-    private List<MainSpecInfo>mainSpecInfos;
+    private List<Map<String,String>> mainSpecValues;
     private Map<String, String> specificationsValue;
     private double unitRate;
     private int quantity;
