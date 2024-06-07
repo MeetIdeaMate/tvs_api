@@ -101,7 +101,7 @@ public class EmployeeServiceImpl implements EmployeeService{
         Employee employee=employeeRepository.findByEmployeeId(employeeId);
         if (employee==null)
             throw new DataNotFoundException("Employee Not found this employeeId:"+employeeId);
-        EmployeeResponse employeeResponse=employeeMapper.mapEmployeeResponseWithEntity(employee);
+        EmployeeResponse employeeResponse=mapEmployeeResponseWithEntity(employee);
             if (employeeResponse.getDateOfBirth()!=null)
                 updateAgeInEmployeeResponse(employeeResponse);
         return employeeResponse;
