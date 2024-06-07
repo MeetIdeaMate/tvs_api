@@ -35,9 +35,9 @@ public class CustomPurchaseRepositoryImpl implements CustomPurchaseRepository{
         if (purchaseNo!=null)
             query.addCriteria(Criteria.where("purchaseNo").is(purchaseNo));
         if (pInvoiceNo!=null)
-            query.addCriteria(Criteria.where("pInvoiceNo").regex(pInvoiceNo));
+            query.addCriteria(Criteria.where("p_invoiceNo").regex(pInvoiceNo));
         if (pOrderRefNo!=null)
-            query.addCriteria(Criteria.where("pInvoiceNo").regex(pOrderRefNo));
+            query.addCriteria(Criteria.where("p_orderRefNo").regex(pOrderRefNo));
         long count = mongoTemplate.count(query, Purchase.class);
         query.with(pageable);
         List<Purchase> purchases = mongoTemplate.find(query, Purchase.class);

@@ -38,11 +38,11 @@ public interface PurchaseMapper {
 
         return itemDetails;
     }
-    void updatePurchaseFromRequest(PurchaseRequest purchaseRequest, @MappingTarget Purchase existingPurchase);
+//    void updatePurchaseFromRequest(PurchaseRequest purchaseRequest, @MappingTarget Purchase existingPurchase);
 
     PurchaseResponse mapEntityWithResponse(Purchase purchase);
 
     ItemDetailResponse mapItemDetailResponseWithItemDetail(ItemDetail itemDetail);
 
-    List<ItemDetail> mapItemDetailRequestToItemDetailsWithoutMainSpec(ItemDetailRequest itemDetailRequest);
+    ItemDetail mapItemDetailRequestToItemDetailsWithoutMainSpec(ItemDetailRequest itemDetailRequest);
 }
