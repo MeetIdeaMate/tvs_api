@@ -26,13 +26,13 @@ public interface PurchaseMapper {
     @Mapping(target =  "mainSpecValue",ignore = true)
     ItemDetail mapItemDetailRequestToItemDetail(ItemDetailRequest request);
 
-    default List<ItemDetail> mapItemDetailRequestToItemDetails(ItemDetailRequest request) {
+    default List<ItemDetail> mapItemDetailRequestToItemDetailsMainSpecPresent(ItemDetailRequest request) {
         List<ItemDetail> itemDetails = new ArrayList<>();
-        for (MainSpecInfo mainSpecInfo : request.getMainSpecInfos()) {
+        for (  int i=0; i< request.getQuantity(); i++) {
             ItemDetail itemDetail = mapItemDetailRequestToItemDetail(request);
             itemDetail.setQuantity(1);
             itemDetail.setValue(request.getUnitRate());
-            itemDetail.setMainSpecValue(mainSpecInfo.getMainSpecValue());
+            itemDetail.setMainSpecValue(request.getMainSpecValues().get(i));
             itemDetails.add(itemDetail);
         }
 
@@ -43,4 +43,6 @@ public interface PurchaseMapper {
     PurchaseResponse mapEntityWithResponse(Purchase purchase);
 
     ItemDetailResponse mapItemDetailResponseWithItemDetail(ItemDetail itemDetail);
+
+    List<ItemDetail> mapItemDetailRequestToItemDetailsWithoutMainSpec(ItemDetailRequest itemDetailRequest);
 }
