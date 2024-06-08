@@ -1,15 +1,20 @@
 package com.techlambdas.delearmanagementapp.service;
 
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
+import com.techlambdas.delearmanagementapp.mapper.CommonMapper;
 import com.techlambdas.delearmanagementapp.mapper.SalesMapper;
+import com.techlambdas.delearmanagementapp.model.Purchase;
 import com.techlambdas.delearmanagementapp.model.Sales;
+import com.techlambdas.delearmanagementapp.repository.CustomSalesRepository;
 import com.techlambdas.delearmanagementapp.repository.SalesRepository;
 import com.techlambdas.delearmanagementapp.request.SalesRequest;
 import com.techlambdas.delearmanagementapp.request.SalesUpdateReq;
+import com.techlambdas.delearmanagementapp.response.SalesResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SalesServiceImpl implements  SalesService{
@@ -19,6 +24,13 @@ public class SalesServiceImpl implements  SalesService{
 
     @Autowired
     private SalesRepository salesRepository;
+
+    @Autowired
+    private CustomSalesRepository customSalesRepository;
+
+
+    @Autowired
+    private CommonMapper commonMapper;
 
     @Override
     public Sales createSales(SalesRequest salesRequest) {
@@ -57,6 +69,14 @@ public class SalesServiceImpl implements  SalesService{
         if (sales==null)
             throw new DataNotFoundException("not found with ID:  " + invoiceNo);
         return sales;
+    }
+
+    @Override
+    public List<SalesResponse> getAllSalesView(String invoiceNo) {
+        List<Sales> sales = customSalesRepository.getAllSales(invoiceNo);
+        return sales.stream()
+                .map(commonMapper::toSalesResponse)
+                .collect(Collectors.toList());
     }
 
 }

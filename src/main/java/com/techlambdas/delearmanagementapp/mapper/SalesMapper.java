@@ -12,4 +12,6 @@ public interface SalesMapper {
     Sales mapSalesRequestToSales(SalesRequest salesRequest);
 
     Sales mapSalesUpdateReqtoSales(SalesUpdateReq salesUpdateReq);
+
+
 }

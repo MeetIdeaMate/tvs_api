@@ -1,10 +1,7 @@
 package com.techlambdas.delearmanagementapp.mapper;
 
 import com.techlambdas.delearmanagementapp.model.*;
-import com.techlambdas.delearmanagementapp.repository.BranchRepository;
-import com.techlambdas.delearmanagementapp.repository.CategoryRepository;
-import com.techlambdas.delearmanagementapp.repository.ItemRepository;
-import com.techlambdas.delearmanagementapp.repository.VendorRepository;
+import com.techlambdas.delearmanagementapp.repository.*;
 import com.techlambdas.delearmanagementapp.response.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -21,6 +18,8 @@ public abstract class CommonMapper {
     protected CategoryRepository categoryRepository;
     @Autowired
     protected ItemRepository itemRepository;
+    @Autowired
+    protected CustomerRepository customerRepository;
 
     @Mapping(target = "branchName", source = "branchId", qualifiedByName = "mapBranchName")
     @Mapping(target = "vendorName", source = "vendorId", qualifiedByName= "mapVendorName")
@@ -68,4 +67,19 @@ public abstract class CommonMapper {
         response.setFinalInvoiceValue(itemDetail.getFinalInvoiceValue());
         return response;
     }
+
+    @Mapping(target = "customerName", source = "customerId", qualifiedByName= "mapCustomerName")
+    @Mapping(target = "mobileNo", source = "customerId", qualifiedByName= "mapMobileNo")
+    public abstract  SalesResponse toSalesResponse (Sales sales) ;
+
+    @Named("mapCustomerName")
+    public String mapCustomerName(String customerId) {
+        return customerRepository.getCustomerName(customerId);
+    }
+@Named("mapMobileNo")
+    public String mapMobileNo(String customerId){
+        return customerRepository.getMobileNo(customerId);
+    }
+
+
 }

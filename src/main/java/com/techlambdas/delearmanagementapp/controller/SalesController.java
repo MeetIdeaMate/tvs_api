@@ -4,6 +4,7 @@ import com.techlambdas.delearmanagementapp.model.Sales;
 import com.techlambdas.delearmanagementapp.model.User;
 import com.techlambdas.delearmanagementapp.request.SalesRequest;
 import com.techlambdas.delearmanagementapp.request.SalesUpdateReq;
+import com.techlambdas.delearmanagementapp.response.SalesResponse;
 import com.techlambdas.delearmanagementapp.service.SalesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,5 +52,10 @@ public class SalesController {
         return successResponse(HttpStatus.OK,"sales",sales);
     }
 
+    @GetMapping
+    public ResponseEntity<List<SalesResponse>> getAllSalesView(@PathVariable String invoiceNo) {
+        List<SalesResponse> sales = salesService.getAllSalesView(invoiceNo);
+        return successResponse(HttpStatus.OK, "salesList", sales);
+    }
 
 }

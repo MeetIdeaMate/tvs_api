@@ -4,7 +4,9 @@ import lombok.Data;
 
 @Data
 public class PaymentType {
-//     private String cash;
-//     private String partPayment;
+     private String cash;
+     private String chequeUpi;
 //     private String loan;
+     //     private String card;
+
 }

@@ -8,5 +8,5 @@ public class PaidDetails {
     private String paymentId;
     private String paymentDate;
     private String paidAmount;
-    private String paymentType;
+    private PaymentType paymentType;
 }

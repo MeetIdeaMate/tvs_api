@@ -16,7 +16,7 @@ public class Sales {
     private String invoiceType;  // - M-Vehile/E-Vechile/Accessories
     private String invoiceNo;
     private LocalDate invoiceDate;
-    private String BillType;   //- Pay / Credit
+    private String billType;   //- Pay / Credit
     private String customerId;
     private List<PaidDetails> paidDetails;
     private List<ItemDetail> itemDetails;
@@ -29,8 +29,8 @@ public class Sales {
     private double roundOffAmt;
     private double netAmt;
     private PaymentStatus paymentStatus;
-//    private Insurance insurance;
-//    private loanInfo loaninfo;
+    private Insurance insurance;
+    private loanInfo loaninfo;
     @CreatedDate
     private LocalDateTime createdDateTime;
     @CreatedBy
