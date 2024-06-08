@@ -20,4 +20,6 @@ public interface ItemService
     Page<Item> getAllItemsWithPage(String itemId, String itemName, String partNo, Pageable pageable);
 
     Item getItemByIdCategoryIdPartNo(String categoryId, String partNo);
+
+    Item findByPartNo(String partNo);
 }

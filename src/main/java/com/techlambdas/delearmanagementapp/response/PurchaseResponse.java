@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 public class PurchaseResponse {
     private String id;
+    private String purchaseId;
     private String purchaseNo;
     private String branchId;
     private String branchName;
@@ -26,8 +27,4 @@ public class PurchaseResponse {
     private double totalIncentiveAmount;
     private double totalInvoiceAmount;
     private double finalTotalInvoiceAmount;
-    private LocalDateTime createdDateTime;
-    private String createdBy;
-    private LocalDateTime updatedDateTime;
-    private String updatedBy;
 }

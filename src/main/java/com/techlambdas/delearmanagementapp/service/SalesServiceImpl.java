@@ -24,6 +24,8 @@ public class SalesServiceImpl implements  SalesService{
 
     @Autowired
     private SalesRepository salesRepository;
+    @Autowired
+    private CustomerService customerService;
 
     @Autowired
     private CustomSalesRepository customSalesRepository;

@@ -52,6 +52,7 @@ public abstract class CommonMapper {
         return itemRepository.getItemName(partNo);
     }
 
+
     public ItemDetailsWithPartNoResponse toItemDetailsWithPartNoResponse(ItemDetail itemDetail) {
         // Implement the mapping logic here
         ItemDetailsWithPartNoResponse response = new ItemDetailsWithPartNoResponse();
@@ -81,5 +82,11 @@ public abstract class CommonMapper {
         return customerRepository.getMobileNo(customerId);
     }
 
+
+    @Mapping(target = "categoryName", source = "categoryId", qualifiedByName = "mapCategoryName")
+    @Mapping(target = "hsnSacCode", source = "categoryId", qualifiedByName = "mapHsnSacCode")
+    @Mapping(target = "itemName", source = "partNo", qualifiedByName = "mapItemName")
+    @Mapping(target = "branchName", source = "branchId", qualifiedByName = "mapBranchName")
+    public abstract StockResponse toStockResponse(Stock stock);
 
 }
