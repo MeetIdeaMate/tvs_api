@@ -2,6 +2,7 @@ package com.techlambdas.delearmanagementapp.service;
 
 import com.techlambdas.delearmanagementapp.model.Stock;
 import com.techlambdas.delearmanagementapp.request.StockRequest;
+import com.techlambdas.delearmanagementapp.request.TransferRequest;
 import com.techlambdas.delearmanagementapp.response.StockResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,4 +17,6 @@ public interface StockService {
     Stock updateStockDetails(String id, StockRequest stockRequest);
 
     Page<Stock> getAllStocksWithPage(String partNo,String itemName,String engineNo,String frameNo, Pageable pageable);
+
+    String createTransfer(TransferRequest transferRequest);
 }

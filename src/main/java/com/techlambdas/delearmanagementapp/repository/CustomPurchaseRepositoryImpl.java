@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -18,8 +19,11 @@ public class CustomPurchaseRepositoryImpl implements CustomPurchaseRepository{
     @Autowired
     private MongoTemplate mongoTemplate;
     @Override
-    public List<Purchase> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo) {
+    public List<Purchase> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo,LocalDate fromDate,LocalDate toDate) {
         Query query=new Query();
+        if (fromDate != null && toDate != null) {
+            query.addCriteria(Criteria.where("p_invoiceDate").gte(fromDate).lte(toDate));
+        }
         if (purchaseNo!=null)
             query.addCriteria(Criteria.where("purchaseNo").is(purchaseNo));
         if (pInvoiceNo!=null)
@@ -30,8 +34,11 @@ public class CustomPurchaseRepositoryImpl implements CustomPurchaseRepository{
     }
 
     @Override
-    public Page<Purchase> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable) {
+    public Page<Purchase> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable, LocalDate fromDate, LocalDate toDate) {
         Query query=new Query();
+        if (fromDate != null && toDate != null) {
+            query.addCriteria(Criteria.where("p_invoiceDate").gte(fromDate).lte(toDate));
+        }
         if (purchaseNo!=null)
             query.addCriteria(Criteria.where("purchaseNo").is(purchaseNo));
         if (pInvoiceNo!=null)

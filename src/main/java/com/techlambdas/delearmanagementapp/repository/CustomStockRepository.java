@@ -10,4 +10,6 @@ public interface CustomStockRepository {
     List<Stock> getAllStocks(String partNo,String itemName,String engineNo,String frameNo);
 
     Page<Stock> getAllStocksWithPage(String partNo,String itemName, String engineNo,String frameNo,Pageable pageable);
+
+    List<Stock> findByPartNoAndBranchId(String partNo, String transferFromBranch);
 }

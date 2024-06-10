@@ -1,5 +1,4 @@
 package com.techlambdas.delearmanagementapp.model;
-
 import lombok.Data;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -8,6 +7,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -22,7 +22,7 @@ public class Stock {
     private PurchaseItem purchaseItem;
     private SalesItem salesItem;
     private String branchId;
-//    private List<TransferDetail> transferDetails;
+    private List<TransferDetail> transferDetails;
     @CreatedDate
     private LocalDateTime createdDateTime;
     @CreatedBy
