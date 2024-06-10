@@ -3,11 +3,13 @@ import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.mapper.CommonMapper;
 import com.techlambdas.delearmanagementapp.mapper.PurchaseMapper;
 import com.techlambdas.delearmanagementapp.model.*;
+import com.techlambdas.delearmanagementapp.repository.CategoryRepository;
 import com.techlambdas.delearmanagementapp.repository.PurchaseRepository;
 import com.techlambdas.delearmanagementapp.request.ItemDetailRequest;
 import com.techlambdas.delearmanagementapp.request.ItemRequest;
 import com.techlambdas.delearmanagementapp.request.PurchaseRequest;
 import com.techlambdas.delearmanagementapp.response.ItemDetailResponse;
+import com.techlambdas.delearmanagementapp.response.PurchaseReport;
 import com.techlambdas.delearmanagementapp.response.PurchaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,10 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.techlambdas.delearmanagementapp.repository.CustomPurchaseRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -37,6 +36,9 @@ public class PurchaseServiceImpl implements PurchaseService {
     private ItemService itemService;
     @Autowired
     private ConfigService configService;
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     @Override
     public Purchase createPurchase(PurchaseRequest purchaseRequest) {
         try {
@@ -276,5 +278,10 @@ public class PurchaseServiceImpl implements PurchaseService {
                 }
             }
             return existingItem;
+    }
+
+    @Override
+    public List<PurchaseReport> getPurchaseReport(Date fromDate, Date toDate) {
+        return customPurchaseRepository.getPurchaseReport(fromDate, toDate);
     }
 }

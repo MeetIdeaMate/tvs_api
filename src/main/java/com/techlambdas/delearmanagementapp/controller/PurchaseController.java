@@ -3,6 +3,7 @@ package com.techlambdas.delearmanagementapp.controller;
 import com.techlambdas.delearmanagementapp.model.ItemDetail;
 import com.techlambdas.delearmanagementapp.model.Purchase;
 import com.techlambdas.delearmanagementapp.request.PurchaseRequest;
+import com.techlambdas.delearmanagementapp.response.PurchaseReport;
 import com.techlambdas.delearmanagementapp.response.PurchaseResponse;
 import com.techlambdas.delearmanagementapp.service.ItemService;
 import com.techlambdas.delearmanagementapp.service.PurchaseService;
@@ -10,10 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 import static com.techlambdas.delearmanagementapp.response.AppResponse.successResponse;
@@ -33,8 +36,8 @@ public class PurchaseController
     }
     @GetMapping
     public ResponseEntity<List<PurchaseResponse>>getAllPurchases(@RequestParam(required = false) String purchaseNo,
-                                                     @RequestParam(required = false) String p_invoiceNo,
-                                                     @RequestParam(required = false) String p_orderRefNo){
+                                                                 @RequestParam(required = false) String p_invoiceNo,
+                                                                 @RequestParam(required = false) String p_orderRefNo){
         List<PurchaseResponse> purchases=purchaseService.getAllPurchases(purchaseNo,p_invoiceNo,p_orderRefNo);
         return successResponse(HttpStatus.CREATED,"purchases",purchases);
     }
@@ -60,5 +63,11 @@ public class PurchaseController
     public ResponseEntity<ItemDetail> getPurchasesByPartNo(@PathVariable String partNo) {
         ItemDetail itemDetail = purchaseService.getItemDetailsByPartNo(partNo);
         return successResponse(HttpStatus.OK,"ItemDetailByPartNo",itemDetail);
+    }
+    @GetMapping("/report")
+    public ResponseEntity<List<PurchaseReport>> getPurchaseReport(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
+                                                                   @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate){
+        List<PurchaseReport> purchaseResports=purchaseService.getPurchaseReport(fromDate,toDate);
+        return successResponse(HttpStatus.CREATED,"purchasesReport",purchaseResports);
     }
 }

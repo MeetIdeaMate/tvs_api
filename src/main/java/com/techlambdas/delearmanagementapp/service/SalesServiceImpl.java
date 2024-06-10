@@ -2,8 +2,10 @@ package com.techlambdas.delearmanagementapp.service;
 
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.mapper.SalesMapper;
-import com.techlambdas.delearmanagementapp.model.Sales;
+import com.techlambdas.delearmanagementapp.model.*;
 import com.techlambdas.delearmanagementapp.repository.SalesRepository;
+import com.techlambdas.delearmanagementapp.repository.StockRepository;
+import com.techlambdas.delearmanagementapp.request.ItemDetailRequest;
 import com.techlambdas.delearmanagementapp.request.SalesRequest;
 import com.techlambdas.delearmanagementapp.request.SalesUpdateReq;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +23,16 @@ public class SalesServiceImpl implements  SalesService{
     private SalesRepository salesRepository;
     @Autowired
     private CustomerService customerService;
+    @Autowired
+    private StockRepository stockRepository;
+    @Autowired
+    private StockService stockService;
 
     @Override
     public Sales createSales(SalesRequest salesRequest) {
         try {
             Sales sales = salesMapper.mapSalesRequestToSales(salesRequest);
+            stockService.mapSalesRequestToStock(salesRequest);
             return salesRepository.save(sales);
         }
         catch (Exception ex) {

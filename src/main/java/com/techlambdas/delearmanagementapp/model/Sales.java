@@ -29,6 +29,7 @@ public class Sales {
     private double roundOffAmt;
     private double netAmt;
     private PaymentStatus paymentStatus;
+    private String branchId;
 //    private Insurance insurance;
 //    private loanInfo loaninfo;
     @CreatedDate
