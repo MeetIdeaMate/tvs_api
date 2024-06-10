@@ -15,4 +15,6 @@ public interface PurchaseRepository extends MongoRepository<Purchase,String>  {
 
     @Query(value = "{ 'itemDetails.partNo': ?0 }", sort = "{ 'p_invoiceDate': 1 }")
     Optional<Purchase> findTopByPartNoOrderByInvoiceDateDesc(String partNo);
+
+    Optional<Purchase> findByPurchaseId(String purchaseId);
 }

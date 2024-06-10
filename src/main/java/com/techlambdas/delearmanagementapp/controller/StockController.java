@@ -1,11 +1,10 @@
 package com.techlambdas.delearmanagementapp.controller;
 
-import com.techlambdas.delearmanagementapp.model.Sales;
 import com.techlambdas.delearmanagementapp.model.Stock;
-import com.techlambdas.delearmanagementapp.request.SalesRequest;
 import com.techlambdas.delearmanagementapp.request.StockRequest;
-import com.techlambdas.delearmanagementapp.response.PurchaseResponse;
+import com.techlambdas.delearmanagementapp.request.TransferRequest;
 import com.techlambdas.delearmanagementapp.response.StockResponse;
+import com.techlambdas.delearmanagementapp.response.TransferResponse;
 import com.techlambdas.delearmanagementapp.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -64,4 +63,15 @@ public class StockController {
         List<StockResponse> stockResponses=stockService.createStockFromPurchase(purchaseId,partNo);
         return successResponse(HttpStatus.CREATED,"stock",stockResponses);
     }
+
+    @PostMapping("/transfer")
+    public ResponseEntity<String> createTransfer(@RequestBody TransferRequest transferRequest) {
+        String result = stockService.createTransfer(transferRequest);
+        return successResponse(HttpStatus.CREATED,"success",result);
+    }
+//    @GetMapping("/transfer")
+//    public ResponseEntity<List<TransferResponse>>getTransfer(@RequestParam  String branchId, @RequestParam TransferStatus transferStatus) {
+//      List<TransferResponse> transferResponses = stockService.
+//        return successResponse(HttpStatus.OK,"",result);
+//    }
 }

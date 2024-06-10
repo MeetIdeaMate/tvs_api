@@ -1,4 +1,4 @@
-package com.techlambdas.delearmanagementapp.model;
+package com.techlambdas.delearmanagementapp.constant;
 
 public enum StockStatus {
     Transfer,
