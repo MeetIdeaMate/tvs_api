@@ -1,8 +1,11 @@
 package com.techlambdas.delearmanagementapp.mapper;
 
+import com.techlambdas.delearmanagementapp.response.ItemDetailResponse;
+import com.techlambdas.delearmanagementapp.response.PurchaseResponse;
+import com.techlambdas.delearmanagementapp.response.SalesResponse;
+import com.techlambdas.delearmanagementapp.response.StockResponse;
 import com.techlambdas.delearmanagementapp.model.*;
 import com.techlambdas.delearmanagementapp.repository.*;
-import com.techlambdas.delearmanagementapp.response.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -52,36 +55,20 @@ public abstract class CommonMapper {
         return itemRepository.getItemName(partNo);
     }
 
-
-    public ItemDetailsWithPartNoResponse toItemDetailsWithPartNoResponse(ItemDetail itemDetail) {
-        // Implement the mapping logic here
-        ItemDetailsWithPartNoResponse response = new ItemDetailsWithPartNoResponse();
-        response.setPartNo(itemDetail.getPartNo());
-        response.setCategoryId(itemDetail.getCategoryId());
-        response.setSpecificationsValue(itemDetail.getSpecificationsValue());
-        response.setUnitRate(itemDetail.getUnitRate());
-        response.setQuantity(itemDetail.getQuantity());
-        response.setValue(itemDetail.getValue());
-        response.setDiscount(itemDetail.getDiscount());
-        response.setTaxableValue(itemDetail.getTaxableValue());
-        response.setInvoiceValue(itemDetail.getInvoiceValue());
-        response.setFinalInvoiceValue(itemDetail.getFinalInvoiceValue());
-        return response;
-    }
-
-    @Mapping(target = "customerName", source = "customerId", qualifiedByName= "mapCustomerName")
+//    @Mapping(target = "categoryName", source = "categoryId", qualifiedByName = "mapCategoryName")
+@Mapping(target = "customerName", source = "customerId", qualifiedByName= "mapCustomerName")
     @Mapping(target = "mobileNo", source = "customerId", qualifiedByName= "mapMobileNo")
-    public abstract  SalesResponse toSalesResponse (Sales sales) ;
+    public abstract SalesResponse toSalesResponse(Sales sales);
 
     @Named("mapCustomerName")
     public String mapCustomerName(String customerId) {
         return customerRepository.getCustomerName(customerId);
     }
+
 @Named("mapMobileNo")
     public String mapMobileNo(String customerId){
         return customerRepository.getMobileNo(customerId);
     }
-
 
     @Mapping(target = "categoryName", source = "categoryId", qualifiedByName = "mapCategoryName")
     @Mapping(target = "hsnSacCode", source = "categoryId", qualifiedByName = "mapHsnSacCode")

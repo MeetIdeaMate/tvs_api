@@ -3,7 +3,6 @@ package com.techlambdas.delearmanagementapp.service;
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.mapper.CommonMapper;
 import com.techlambdas.delearmanagementapp.mapper.SalesMapper;
-import com.techlambdas.delearmanagementapp.model.Purchase;
 import com.techlambdas.delearmanagementapp.model.Sales;
 import com.techlambdas.delearmanagementapp.repository.CustomSalesRepository;
 import com.techlambdas.delearmanagementapp.repository.SalesRepository;
@@ -11,8 +10,12 @@ import com.techlambdas.delearmanagementapp.request.SalesRequest;
 import com.techlambdas.delearmanagementapp.request.SalesUpdateReq;
 import com.techlambdas.delearmanagementapp.response.SalesResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +33,9 @@ public class SalesServiceImpl implements  SalesService{
     @Autowired
     private CustomSalesRepository customSalesRepository;
 
+    @Autowired
+    private ConfigService configService;
+
 
     @Autowired
     private CommonMapper commonMapper;
@@ -38,6 +44,7 @@ public class SalesServiceImpl implements  SalesService{
     public Sales createSales(SalesRequest salesRequest) {
         try {
             Sales sales = salesMapper.mapSalesRequestToSales(salesRequest);
+            sales.setInvoiceNo(configService.getNextSalesNoSequence());
             return salesRepository.save(sales);
         }
         catch (Exception ex) {
@@ -46,16 +53,18 @@ public class SalesServiceImpl implements  SalesService{
     }
 
     @Override
-    public List<Sales> getAllSales() {
-        return salesRepository.findAll();
+    public List<SalesResponse> getAllSales(String invoiceNo) {
+        List<Sales> sales = customSalesRepository.getAllSales(invoiceNo);
+        return sales.stream()
+                .map(commonMapper::toSalesResponse)
+                .collect(Collectors.toList());
+//        return salesRepository.findAll();
     }
 
     @Override
     public Sales updateSales(SalesUpdateReq salesUpdateReq) {
         Sales sales = salesRepository.findByCustomerId(salesUpdateReq.getCustomerId());
-        System.out.println(sales+"-------------->");
         Sales sale = salesMapper.mapSalesUpdateReqtoSales(salesUpdateReq);
-        System.out.println(sale+"--------sale from impl class------>");
         return salesRepository.save(sale);
     }
 
@@ -80,5 +89,15 @@ public class SalesServiceImpl implements  SalesService{
                 .map(commonMapper::toSalesResponse)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public Page<SalesResponse> getAllSalesWithPage(String invoiceNo, String categoryName , LocalDate fromDate , LocalDate toDate, Pageable pageable) {
+        Page<Sales>sales= customSalesRepository.getAllSalesWithPage(invoiceNo, categoryName ,fromDate , toDate ,pageable);
+        List<SalesResponse>salesResponses=sales.stream()
+                .map(commonMapper::toSalesResponse)
+                .collect(Collectors.toList());
+        return new PageImpl<>(salesResponses,pageable,sales.getTotalElements());
+    }
+
 
 }

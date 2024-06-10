@@ -8,5 +8,5 @@ public class loanInfo {
     private String loanId;
     private String bankName;
     private double loanAmt;
-    private String invoiceNo;
+//    private String invoiceNo;
 }

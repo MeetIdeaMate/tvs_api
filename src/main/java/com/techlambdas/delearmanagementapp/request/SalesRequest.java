@@ -9,16 +9,12 @@ import java.util.List;
 @Data
 public class SalesRequest {
     private String invoiceType;
-    private String invoiceNo;
     private LocalDate invoiceDate;
-    private String BillType;
-//    private String customerId;
-    private List<PaidDetails> paidDetails;
+    private String billType;
+    private String customerId;
+    private List<PaidDetail> paidDetails;
     private List<ItemDetail> itemDetails;
     private PaymentStatus paymentStatus;
-    private String customerId;
-    private String customerName;
-    private String mobileNo;
     private int totalQty;
     private double totalTaxableAmt;
     private double totalDisc;
@@ -27,4 +23,7 @@ public class SalesRequest {
     private double totalInvoiceAmt;
     private double roundOffAmt;
     private double netAmt;
+    private Insurance insurance;
+    private loanInfo loaninfo;
+   private String branchId;
 }

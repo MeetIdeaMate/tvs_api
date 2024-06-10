@@ -10,7 +10,7 @@ public interface SalesRepository extends MongoRepository<Sales,String> {
 
     Sales findByInvoiceNo(String invoiceNo);
 
-  List<Sales> findByCustomerName(String customerName);
+//  List<Sales> findByCustomerName(String customerName);
 
 
 }
