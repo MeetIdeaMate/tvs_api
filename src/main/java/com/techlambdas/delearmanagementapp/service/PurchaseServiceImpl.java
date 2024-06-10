@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.techlambdas.delearmanagementapp.repository.CustomPurchaseRepository;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -96,6 +97,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex);
         }
     }
+
 //    private void updateItemDetailWithCalculations(ItemDetail itemDetail, ItemDetailRequest itemDetailRequest) {
 //        double itemTotalValue = itemDetailRequest.getUnitRate();
 //        double gstAmount = calculateTotalGstAmount(itemDetailRequest);
@@ -169,8 +171,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
     }
     @Override
-    public List<PurchaseResponse> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo) {
-        List<Purchase> purchases = customPurchaseRepository.getAllPurchases(purchaseNo, pInvoiceNo, pOrderRefNo);
+    public List<PurchaseResponse> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo,LocalDate fromDate,LocalDate toDate) {
+        List<Purchase> purchases = customPurchaseRepository.getAllPurchases(purchaseNo, pInvoiceNo, pOrderRefNo,fromDate,toDate);
         return purchases.stream()
                 .map(commonMapper::toPurchaseResponse)
                 .collect(Collectors.toList());
@@ -192,8 +194,8 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public Page<PurchaseResponse> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable) {
-      Page<Purchase>purchases= customPurchaseRepository.getAllPurchasesWithPage(purchaseNo, pInvoiceNo, pOrderRefNo, pageable);
+    public Page<PurchaseResponse> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable, LocalDate fromDate, LocalDate toDate) {
+      Page<Purchase>purchases= customPurchaseRepository.getAllPurchasesWithPage(purchaseNo, pInvoiceNo, pOrderRefNo, pageable,fromDate,toDate);
       List<PurchaseResponse> purchaseResponses=mapEntityWithResponse(purchases.getContent());
       return new PageImpl<>(purchaseResponses,pageable,purchases.getTotalElements());
     }
@@ -279,6 +281,8 @@ public class PurchaseServiceImpl implements PurchaseService {
             }
             return existingItem;
     }
+
+
 
     @Override
     public List<PurchaseReport> getPurchaseReport(Date fromDate, Date toDate) {

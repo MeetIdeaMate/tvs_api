@@ -1,12 +1,15 @@
 package com.techlambdas.delearmanagementapp.model;
 
+import com.techlambdas.delearmanagementapp.constant.Status;
 import lombok.Data;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 public class TransferDetail {
-    private LocalDate transferDate;
     private String transferFromBranch;
     private String transferToBranch;
+    private LocalDateTime transferDate;
+    private LocalDateTime receivedDate;
+    private Status status;
 }

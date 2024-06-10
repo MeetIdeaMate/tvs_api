@@ -2,11 +2,9 @@ package com.techlambdas.delearmanagementapp.request;
 
 import com.techlambdas.delearmanagementapp.model.PurchaseItem;
 import com.techlambdas.delearmanagementapp.model.SalesItem;
-import com.techlambdas.delearmanagementapp.model.StockStatus;
-import com.techlambdas.delearmanagementapp.model.TransferDetail;
+import com.techlambdas.delearmanagementapp.constant.StockStatus;
 import lombok.Data;
 
-import java.util.List;
 import java.util.Map;
 
 @Data

@@ -55,6 +55,20 @@ public class CustomStockRepositoryImpl implements CustomStockRepository{
         List<Stock> stocks=mongoTemplate.find(query,Stock.class);
         return new PageImpl<>(stocks,pageable,count);
     }
+
+    @Override
+    public List<Stock> findByPartNoAndBranchId(String partNo, String transferFromBranch) {
+        Query query=new Query();
+        if (partNo!=null)
+            query.addCriteria(Criteria.where("partNo").is(partNo));
+        if (partNo!=null) {
+            query.addCriteria(Criteria.where("partNo").in(partNo));
+        }
+        if (transferFromBranch!=null)
+            query.addCriteria(Criteria.where("branchId").is(transferFromBranch));
+        return mongoTemplate.find(query, Stock.class);
+    }
+
     public List<String>getItemNameFromItems(String itemName)
     {
         Query query=new Query();

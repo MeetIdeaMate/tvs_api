@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 
@@ -24,30 +25,37 @@ public class CustomPurchaseRepositoryImpl implements CustomPurchaseRepository {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+
     @Override
-    public List<Purchase> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo) {
-        Query query = new Query();
-        if (purchaseNo != null)
+    public List<Purchase> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo,LocalDate fromDate,LocalDate toDate) {
+        Query query=new Query();
+        if (fromDate != null && toDate != null) {
+            query.addCriteria(Criteria.where("p_invoiceDate").gte(fromDate).lte(toDate));
+        }
+        if (purchaseNo!=null)
             query.addCriteria(Criteria.where("purchaseNo").is(purchaseNo));
-        if (pInvoiceNo != null)
+        if (pInvoiceNo!=null)
             query.addCriteria(Criteria.where("pInvoiceNo").regex(pInvoiceNo));
-        if (pOrderRefNo != null)
+        if (pOrderRefNo!=null)
             query.addCriteria(Criteria.where("pInvoiceNo").regex(pOrderRefNo));
         return mongoTemplate.find(query, Purchase.class);
     }
 
-    @Override
-    public Page<Purchase> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable) {
-        Query query = new Query();
-        if (purchaseNo != null)
-            query.addCriteria(Criteria.where("purchaseNo").is(purchaseNo));
-        if (pInvoiceNo != null)
-            query.addCriteria(Criteria.where("p_invoiceNo").regex(pInvoiceNo));
-        if (pOrderRefNo != null)
-            query.addCriteria(Criteria.where("p_orderRefNo").regex(pOrderRefNo));
-        long count = mongoTemplate.count(query, Purchase.class);
-        query.with(pageable);
-        List<Purchase> purchases = mongoTemplate.find(query, Purchase.class);
+        @Override
+        public Page<Purchase> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable, LocalDate fromDate, LocalDate toDate) {
+            Query query=new Query();
+            if (fromDate != null && toDate != null) {
+                query.addCriteria(Criteria.where("p_invoiceDate").gte(fromDate).lte(toDate));
+            }
+            if (purchaseNo!=null)
+                query.addCriteria(Criteria.where("purchaseNo").is(purchaseNo));
+            if (pInvoiceNo!=null)
+                query.addCriteria(Criteria.where("p_invoiceNo").regex(pInvoiceNo));
+            if (pOrderRefNo!=null)
+                query.addCriteria(Criteria.where("p_orderRefNo").regex(pOrderRefNo));
+            long count = mongoTemplate.count(query, Purchase.class);
+            query.with(pageable);
+            List<Purchase> purchases = mongoTemplate.find(query, Purchase.class);
 
         return new PageImpl<>(purchases, pageable, count);
     }

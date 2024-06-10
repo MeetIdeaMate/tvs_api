@@ -4,6 +4,7 @@ import com.techlambdas.delearmanagementapp.model.Sales;
 import com.techlambdas.delearmanagementapp.model.Stock;
 import com.techlambdas.delearmanagementapp.request.SalesRequest;
 import com.techlambdas.delearmanagementapp.request.StockRequest;
+import com.techlambdas.delearmanagementapp.request.TransferRequest;
 import com.techlambdas.delearmanagementapp.response.PurchaseResponse;
 import com.techlambdas.delearmanagementapp.response.StockResponse;
 import org.springframework.data.domain.Page;
@@ -24,4 +25,6 @@ public interface StockService {
     List<StockResponse> createStockFromPurchase(String purchaseId, List<String> partNo);
 
     void mapSalesRequestToStock(SalesRequest salesRequest);
+
+    String createTransfer(TransferRequest transferRequest);
 }
