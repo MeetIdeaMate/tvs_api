@@ -1,4 +1,5 @@
 package com.techlambdas.delearmanagementapp.model;
+import com.techlambdas.delearmanagementapp.constant.StockStatus;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -14,14 +15,20 @@ import java.util.Map;
 @Document(collection = "stock")
 public class Stock {
     private String id;
+    private String stockId;
     private String partNo;
     private String categoryId;
     private Map<String,String> mainSpecValue;
     private Map<String,String> specificationsValue;
     private int quantity;
+    private int purchaseQuantity;
+    private int salesQuantity;
+    private String purchaseId;
+    private String salesId;
     private PurchaseItem purchaseItem;
     private SalesItem salesItem;
     private String branchId;
+    private StockStatus stockStatus;
     private List<TransferDetail> transferDetails;
     @CreatedDate
     private LocalDateTime createdDateTime;

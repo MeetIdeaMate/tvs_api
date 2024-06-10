@@ -10,5 +10,5 @@ import java.util.List;
 public interface StockRepository extends MongoRepository<Stock,String> {
     Stock findStockById(String id);
 
-
+    List<Stock> findPartNoByBranchId(String branchId);
 }

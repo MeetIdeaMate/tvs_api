@@ -1,23 +1,31 @@
 package com.techlambdas.delearmanagementapp.service;
 
+import com.techlambdas.delearmanagementapp.constant.Status;
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.mapper.CommonMapper;
+import com.techlambdas.delearmanagementapp.mapper.SalesMapper;
 import com.techlambdas.delearmanagementapp.mapper.StockMapper;
 import com.techlambdas.delearmanagementapp.model.Stock;
 import com.techlambdas.delearmanagementapp.model.TransferDetail;
+import com.techlambdas.delearmanagementapp.model.*;
 import com.techlambdas.delearmanagementapp.repository.CustomStockRepository;
+import com.techlambdas.delearmanagementapp.repository.PurchaseRepository;
+import com.techlambdas.delearmanagementapp.repository.SalesRepository;
 import com.techlambdas.delearmanagementapp.repository.StockRepository;
 import com.techlambdas.delearmanagementapp.request.ItemDetailRequest;
+import com.techlambdas.delearmanagementapp.request.SalesRequest;
 import com.techlambdas.delearmanagementapp.request.StockRequest;
 import com.techlambdas.delearmanagementapp.request.TransferItemReq;
 import com.techlambdas.delearmanagementapp.request.TransferRequest;
 import com.techlambdas.delearmanagementapp.response.StockResponse;
+import com.techlambdas.delearmanagementapp.utils.RandomIdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +41,12 @@ public class StockServiceImpl implements StockService{
     private CustomStockRepository customStockRepository;
     @Autowired
     private CommonMapper commonMapper;
-
+    @Autowired
+    private PurchaseRepository purchaseRepository;
+    @Autowired
+    private SalesRepository salesRepository;
+    @Autowired
+    private SalesMapper salesMapper;
     @Override
     public Stock createStock(StockRequest stockRequest) {
         try {
@@ -73,6 +86,45 @@ public class StockServiceImpl implements StockService{
     }
 
     @Override
+    public List<StockResponse> createStockFromPurchase(String purchaseId, List<String> partNo) {
+        Optional<Purchase> purchaseOptional = purchaseRepository.findByPurchaseId(purchaseId);
+        if (!purchaseOptional.isPresent()) {
+            throw new DataNotFoundException("Purchase not found with id: " + purchaseId);
+        }
+
+        Purchase purchase = purchaseOptional.get();
+        List<Stock> stocks = new ArrayList<>();
+
+        for (ItemDetail itemDetail : purchase.getItemDetails()) {
+            if (partNo.contains(itemDetail.getPartNo())) {
+                Stock stock = stockMapper.itemDetailToStock(itemDetail, purchase.getBranchId());
+                PurchaseItem purchaseItem = stockMapper.itemDetailToPurchaseItem(itemDetail);
+                SalesItem salesItem = stockMapper.itemDetailToSalesItem(itemDetail);
+                stock.setPurchaseItem(purchaseItem);
+                stock.setSalesItem(salesItem);
+                stockRepository.save(stock);
+                stocks.add(stock);
+            }
+        }
+
+        return stocks.stream()
+                .map(commonMapper::toStockResponse)
+                .collect(Collectors.toList());
+    }
+    public void mapSalesRequestToStock(SalesRequest salesRequest)
+    {
+        for (ItemDetail itemDetail:salesRequest.getItemDetails()) {
+            Stock stock = stockMapper.itemDetailToStock(itemDetail, salesRequest.getBranchId());
+            PurchaseItem purchaseItem = stockMapper.itemDetailToPurchaseItem(itemDetail);
+            SalesItem salesItem = stockMapper.itemDetailToSalesItem(itemDetail);
+
+            stock.setPurchaseItem(purchaseItem);
+            stock.setSalesItem(salesItem);
+            stockRepository.save(stock);
+        }
+    }
+
+    @Override
     public String createTransfer(TransferRequest transferRequest) {
        for (TransferItemReq transferItemReq:transferRequest.getTransferItems()){
              List<Stock>stocks=customStockRepository.findByPartNoAndBranchId(transferItemReq.getPartNo(),transferRequest.getTransferFromBranch());
@@ -82,13 +134,19 @@ public class StockServiceImpl implements StockService{
                  transferDetail.setTransferToBranch(transferRequest.getTransferFromBranch());
                  transferDetail.setTransferToBranch(transferRequest.getTransferToBranch());
                  transferDetail.setTransferDate(LocalDateTime.now());
+                 transferDetail.setStatus(Status.INPROGRESS);
+                 List<TransferDetail>transferDetails=new ArrayList<>();
                  if (Optional.ofNullable(stock.getTransferDetails()).isPresent()){
-                     stock.getTransferDetails().add(transferDetail);
-                 }else {
-                     List<TransferDetail>transferDetails=new ArrayList<>();
+
+                    for (TransferDetail tD:stock.getTransferDetails()){
+                          tD.setStatus(Status.COMPLETED);
+                          transferDetails.add(tD);
+                    }
                      transferDetails.add(transferDetail);
-                     stock.setTransferDetails(transferDetails);
+                 }else {
+                     transferDetails.add(transferDetail);
                  }
+                 stock.setTransferDetails(transferDetails);
                  stockRepository.save(stock);
              }
        }
