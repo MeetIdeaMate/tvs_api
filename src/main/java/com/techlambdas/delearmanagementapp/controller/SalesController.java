@@ -80,9 +80,9 @@ public ResponseEntity<List<SalesResponse>>getAllSales(@RequestParam(required = f
             @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<SalesResponse> SalesPage = salesService.getAllSalesWithPage(invoiceNo,categoryName, fromDate,toDate,pageable);
-
-        return successResponse(HttpStatus.OK,"salesWithPage",SalesPage);
+        Page<SalesResponse> salesPage = salesService.getAllSalesWithPage(invoiceNo,categoryName, fromDate,toDate,pageable);
+         System.out.println(salesPage+"------>");
+        return successResponse(HttpStatus.OK,"salesWithPage",salesPage);
     }
 
 

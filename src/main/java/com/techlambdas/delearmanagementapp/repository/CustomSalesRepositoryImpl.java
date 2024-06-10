@@ -1,7 +1,6 @@
 package com.techlambdas.delearmanagementapp.repository;
 
-import com.techlambdas.delearmanagementapp.model.Purchase;
-import com.techlambdas.delearmanagementapp.model.Sales;
+import com.techlambdas.delearmanagementapp.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 public class CustomSalesRepositoryImpl implements  CustomSalesRepository{
@@ -37,7 +37,8 @@ public class CustomSalesRepositoryImpl implements  CustomSalesRepository{
             query.addCriteria(Criteria.where("invoiceNo").is(invoiceNo));
         }
         if (Optional.ofNullable(categoryName).isPresent()) {
-            query.addCriteria(Criteria.where("itemDetails.categoryId").is(categoryName));
+            List<String> categoryFromCatName = getCategoryNameFromCategory(categoryName);
+            query.addCriteria(Criteria.where("itemDetails.categoryId").in(categoryFromCatName));
         }
 
         if (fromDate != null && toDate != null) {
@@ -56,5 +57,14 @@ public class CustomSalesRepositoryImpl implements  CustomSalesRepository{
         return new PageImpl<>(sales, pageable, count);
     }
 
+    public List<String>getCategoryNameFromCategory(String categoryName)
+    {
+        Query query=new Query();
+        if (categoryName!=null){
+            query.addCriteria(Criteria.where("categoryName").regex("^.*"+categoryName+".*","i"));
+        }
+        List<Category> categoryList=mongoTemplate.find(query, Category.class);
+        return categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
+    }
 
 }
