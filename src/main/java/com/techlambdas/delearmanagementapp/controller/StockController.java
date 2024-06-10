@@ -1,7 +1,10 @@
 package com.techlambdas.delearmanagementapp.controller;
 
+import com.techlambdas.delearmanagementapp.model.Sales;
 import com.techlambdas.delearmanagementapp.model.Stock;
+import com.techlambdas.delearmanagementapp.request.SalesRequest;
 import com.techlambdas.delearmanagementapp.request.StockRequest;
+import com.techlambdas.delearmanagementapp.response.PurchaseResponse;
 import com.techlambdas.delearmanagementapp.response.StockResponse;
 import com.techlambdas.delearmanagementapp.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.techlambdas.delearmanagementapp.response.AppResponse.successResponse;
 
@@ -52,5 +56,12 @@ public class StockController {
         Pageable pageable = PageRequest.of(page,size);
         Page<Stock> stockPage = stockService.getAllStocksWithPage(partNo,itemName,engineNo,frameNo, pageable);
         return successResponse(HttpStatus.CREATED,"stockWithPage",stockPage);
+    }
+    @PostMapping("/{purchaseId}")
+    public ResponseEntity<List<StockResponse>> createStockFromPurchase(@PathVariable String purchaseId,
+                                                                           @RequestParam(required = false) List<String> partNo)
+    {
+        List<StockResponse> stockResponses=stockService.createStockFromPurchase(purchaseId,partNo);
+        return successResponse(HttpStatus.CREATED,"stock",stockResponses);
     }
 }
