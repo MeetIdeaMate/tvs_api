@@ -10,12 +10,12 @@ import java.util.List;
 public class SalesRequest {
     private String branchId;
     private String invoiceType;
-    private String invoiceNo;
     private LocalDate invoiceDate;
-    private String BillType;
+    private String billType;
     private String customerId;
-    private List<PaidDetails> paidDetails;
+    private List<PaidDetail> paidDetails;
     private List<ItemDetail> itemDetails;
+    private PaymentStatus paymentStatus;
     private int totalQty;
     private double totalTaxableAmt;
     private double totalDisc;
@@ -24,7 +24,7 @@ public class SalesRequest {
     private double totalInvoiceAmt;
     private double roundOffAmt;
     private double netAmt;
-    private PaymentStatus paymentStatus;
-//    private Insurance insurance;
-//    private loanInfo loaninfo;
+    private Insurance insurance;
+    private loanInfo loaninfo;
+   private String branchId;
 }

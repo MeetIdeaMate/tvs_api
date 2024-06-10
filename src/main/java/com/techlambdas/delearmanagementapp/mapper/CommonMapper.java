@@ -1,11 +1,11 @@
 package com.techlambdas.delearmanagementapp.mapper;
 
+import com.techlambdas.delearmanagementapp.response.ItemDetailResponse;
+import com.techlambdas.delearmanagementapp.response.PurchaseResponse;
+import com.techlambdas.delearmanagementapp.response.SalesResponse;
+import com.techlambdas.delearmanagementapp.response.StockResponse;
 import com.techlambdas.delearmanagementapp.model.*;
-import com.techlambdas.delearmanagementapp.repository.BranchRepository;
-import com.techlambdas.delearmanagementapp.repository.CategoryRepository;
-import com.techlambdas.delearmanagementapp.repository.ItemRepository;
-import com.techlambdas.delearmanagementapp.repository.VendorRepository;
-import com.techlambdas.delearmanagementapp.response.*;
+import com.techlambdas.delearmanagementapp.repository.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -21,6 +21,8 @@ public abstract class CommonMapper {
     protected CategoryRepository categoryRepository;
     @Autowired
     protected ItemRepository itemRepository;
+    @Autowired
+    protected CustomerRepository customerRepository;
 
     @Mapping(target = "branchName", source = "branchId", qualifiedByName = "mapBranchName")
     @Mapping(target = "vendorName", source = "vendorId", qualifiedByName= "mapVendorName")
@@ -53,9 +55,25 @@ public abstract class CommonMapper {
         return itemRepository.getItemName(partNo);
     }
 
+//    @Mapping(target = "categoryName", source = "categoryId", qualifiedByName = "mapCategoryName")
+@Mapping(target = "customerName", source = "customerId", qualifiedByName= "mapCustomerName")
+    @Mapping(target = "mobileNo", source = "customerId", qualifiedByName= "mapMobileNo")
+    public abstract SalesResponse toSalesResponse(Sales sales);
+
+    @Named("mapCustomerName")
+    public String mapCustomerName(String customerId) {
+        return customerRepository.getCustomerName(customerId);
+    }
+
+@Named("mapMobileNo")
+    public String mapMobileNo(String customerId){
+        return customerRepository.getMobileNo(customerId);
+    }
+
     @Mapping(target = "categoryName", source = "categoryId", qualifiedByName = "mapCategoryName")
     @Mapping(target = "hsnSacCode", source = "categoryId", qualifiedByName = "mapHsnSacCode")
     @Mapping(target = "itemName", source = "partNo", qualifiedByName = "mapItemName")
     @Mapping(target = "branchName", source = "branchId", qualifiedByName = "mapBranchName")
     public abstract StockResponse toStockResponse(Stock stock);
+
 }
