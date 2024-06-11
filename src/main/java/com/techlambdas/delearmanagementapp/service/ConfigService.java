@@ -22,5 +22,5 @@ public interface ConfigService {
     Config removeConfigValue(String configId, String configValue);
     String getNextPurchaseNoSequence();
     String getNextSalesNoSequence();
-
+    String getNextReceiptNoSequence();
 }

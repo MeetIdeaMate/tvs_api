@@ -122,4 +122,20 @@ public class ConfigServiceImpl implements ConfigService{
             return null;
         }
     }
+
+    @Override
+    public String getNextReceiptNoSequence() {
+        Query query = new Query(Criteria.where("configId").is("receiptNoSeq"));
+        Config config = mongoTemplate.findOne(query, Config.class);
+        if (config!=null) {
+            List<String> regSeqNo = config.getConfiguration();
+            int currentSequence = Integer.parseInt(regSeqNo.get(0));
+            int nextSeq = currentSequence + 1;
+            config.setConfiguration(Collections.singletonList(Integer.toString(nextSeq)));
+            mongoTemplate.save(config);
+            return String.valueOf(currentSequence);
+        }else {
+            return null;
+        }
+    }
 }

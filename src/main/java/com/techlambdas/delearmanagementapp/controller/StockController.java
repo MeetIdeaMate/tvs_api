@@ -36,13 +36,13 @@ public class StockController {
                                                     @RequestParam(required = false) String frameNo)
     {
         List<StockResponse> stocks=stockService.getAllStocks(partNo,itemName,engineNo,frameNo);
-        return successResponse(HttpStatus.CREATED,"Stocks",stocks);
+        return successResponse(HttpStatus.OK,"Stocks",stocks);
     }
     @PutMapping("/{id}")
     public ResponseEntity<Stock> updateStockDetails(@PathVariable String id,@RequestBody StockRequest stockRequest)
     {
         Stock stock=stockService.updateStockDetails(id,stockRequest);
-        return successResponse(HttpStatus.CREATED,"UpdatedStock",stock);
+        return successResponse(HttpStatus.OK,"UpdatedStock",stock);
     }
     @GetMapping("/page")
     public ResponseEntity<Page<Stock>> getAllStockWithPage(@RequestParam(required = false) String partNo,
@@ -54,7 +54,7 @@ public class StockController {
     {
         Pageable pageable = PageRequest.of(page,size);
         Page<Stock> stockPage = stockService.getAllStocksWithPage(partNo,itemName,engineNo,frameNo, pageable);
-        return successResponse(HttpStatus.CREATED,"stockWithPage",stockPage);
+        return successResponse(HttpStatus.OK,"stockWithPage",stockPage);
     }
     @PostMapping("/{purchaseId}")
     public ResponseEntity<List<StockResponse>> createStockFromPurchase(@PathVariable String purchaseId,
