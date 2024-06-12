@@ -1,5 +1,6 @@
 package com.techlambdas.delearmanagementapp.repository;
 
+import com.techlambdas.delearmanagementapp.model.Category;
 import com.techlambdas.delearmanagementapp.model.Purchase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 public class CustomPurchaseRepositoryImpl implements CustomPurchaseRepository{
@@ -34,10 +37,14 @@ public class CustomPurchaseRepositoryImpl implements CustomPurchaseRepository{
     }
 
     @Override
-    public Page<Purchase> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable, LocalDate fromDate, LocalDate toDate) {
+    public Page<Purchase> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable, LocalDate fromDate, LocalDate toDate,String categoryName) {
         Query query=new Query();
         if (fromDate != null && toDate != null) {
             query.addCriteria(Criteria.where("p_invoiceDate").gte(fromDate).lte(toDate));
+        }
+        if (Optional.ofNullable(categoryName).isPresent()) {
+            List<String> categoryIdList= getCategoryNameFromCategory(categoryName);
+            query.addCriteria(Criteria.where("itemDetails.categoryId").in(categoryIdList));
         }
         if (purchaseNo!=null)
             query.addCriteria(Criteria.where("purchaseNo").is(purchaseNo));
@@ -51,7 +58,15 @@ public class CustomPurchaseRepositoryImpl implements CustomPurchaseRepository{
 
         return new PageImpl<>(purchases, pageable, count);
     }
-
+    public List<String>getCategoryNameFromCategory(String categoryName)
+    {
+        Query query=new Query();
+        if (categoryName!=null){
+            query.addCriteria(Criteria.where("categoryName").regex("^.*"+categoryName+".*","i"));
+        }
+        List<Category> categoryList=mongoTemplate.find(query, Category.class);
+        return categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
+    }
 
     @Override
     public Purchase findLastPurchaseItemDetailsByPartNo(String partNo) {

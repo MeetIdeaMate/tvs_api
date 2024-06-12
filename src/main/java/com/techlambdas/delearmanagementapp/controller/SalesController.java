@@ -78,10 +78,8 @@ public ResponseEntity<List<SalesResponse>>getAllSales(@RequestParam(required = f
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-
         Pageable pageable = PageRequest.of(page, size);
         Page<SalesResponse> salesPage = salesService.getAllSalesWithPage(invoiceNo,categoryName, fromDate,toDate,pageable);
-         System.out.println(salesPage+"------>");
         return successResponse(HttpStatus.OK,"salesWithPage",salesPage);
     }
 

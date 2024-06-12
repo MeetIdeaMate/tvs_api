@@ -1,9 +1,6 @@
 package com.techlambdas.delearmanagementapp.mapper;
 
-import com.techlambdas.delearmanagementapp.response.ItemDetailResponse;
-import com.techlambdas.delearmanagementapp.response.PurchaseResponse;
-import com.techlambdas.delearmanagementapp.response.SalesResponse;
-import com.techlambdas.delearmanagementapp.response.StockResponse;
+import com.techlambdas.delearmanagementapp.response.*;
 import com.techlambdas.delearmanagementapp.model.*;
 import com.techlambdas.delearmanagementapp.repository.*;
 import org.mapstruct.Mapper;
@@ -76,4 +73,7 @@ public abstract class CommonMapper {
     @Mapping(target = "branchName", source = "branchId", qualifiedByName = "mapBranchName")
     public abstract StockResponse toStockResponse(Stock stock);
 
+    @Mapping(target = "categoryName", source = "categoryId", qualifiedByName = "mapCategoryName")
+    @Mapping(target = "itemName", source = "partNo", qualifiedByName = "mapItemName")
+    public abstract TransferItem mapTransferItem(TransferItem transferItem) ;
 }

@@ -26,5 +26,4 @@ public class SalesRequest {
     private double netAmt;
     private Insurance insurance;
     private loanInfo loaninfo;
-   private String branchId;
 }

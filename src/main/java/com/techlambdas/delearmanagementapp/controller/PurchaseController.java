@@ -53,10 +53,11 @@ public class PurchaseController
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @RequestParam(required = false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate
+            @RequestParam(required = false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            @RequestParam(required = false) String categoryName
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<PurchaseResponse> purchasesPage = purchaseService.getAllPurchasesWithPage(purchaseNo,p_invoiceNo,p_orderRefNo, pageable,fromDate,toDate);
+        Page<PurchaseResponse> purchasesPage = purchaseService.getAllPurchasesWithPage(purchaseNo,p_invoiceNo,p_orderRefNo, pageable,fromDate,toDate,categoryName);
 
         return successResponse(HttpStatus.OK,"purchasesWithPage",purchasesPage);
     }

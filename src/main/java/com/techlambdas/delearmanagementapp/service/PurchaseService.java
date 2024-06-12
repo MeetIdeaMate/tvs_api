@@ -21,7 +21,7 @@ public interface PurchaseService {
 
     Purchase updatePurchase(String purchaseNo, PurchaseRequest purchaseRequest);
 
-    Page<PurchaseResponse> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable, LocalDate fromDate,LocalDate toDate);
+    Page<PurchaseResponse> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable, LocalDate fromDate,LocalDate toDate,String categoryName);
 
     ItemDetail getItemDetailsByPartNo(String partNo);
 }
