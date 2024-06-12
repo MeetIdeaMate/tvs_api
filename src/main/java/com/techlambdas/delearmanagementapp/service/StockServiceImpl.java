@@ -3,6 +3,7 @@ package com.techlambdas.delearmanagementapp.service;
 import com.techlambdas.delearmanagementapp.constant.Status;
 import com.techlambdas.delearmanagementapp.constant.StockStatus;
 import com.techlambdas.delearmanagementapp.constant.TransferStatus;
+import com.techlambdas.delearmanagementapp.exception.AlreadyExistException;
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.mapper.CommonMapper;
 import com.techlambdas.delearmanagementapp.mapper.SalesMapper;
@@ -98,6 +99,9 @@ public class StockServiceImpl implements StockService{
             throw new DataNotFoundException("Purchase not found with id: " + purchaseId);
         }
             Purchase purchase = purchaseOptional.get();
+        if (purchase.isStockUpdated()){
+            throw new AlreadyExistException("Already Stock Update this PurchaseId:"+purchaseId);
+        }
             List<Stock> stocks = new ArrayList<>();
 
             for (ItemDetail itemDetail : purchase.getItemDetails()) {
@@ -113,7 +117,8 @@ public class StockServiceImpl implements StockService{
                     stocks.add(stock);
                 }
             }
-
+            purchase.setStockUpdated(true);
+            purchaseRepository.save(purchase);
             return stocks.stream()
                     .map(commonMapper::toStockResponse)
                     .collect(Collectors.toList());
