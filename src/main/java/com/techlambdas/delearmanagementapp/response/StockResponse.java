@@ -1,11 +1,13 @@
 package com.techlambdas.delearmanagementapp.response;
 
+import com.techlambdas.delearmanagementapp.constant.StockStatus;
 import lombok.Data;
 
 import java.util.Map;
 
 @Data
 public class StockResponse {
+    private String stockId;
     private String partNo;
     private String itemName;
     private String categoryId;
@@ -16,4 +18,5 @@ public class StockResponse {
     private String branchId;
     private String branchName;
     private String hsnSacCode;
+    private StockStatus stockStatus;
 }

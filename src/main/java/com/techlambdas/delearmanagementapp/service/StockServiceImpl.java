@@ -51,6 +51,7 @@ public class StockServiceImpl implements StockService{
     public Stock createStock(StockRequest stockRequest) {
         try {
             Stock stock = stockMapper.mapStockRequestToStock(stockRequest);
+            stock.setStockId(RandomIdGenerator.getRandomId());
             stock.setStockStatus(StockStatus.Available);
             return stockRepository.save(stock);
         }catch (Exception ex) {
@@ -107,6 +108,7 @@ public class StockServiceImpl implements StockService{
                     stock.setPurchaseItem(purchaseItem);
                     stock.setSalesItem(salesItem);
                     stock.setStockStatus(StockStatus.Available);
+                    stock.setStockId(RandomIdGenerator.getRandomId());
                     stockRepository.save(stock);
                     stocks.add(stock);
                 }
@@ -195,5 +197,23 @@ public class StockServiceImpl implements StockService{
     @Override
     public List<TransferResponse> getTransferReceivedDetails(String branchId, TransferStatus transferStatus) {
         return null;
+    }
+
+    @Override
+    public String approveTransfer(String branchId, String transferId) {
+        List<Stock>stocks =customStockRepository.findStocksByTransferId(transferId);
+        for (Stock stock:stocks){
+            for (TransferDetail transferDetail:stock.getTransferDetails()){
+                if (transferDetail.getStatus().equals(Status.CURRENT)){
+                    stock.setStockStatus(StockStatus.Available);
+                    transferDetail.setReceivedDate(LocalDateTime.now());
+                    if (transferDetail.getTransferToBranch().equals(branchId)) {
+                        stock.setBranchId(transferDetail.getTransferToBranch());
+                    }
+                }
+            }
+            stockRepository.save(stock);
+        }
+        return "Stock Updated Successfully";
     }
 }

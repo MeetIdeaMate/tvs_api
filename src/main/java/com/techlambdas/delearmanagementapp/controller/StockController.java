@@ -33,10 +33,11 @@ public class StockController {
     }
     @GetMapping
     public ResponseEntity<List<StockResponse>> getAllStockS(@RequestParam(required = false) String partNo,
-                                                    @RequestParam(required = false) String itemName,
-                                                    @RequestParam(required = false) String engineNo,
-                                                    @RequestParam(required = false) String frameNo,
-                                                            @RequestParam(required = false) String categoryName){
+                                                            @RequestParam(required = false) String itemName,
+                                                            @RequestParam(required = false) String engineNo,
+                                                            @RequestParam(required = false) String frameNo,
+                                                            @RequestParam(required = false) String categoryName,
+                                                            @RequestParam(required = false) String branchId){
         List<StockResponse> stocks=stockService.getAllStocks(partNo,itemName,engineNo,frameNo,categoryName);
         return successResponse(HttpStatus.OK,"Stocks",stocks);
     }
@@ -53,7 +54,8 @@ public class StockController {
                                                            @RequestParam(required = false) String frameNo,
                                                            @RequestParam(defaultValue = "0") int page,
                                                            @RequestParam(defaultValue = "10") int size,
-                                                                   @RequestParam(required = false) String categoryName)
+                                                                   @RequestParam(required = false) String categoryName,
+                                                                   @RequestParam(required = false) String branchId)
     {
         Pageable pageable = PageRequest.of(page,size);
         Page<StockResponse> stockPage = stockService.getAllStocksWithPage(partNo,itemName,engineNo,frameNo, pageable,categoryName);
@@ -77,9 +79,9 @@ public class StockController {
       List<TransferResponse> transferResponses = stockService.getTransferDetails(branchId,transferStatus);
         return successResponse(HttpStatus.OK,"transferDetails",transferResponses);
     }
-    @GetMapping("/transfer/received")
-    public ResponseEntity<List<TransferResponse>>getTransferReceivedDetails(@RequestParam  String branchId, @RequestParam(required = false) TransferStatus transferStatus) {
-        List<TransferResponse> transferResponses = stockService.getTransferReceivedDetails(branchId,transferStatus);
-        return successResponse(HttpStatus.OK,"transferDetails",transferResponses);
+    @PatchMapping("/transfer/approve")
+    public ResponseEntity<String>approveTransfer(@RequestParam  String branchId, @RequestParam String transferId) {
+        String result= stockService.approveTransfer(branchId,transferId);
+        return successResponse(HttpStatus.OK,"success",result);
     }
 }

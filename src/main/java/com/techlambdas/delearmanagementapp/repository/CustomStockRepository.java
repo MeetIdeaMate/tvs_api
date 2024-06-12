@@ -16,4 +16,6 @@ public interface CustomStockRepository {
     List<Stock> findByPartNoAndBranchId(String partNo, String transferFromBranch);
 
     List<TransferResponse> findTransferDetails(String branchId);
+
+    List<Stock> findStocksByTransferId(String transferId);
 }

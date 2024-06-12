@@ -157,6 +157,15 @@ public class CustomStockRepositoryImpl implements CustomStockRepository{
         return results.getMappedResults();
     }
 
+    @Override
+    public List<Stock> findStocksByTransferId(String transferId) {
+        Query query=new Query();
+        query.addCriteria(Criteria.where("transferDetails.transferId").is(transferId));
+        query.addCriteria(Criteria.where("transferDetails.status").is(Status.CURRENT));
+        query.addCriteria(Criteria.where("stockStatus").is(StockStatus.Transfer));
+        return mongoTemplate.find(query, Stock.class);
+    }
+
     public List<String>getCategoryNameFromCategory(String categoryName)
     {
         Query query=new Query();

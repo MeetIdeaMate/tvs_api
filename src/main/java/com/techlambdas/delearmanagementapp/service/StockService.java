@@ -34,4 +34,6 @@ public interface StockService {
     List<TransferResponse> getTransferDetails(String branchId, TransferStatus transferStatus);
 
     List<TransferResponse> getTransferReceivedDetails(String branchId, TransferStatus transferStatus);
+
+    String approveTransfer(String branchId, String transferId);
 }

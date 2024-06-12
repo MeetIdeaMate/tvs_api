@@ -36,8 +36,10 @@ public class PurchaseController
                                                      @RequestParam(required = false) String p_invoiceNo,
                                                      @RequestParam(required = false) String p_orderRefNo,
                                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-                                                                 @RequestParam(required = false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate){
-        List<PurchaseResponse> purchases=purchaseService.getAllPurchases(purchaseNo,p_invoiceNo,p_orderRefNo,fromDate,toDate);
+                                                                 @RequestParam(required = false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+                                                                 @RequestParam(required = false) String categoryName,
+                                                                 @RequestParam(required = false) String branchId){
+        List<PurchaseResponse> purchases=purchaseService.getAllPurchases(purchaseNo,p_invoiceNo,p_orderRefNo,fromDate,toDate,categoryName,branchId);
         return successResponse(HttpStatus.CREATED,"purchases",purchases);
     }
     @PutMapping("/{purchaseNo}")
@@ -54,10 +56,11 @@ public class PurchaseController
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
             @RequestParam(required = false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
-            @RequestParam(required = false) String categoryName
+            @RequestParam(required = false) String categoryName,
+            @RequestParam(required = false) String branchId
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<PurchaseResponse> purchasesPage = purchaseService.getAllPurchasesWithPage(purchaseNo,p_invoiceNo,p_orderRefNo, pageable,fromDate,toDate,categoryName);
+        Page<PurchaseResponse> purchasesPage = purchaseService.getAllPurchasesWithPage(purchaseNo,p_invoiceNo,p_orderRefNo, pageable,fromDate,toDate,categoryName,branchId);
 
         return successResponse(HttpStatus.OK,"purchasesWithPage",purchasesPage);
     }
