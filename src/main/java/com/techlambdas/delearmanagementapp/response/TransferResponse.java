@@ -6,11 +6,13 @@ import java.util.List;
 
 @Data
 public class TransferResponse {
+    private String transferId;
+    private String fromBranchId;
+    private String fromBranchName;
+    private String toBranchId;
+    private String toBranchName;
     private List<TransferItem>transferItems;
     private int totalQuantity;
-    private String transferFromBranch;
-    private String fromBranchName;
-    private String transferToBranch;
     private LocalDateTime transferDate;
     private LocalDateTime receivedDate;
     private TransferStatus transferStatus;

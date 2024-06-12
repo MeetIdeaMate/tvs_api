@@ -2,7 +2,6 @@ package com.techlambdas.delearmanagementapp.response;
 
 import com.techlambdas.delearmanagementapp.model.GstDetail;
 import com.techlambdas.delearmanagementapp.model.Incentive;
-import com.techlambdas.delearmanagementapp.model.MainSpecInfo;
 import com.techlambdas.delearmanagementapp.model.Taxes;
 import lombok.Data;
 

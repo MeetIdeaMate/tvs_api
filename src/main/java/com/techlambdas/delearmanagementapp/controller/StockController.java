@@ -1,6 +1,8 @@
 package com.techlambdas.delearmanagementapp.controller;
 
+import com.techlambdas.delearmanagementapp.constant.TransferStatus;
 import com.techlambdas.delearmanagementapp.model.Stock;
+import com.techlambdas.delearmanagementapp.request.StockAddReq;
 import com.techlambdas.delearmanagementapp.request.StockRequest;
 import com.techlambdas.delearmanagementapp.request.TransferRequest;
 import com.techlambdas.delearmanagementapp.response.StockResponse;
@@ -30,37 +32,38 @@ public class StockController {
         return successResponse(HttpStatus.CREATED,"stock",stock);
     }
     @GetMapping
-    public ResponseEntity<List<Stock>> getAllStockS(@RequestParam(required = false) String partNo,
+    public ResponseEntity<List<StockResponse>> getAllStockS(@RequestParam(required = false) String partNo,
                                                     @RequestParam(required = false) String itemName,
                                                     @RequestParam(required = false) String engineNo,
-                                                    @RequestParam(required = false) String frameNo)
-    {
-        List<StockResponse> stocks=stockService.getAllStocks(partNo,itemName,engineNo,frameNo);
-        return successResponse(HttpStatus.CREATED,"Stocks",stocks);
+                                                    @RequestParam(required = false) String frameNo,
+                                                            @RequestParam(required = false) String categoryName){
+        List<StockResponse> stocks=stockService.getAllStocks(partNo,itemName,engineNo,frameNo,categoryName);
+        return successResponse(HttpStatus.OK,"Stocks",stocks);
     }
     @PutMapping("/{id}")
     public ResponseEntity<Stock> updateStockDetails(@PathVariable String id,@RequestBody StockRequest stockRequest)
     {
         Stock stock=stockService.updateStockDetails(id,stockRequest);
-        return successResponse(HttpStatus.CREATED,"UpdatedStock",stock);
+        return successResponse(HttpStatus.OK,"UpdatedStock",stock);
     }
     @GetMapping("/page")
-    public ResponseEntity<Page<Stock>> getAllStockWithPage(@RequestParam(required = false) String partNo,
+    public ResponseEntity<Page<StockResponse>> getAllStockWithPage(@RequestParam(required = false) String partNo,
                                                            @RequestParam(required = false) String itemName,
                                                            @RequestParam(required = false) String engineNo,
                                                            @RequestParam(required = false) String frameNo,
                                                            @RequestParam(defaultValue = "0") int page,
-                                                           @RequestParam(defaultValue = "10") int size)
+                                                           @RequestParam(defaultValue = "10") int size,
+                                                                   @RequestParam(required = false) String categoryName)
     {
         Pageable pageable = PageRequest.of(page,size);
-        Page<Stock> stockPage = stockService.getAllStocksWithPage(partNo,itemName,engineNo,frameNo, pageable);
-        return successResponse(HttpStatus.CREATED,"stockWithPage",stockPage);
+        Page<StockResponse> stockPage = stockService.getAllStocksWithPage(partNo,itemName,engineNo,frameNo, pageable,categoryName);
+        return successResponse(HttpStatus.OK,"stockWithPage",stockPage);
     }
-    @PostMapping("/{purchaseId}")
+    @PatchMapping("/{purchaseId}")
     public ResponseEntity<List<StockResponse>> createStockFromPurchase(@PathVariable String purchaseId,
-                                                                           @RequestParam(required = false) List<String> partNo)
+                                                                       @RequestBody StockAddReq stockAddReq)
     {
-        List<StockResponse> stockResponses=stockService.createStockFromPurchase(purchaseId,partNo);
+        List<StockResponse> stockResponses=stockService.createStockFromPurchase(purchaseId,stockAddReq);
         return successResponse(HttpStatus.CREATED,"stock",stockResponses);
     }
 
@@ -69,9 +72,14 @@ public class StockController {
         String result = stockService.createTransfer(transferRequest);
         return successResponse(HttpStatus.CREATED,"success",result);
     }
-//    @GetMapping("/transfer")
-//    public ResponseEntity<List<TransferResponse>>getTransfer(@RequestParam  String branchId, @RequestParam TransferStatus transferStatus) {
-//      List<TransferResponse> transferResponses = stockService.
-//        return successResponse(HttpStatus.OK,"",result);
-//    }
+    @GetMapping("/transferd")
+    public ResponseEntity<List<TransferResponse>>getTransferDetails(@RequestParam  (required = false)String branchId, @RequestParam(required = false) TransferStatus transferStatus) {
+      List<TransferResponse> transferResponses = stockService.getTransferDetails(branchId,transferStatus);
+        return successResponse(HttpStatus.OK,"transferDetails",transferResponses);
+    }
+    @GetMapping("/transfer/received")
+    public ResponseEntity<List<TransferResponse>>getTransferReceivedDetails(@RequestParam  String branchId, @RequestParam(required = false) TransferStatus transferStatus) {
+        List<TransferResponse> transferResponses = stockService.getTransferReceivedDetails(branchId,transferStatus);
+        return successResponse(HttpStatus.OK,"transferDetails",transferResponses);
+    }
 }
