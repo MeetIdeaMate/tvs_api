@@ -2,6 +2,7 @@ package com.techlambdas.delearmanagementapp.repository;
 
 import com.mongodb.BasicDBObject;
 import com.techlambdas.delearmanagementapp.constant.Status;
+import com.techlambdas.delearmanagementapp.constant.StockStatus;
 import com.techlambdas.delearmanagementapp.model.Category;
 import com.techlambdas.delearmanagementapp.model.Item;
 import com.techlambdas.delearmanagementapp.model.Stock;
@@ -43,12 +44,14 @@ public class CustomStockRepositoryImpl implements CustomStockRepository{
             query.addCriteria(Criteria.where("mainSpecValue.engineNo").is(engineNo));
         if (frameNo!=null)
             query.addCriteria(Criteria.where("mainSpecValue.frameNo").is(frameNo));
+            query.addCriteria(Criteria.where("stockStatus").is(StockStatus.Available));
         return mongoTemplate.find(query, Stock.class);
     }
 
     @Override
     public Page<Stock> getAllStocksWithPage(String partNo,String itemName, String engineNo,String frameNo,Pageable pageable,String categoryName) {
         Query query=new Query();
+        query.addCriteria(Criteria.where("stockStatus").is(StockStatus.Available));
         if (partNo!=null)
             query.addCriteria(Criteria.where("partNo").is(partNo));
         if (itemName!=null)
@@ -163,5 +166,4 @@ public class CustomStockRepositoryImpl implements CustomStockRepository{
         List<Category> categoryList=mongoTemplate.find(query, Category.class);
         return categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
     }
-
 }
