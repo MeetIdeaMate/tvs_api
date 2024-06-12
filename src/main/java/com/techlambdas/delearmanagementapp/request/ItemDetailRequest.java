@@ -10,6 +10,7 @@ public class ItemDetailRequest {
     private String partNo;
     private String itemName;
     private String categoryId;
+    private String hsnSacCode;
     private List<Map<String, String>> mainSpecValues;
     private Map<String, String> specificationsValue;
     private double unitRate;

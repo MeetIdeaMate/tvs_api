@@ -9,6 +9,7 @@ import java.util.Map;
 public class ItemDetail {
     private String partNo;
     private String categoryId;
+    private String hsnSacCode;
     private Map<String,String> mainSpecValue;
     private Map<String,String> specificationsValue;
     private double unitRate;
