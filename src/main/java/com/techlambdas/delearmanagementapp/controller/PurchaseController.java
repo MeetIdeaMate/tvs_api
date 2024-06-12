@@ -69,4 +69,9 @@ public class PurchaseController
         ItemDetail itemDetail = purchaseService.getItemDetailsByPartNo(partNo);
         return successResponse(HttpStatus.OK,"ItemDetailByPartNo",itemDetail);
     }
+    @PatchMapping("/cancel/{purchaseId}")
+    public ResponseEntity<String> cancelPurchase(@PathVariable String purchaseId){
+        String result=purchaseService.cancelPurchase(purchaseId);
+        return successResponse(HttpStatus.CREATED,"success",result);
+    }
 }

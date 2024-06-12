@@ -287,4 +287,17 @@ public class PurchaseServiceImpl implements PurchaseService {
             }
             return existingItem;
     }
+
+    @Override
+    public String cancelPurchase(String purchaseId) {
+        Optional<Purchase> existingPurchase = purchaseRepository.findByPurchaseId(purchaseId);
+            if (existingPurchase.isPresent()){
+               Purchase purchase= existingPurchase.get();
+               purchase.setCancelled(true);
+               purchaseRepository.save(purchase);
+               return "Cancelled Successfully";
+            }else {
+                throw new DataNotFoundException("Purchase not found this purchaseId : " + purchaseId);
+            }
+    }
 }
