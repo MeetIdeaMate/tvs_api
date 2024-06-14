@@ -93,7 +93,7 @@ public class CustomPurchaseRepositoryImpl implements CustomPurchaseRepository{
     public Purchase findPuechaseByPartNoAndMainspecValue(String partNo, Map<String, String> mainSpecValue) {
         Query query = new Query();
         query.addCriteria(Criteria.where("itemDetails.partNo").is(partNo));
-        query.addCriteria(Criteria.where("mainSpecValue").is(mainSpecValue));
+        query.addCriteria(Criteria.where("itemDetails.mainSpecValue").is(mainSpecValue));
         return mongoTemplate.findOne(query, Purchase.class);
     }
 }

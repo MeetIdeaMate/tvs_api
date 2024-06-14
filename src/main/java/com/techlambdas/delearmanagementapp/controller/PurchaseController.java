@@ -75,8 +75,8 @@ public class PurchaseController
         String result=purchaseService.cancelPurchase(purchaseId);
         return successResponse(HttpStatus.CREATED,"success",result);
     }
-    @GetMapping("/validate")
-    public ResponseEntity<Boolean> validatePurchaseItem(@RequestParam String partNo,@RequestParam Map<String,String> mainSpecValue) {
+    @PostMapping("/validate")
+    public ResponseEntity<Boolean> validatePurchaseItem(@RequestParam String partNo,@RequestBody Map<String,String> mainSpecValue) {
         Boolean isExist = purchaseService.validatePurchaseItem(partNo,mainSpecValue);
         return successResponse(HttpStatus.OK,"successResponse",isExist);
     }
