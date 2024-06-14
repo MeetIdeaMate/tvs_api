@@ -1,12 +1,16 @@
 package com.techlambdas.delearmanagementapp.service;
 
+import com.techlambdas.delearmanagementapp.constant.TransferStatus;
+import com.techlambdas.delearmanagementapp.constant.TransferType;
 import com.techlambdas.delearmanagementapp.model.Sales;
 import com.techlambdas.delearmanagementapp.model.Stock;
 import com.techlambdas.delearmanagementapp.request.SalesRequest;
+import com.techlambdas.delearmanagementapp.request.StockAddReq;
 import com.techlambdas.delearmanagementapp.request.StockRequest;
 import com.techlambdas.delearmanagementapp.request.TransferRequest;
 import com.techlambdas.delearmanagementapp.response.PurchaseResponse;
 import com.techlambdas.delearmanagementapp.response.StockResponse;
+import com.techlambdas.delearmanagementapp.response.TransferResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -16,15 +20,20 @@ import java.util.Optional;
 public interface StockService {
     Stock createStock(StockRequest stockRequest);
 
-    List<StockResponse> getAllStocks(String partNo, String itemName,String engineNo,String frameNo);
+    List<StockResponse> getAllStocks(String partNo, String itemName,String keyValue,String categoryName);
 
-    Stock updateStockDetails(String id, StockRequest stockRequest);
+//    Stock updateStockDetails(String id, StockRequest stockRequest);
 
-    Page<Stock> getAllStocksWithPage(String partNo,String itemName,String engineNo,String frameNo, Pageable pageable);
+    Page<StockResponse> getAllStocksWithPage(String partNo,String itemName,String keyValue, Pageable pageable,String categoryName);
 
-    List<StockResponse> createStockFromPurchase(String purchaseId, List<String> partNo);
+    List<StockResponse> createStockFromPurchase(String purchaseId, StockAddReq stockAddReq);
 
-    void mapSalesRequestToStock(SalesRequest salesRequest);
+  void updateSalesInfoToStock(Sales sales);
 
     String createTransfer(TransferRequest transferRequest);
+
+    List<TransferResponse> getTransferDetails(String fromBranchId,String toBranchId, TransferStatus transferStatus, TransferType transferType);
+
+
+    String approveTransfer(String branchId, String transferId);
 }

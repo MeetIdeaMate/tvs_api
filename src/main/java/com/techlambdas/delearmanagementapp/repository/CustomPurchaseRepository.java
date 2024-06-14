@@ -8,14 +8,17 @@ import org.springframework.data.domain.Pageable;
 import java.util.Date;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public interface CustomPurchaseRepository {
 
-    List<Purchase> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo,LocalDate fromDate,LocalDate toDate);
+    List<Purchase> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo,LocalDate fromDate,LocalDate toDate,String categoryName,String branchId);
 
-    Page<Purchase> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable, LocalDate fromDate,LocalDate toDate);
+    Page<Purchase> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable, LocalDate fromDate,LocalDate toDate,String categoryName,String branchId);
 
     Purchase findLastPurchaseItemDetailsByPartNo(String partNo);
 
     List<PurchaseReport> getPurchaseReport(Date fromDate, Date toDate);
+
+    Purchase findPuechaseByPartNoAndMainspecValue(String partNo, Map<String, String> mainSpecValue);
 }

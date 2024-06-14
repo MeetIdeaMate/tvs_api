@@ -1,5 +1,4 @@
 package com.techlambdas.delearmanagementapp.controller;
-
 import com.techlambdas.delearmanagementapp.model.ItemDetail;
 import com.techlambdas.delearmanagementapp.model.Purchase;
 import com.techlambdas.delearmanagementapp.request.PurchaseRequest;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import static com.techlambdas.delearmanagementapp.response.AppResponse.successResponse;
 
@@ -40,8 +40,10 @@ public class PurchaseController
                                                      @RequestParam(required = false) String p_invoiceNo,
                                                      @RequestParam(required = false) String p_orderRefNo,
                                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-                                                                 @RequestParam(required = false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate){
-        List<PurchaseResponse> purchases=purchaseService.getAllPurchases(purchaseNo,p_invoiceNo,p_orderRefNo,fromDate,toDate);
+                                                                 @RequestParam(required = false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+                                                                 @RequestParam(required = false) String categoryName,
+                                                                 @RequestParam(required = false) String branchId){
+        List<PurchaseResponse> purchases=purchaseService.getAllPurchases(purchaseNo,p_invoiceNo,p_orderRefNo,fromDate,toDate,categoryName,branchId);
         return successResponse(HttpStatus.CREATED,"purchases",purchases);
     }
     @PutMapping("/{purchaseNo}")
@@ -57,8 +59,10 @@ public class PurchaseController
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @RequestParam(required = false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
-
+            @RequestParam(required = false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            @RequestParam(required = false) String categoryName,
+            @RequestParam(required = false) String branchId
+    ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<PurchaseResponse> purchasesPage = purchaseService.getAllPurchasesWithPage(purchaseNo,p_invoiceNo,p_orderRefNo, pageable,fromDate,toDate);
 
@@ -68,6 +72,16 @@ public class PurchaseController
     public ResponseEntity<ItemDetail> getPurchasesByPartNo(@PathVariable String partNo) {
         ItemDetail itemDetail = purchaseService.getItemDetailsByPartNo(partNo);
         return successResponse(HttpStatus.OK,"ItemDetailByPartNo",itemDetail);
+    }
+    @PatchMapping("/cancel/{purchaseId}")
+    public ResponseEntity<String> cancelPurchase(@PathVariable String purchaseId){
+        String result=purchaseService.cancelPurchase(purchaseId);
+        return successResponse(HttpStatus.CREATED,"success",result);
+    }
+    @GetMapping("/validate")
+    public ResponseEntity<Boolean> validatePurchaseItem(@RequestParam String partNo,@RequestParam Map<String,String> mainSpecValue) {
+        Boolean isExist = purchaseService.validatePurchaseItem(partNo,mainSpecValue);
+        return successResponse(HttpStatus.OK,"successResponse",isExist);
     }
     @GetMapping("/report")
     public ResponseEntity<List<PurchaseReport>> getPurchaseReport(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,

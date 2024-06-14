@@ -73,6 +73,10 @@ public abstract class CommonMapper {
     @Mapping(target = "branchName", source = "branchId", qualifiedByName = "mapBranchName")
     public abstract StockResponse toStockResponse(Stock stock);
 
+    @Mapping(target = "categoryName", source = "categoryId", qualifiedByName = "mapCategoryName")
+    @Mapping(target = "itemName", source = "partNo", qualifiedByName = "mapItemName")
+    public abstract TransferItem mapTransferItem(TransferItem transferItem) ;
+
     @Mapping(target = "itemName", source = "partNo", qualifiedByName = "mapItemName")
     @Mapping(target = "customerName", source = "customerId", qualifiedByName= "mapCustomerName")
     public abstract ReceiptResponse ToReceiptResponse(Receipt receipt);
