@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -22,8 +23,11 @@ public class CustomPurchaseRepositoryImpl implements CustomPurchaseRepository{
     @Autowired
     private MongoTemplate mongoTemplate;
     @Override
-    public List<Purchase> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo,LocalDate fromDate,LocalDate toDate) {
+    public List<Purchase> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo,LocalDate fromDate,LocalDate toDate,String categoryName,String branchId) {
         Query query=new Query();
+        if (Optional.ofNullable(branchId).isPresent()){
+            query.addCriteria(Criteria.where("branchId").is(branchId));
+        }
         if (fromDate != null && toDate != null) {
             query.addCriteria(Criteria.where("p_invoiceDate").gte(fromDate).lte(toDate));
         }
@@ -31,13 +35,18 @@ public class CustomPurchaseRepositoryImpl implements CustomPurchaseRepository{
             query.addCriteria(Criteria.where("purchaseNo").is(purchaseNo));
         if (pInvoiceNo!=null)
             query.addCriteria(Criteria.where("pInvoiceNo").regex(pInvoiceNo));
+        if (Optional.ofNullable(categoryName).isPresent()) {
+            List<String> categoryIdList= getCategoryNameFromCategory(categoryName);
+            query.addCriteria(Criteria.where("itemDetails.categoryId").in(categoryIdList));
+        }
+        query.addCriteria(Criteria.where("isCancelled").is(false));
         if (pOrderRefNo!=null)
             query.addCriteria(Criteria.where("pInvoiceNo").regex(pOrderRefNo));
         return mongoTemplate.find(query, Purchase.class);
     }
 
     @Override
-    public Page<Purchase> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable, LocalDate fromDate, LocalDate toDate,String categoryName) {
+    public Page<Purchase> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable, LocalDate fromDate, LocalDate toDate,String categoryName,String branchId) {
         Query query=new Query();
         if (fromDate != null && toDate != null) {
             query.addCriteria(Criteria.where("p_invoiceDate").gte(fromDate).lte(toDate));
@@ -46,6 +55,8 @@ public class CustomPurchaseRepositoryImpl implements CustomPurchaseRepository{
             List<String> categoryIdList= getCategoryNameFromCategory(categoryName);
             query.addCriteria(Criteria.where("itemDetails.categoryId").in(categoryIdList));
         }
+        query.addCriteria(Criteria.where("isCancelled").is(false));
+
         if (purchaseNo!=null)
             query.addCriteria(Criteria.where("purchaseNo").is(purchaseNo));
         if (pInvoiceNo!=null)
@@ -76,5 +87,13 @@ public class CustomPurchaseRepositoryImpl implements CustomPurchaseRepository{
                     .limit(1);
         return mongoTemplate.findOne(query, Purchase.class);
 
+    }
+
+    @Override
+    public Purchase findPuechaseByPartNoAndMainspecValue(String partNo, Map<String, String> mainSpecValue) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("itemDetails.partNo").is(partNo));
+        query.addCriteria(Criteria.where("mainSpecValue").is(mainSpecValue));
+        return mongoTemplate.findOne(query, Purchase.class);
     }
 }

@@ -1,6 +1,7 @@
 package com.techlambdas.delearmanagementapp.controller;
 
 import com.techlambdas.delearmanagementapp.constant.TransferStatus;
+import com.techlambdas.delearmanagementapp.constant.TransferType;
 import com.techlambdas.delearmanagementapp.model.Stock;
 import com.techlambdas.delearmanagementapp.request.StockAddReq;
 import com.techlambdas.delearmanagementapp.request.StockRequest;
@@ -15,10 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.Optional;
-
 import static com.techlambdas.delearmanagementapp.response.AppResponse.successResponse;
 
 @RestController
@@ -33,30 +31,31 @@ public class StockController {
     }
     @GetMapping
     public ResponseEntity<List<StockResponse>> getAllStockS(@RequestParam(required = false) String partNo,
-                                                    @RequestParam(required = false) String itemName,
-                                                    @RequestParam(required = false) String engineNo,
-                                                    @RequestParam(required = false) String frameNo,
-                                                            @RequestParam(required = false) String categoryName){
-        List<StockResponse> stocks=stockService.getAllStocks(partNo,itemName,engineNo,frameNo,categoryName);
+                                                            @RequestParam(required = false) String itemName,
+                                                            @RequestParam(required = false) String keyValue,
+
+                                                            @RequestParam(required = false) String categoryName,
+                                                            @RequestParam(required = false) String branchId){
+        List<StockResponse> stocks=stockService.getAllStocks(partNo,itemName,keyValue,categoryName);
         return successResponse(HttpStatus.OK,"Stocks",stocks);
     }
-    @PutMapping("/{id}")
-    public ResponseEntity<Stock> updateStockDetails(@PathVariable String id,@RequestBody StockRequest stockRequest)
-    {
-        Stock stock=stockService.updateStockDetails(id,stockRequest);
-        return successResponse(HttpStatus.OK,"UpdatedStock",stock);
-    }
+//    @PutMapping("/{id}")
+//    public ResponseEntity<Stock> updateStockDetails(@PathVariable String id,@RequestBody StockRequest stockRequest)
+//    {
+//        Stock stock=stockService.updateStockDetails(id,stockRequest);
+//        return successResponse(HttpStatus.OK,"UpdatedStock",stock);
+//    }
     @GetMapping("/page")
     public ResponseEntity<Page<StockResponse>> getAllStockWithPage(@RequestParam(required = false) String partNo,
                                                            @RequestParam(required = false) String itemName,
-                                                           @RequestParam(required = false) String engineNo,
-                                                           @RequestParam(required = false) String frameNo,
+                                                           @RequestParam(required = false) String keyValue,
                                                            @RequestParam(defaultValue = "0") int page,
                                                            @RequestParam(defaultValue = "10") int size,
-                                                                   @RequestParam(required = false) String categoryName)
+                                                                   @RequestParam(required = false) String categoryName,
+                                                                   @RequestParam(required = false) String branchId)
     {
         Pageable pageable = PageRequest.of(page,size);
-        Page<StockResponse> stockPage = stockService.getAllStocksWithPage(partNo,itemName,engineNo,frameNo, pageable,categoryName);
+        Page<StockResponse> stockPage = stockService.getAllStocksWithPage(partNo,itemName,keyValue, pageable,categoryName);
         return successResponse(HttpStatus.OK,"stockWithPage",stockPage);
     }
     @PatchMapping("/{purchaseId}")
@@ -73,13 +72,16 @@ public class StockController {
         return successResponse(HttpStatus.CREATED,"success",result);
     }
     @GetMapping("/transferd")
-    public ResponseEntity<List<TransferResponse>>getTransferDetails(@RequestParam  (required = false)String branchId, @RequestParam(required = false) TransferStatus transferStatus) {
-      List<TransferResponse> transferResponses = stockService.getTransferDetails(branchId,transferStatus);
+    public ResponseEntity<List<TransferResponse>>getTransferDetails(@RequestParam  (required = false)String fromBranchId,
+                                                                    @RequestParam  (required = false)String toBranchId,
+                                                                    @RequestParam(required = false) TransferStatus transferStatus,
+                                                                    @RequestParam(required = false) TransferType transferType) {
+      List<TransferResponse> transferResponses = stockService.getTransferDetails(fromBranchId,toBranchId,transferStatus,transferType);
         return successResponse(HttpStatus.OK,"transferDetails",transferResponses);
     }
-    @GetMapping("/transfer/received")
-    public ResponseEntity<List<TransferResponse>>getTransferReceivedDetails(@RequestParam  String branchId, @RequestParam(required = false) TransferStatus transferStatus) {
-        List<TransferResponse> transferResponses = stockService.getTransferReceivedDetails(branchId,transferStatus);
-        return successResponse(HttpStatus.OK,"transferDetails",transferResponses);
+    @PatchMapping("/transfer/approve")
+    public ResponseEntity<String>approveTransfer(@RequestParam  String branchId, @RequestParam String transferId) {
+        String result= stockService.approveTransfer(branchId,transferId);
+        return successResponse(HttpStatus.OK,"success",result);
     }
 }

@@ -35,17 +35,21 @@ public class SalesServiceImpl implements  SalesService{
 
     @Autowired
     private ConfigService configService;
+    @Autowired
+    private StockService stockService;
 
 
     @Autowired
     private CommonMapper commonMapper;
 
     @Override
-    public Sales createSales(SalesRequest salesRequest) {
+    public SalesResponse createSales(SalesRequest salesRequest) {
         try {
             Sales sales = salesMapper.mapSalesRequestToSales(salesRequest);
             sales.setInvoiceNo(configService.getNextSalesNoSequence());
-            return salesRepository.save(sales);
+            Sales createdSales= salesRepository.save(sales);
+            stockService.updateSalesInfoToStock(createdSales);
+            return commonMapper.toSalesResponse(createdSales);
         }
         catch (Exception ex) {
             throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex.getCause());
@@ -75,11 +79,11 @@ public class SalesServiceImpl implements  SalesService{
     }
 
     @Override
-    public Sales getSalesByInvoiceNo(String invoiceNo) {
+    public SalesResponse getSalesByInvoiceNo(String invoiceNo) {
         Sales  sales = salesRepository.findByInvoiceNo(invoiceNo);
         if (sales==null)
             throw new DataNotFoundException("not found with ID:  " + invoiceNo);
-        return sales;
+        return commonMapper.toSalesResponse(sales);
     }
 
     @Override

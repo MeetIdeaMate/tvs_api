@@ -162,19 +162,24 @@ public class PurchaseServiceImpl implements PurchaseService {
             if (existingItem == null) {
                 ItemRequest newItem = new ItemRequest();
                 newItem.setCategoryId(itemDetail.getCategoryId());
-                if (Optional.of(itemDetail.getIncentives()).isPresent()&&!itemDetail.getIncentives().isEmpty())
-                 newItem.setIncentive(true);
+                if (Optional.ofNullable(itemDetail.getIncentives()).isPresent()) {
+                    if (!itemDetail.getIncentives().isEmpty())
+                     newItem.setIncentive(true);
+
+                }
                  newItem.setItemName(itemDetail.getItemName());
                  newItem.setPartNo(itemDetail.getPartNo());
-                if (Optional.of(itemDetail.getTaxes()).isPresent()&&!itemDetail.getTaxes().isEmpty())
-                    newItem.setTaxable(true);
+                if (Optional.ofNullable(itemDetail.getTaxes()).isPresent()){
+                    if(!itemDetail.getTaxes().isEmpty())
+                        newItem.setTaxable(true);
+                    }
                 itemService.createItem(newItem);
             }
         }
     }
     @Override
-    public List<PurchaseResponse> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo,LocalDate fromDate,LocalDate toDate) {
-        List<Purchase> purchases = customPurchaseRepository.getAllPurchases(purchaseNo, pInvoiceNo, pOrderRefNo,fromDate,toDate);
+    public List<PurchaseResponse> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo,LocalDate fromDate,LocalDate toDate,String categoryName,String branchId) {
+        List<Purchase> purchases = customPurchaseRepository.getAllPurchases(purchaseNo, pInvoiceNo, pOrderRefNo,fromDate,toDate,categoryName,branchId);
         return purchases.stream()
                 .map(commonMapper::toPurchaseResponse)
                 .collect(Collectors.toList());
@@ -196,8 +201,8 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public Page<PurchaseResponse> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable, LocalDate fromDate,LocalDate toDate,String categoryName) {
-      Page<Purchase>purchases= customPurchaseRepository.getAllPurchasesWithPage(purchaseNo, pInvoiceNo, pOrderRefNo, pageable,fromDate,toDate,categoryName);
+    public Page<PurchaseResponse> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable, LocalDate fromDate,LocalDate toDate,String categoryName,String branchId) {
+      Page<Purchase>purchases= customPurchaseRepository.getAllPurchasesWithPage(purchaseNo, pInvoiceNo, pOrderRefNo, pageable,fromDate,toDate,categoryName,branchId);
       List<PurchaseResponse> purchaseResponses=mapEntityWithResponse(purchases.getContent());
       return new PageImpl<>(purchaseResponses,pageable,purchases.getTotalElements());
     }
@@ -281,5 +286,27 @@ public class PurchaseServiceImpl implements PurchaseService {
                 }
             }
             return existingItem;
+    }
+
+    @Override
+    public String cancelPurchase(String purchaseId) {
+        Optional<Purchase> existingPurchase = purchaseRepository.findByPurchaseId(purchaseId);
+            if (existingPurchase.isPresent()){
+               Purchase purchase= existingPurchase.get();
+               purchase.setCancelled(true);
+               purchaseRepository.save(purchase);
+               return "Cancelled Successfully";
+            }else {
+                throw new DataNotFoundException("Purchase not found this purchaseId : " + purchaseId);
+            }
+    }
+
+    @Override
+    public Boolean validatePurchaseItem(String partNo, Map<String, String> mainSpecValue) {
+        Purchase purchase=customPurchaseRepository.findPuechaseByPartNoAndMainspecValue(partNo,mainSpecValue);
+        if (Optional.ofNullable(purchase).isPresent()){
+            return true;
+        }
+        return false;
     }
 }

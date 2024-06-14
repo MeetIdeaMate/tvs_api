@@ -28,6 +28,8 @@ public class Purchase {
     private double totalIncentiveAmount;
     private double totalInvoiceAmount;
     private double finalTotalInvoiceAmount;
+    private boolean isCancelled;
+    private boolean isStockUpdated;
     @CreatedDate
     private LocalDateTime createdDateTime;
     @CreatedBy

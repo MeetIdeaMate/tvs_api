@@ -27,9 +27,9 @@ public class SalesController {
     SalesService salesService;
 
     @PostMapping
-    public ResponseEntity<Sales> createSales(@RequestBody SalesRequest salesRequest) {
-        Sales sales = salesService.createSales(salesRequest);
-        return successResponse(HttpStatus.CREATED, "sales", sales);
+    public ResponseEntity<SalesResponse> createSales(@RequestBody SalesRequest salesRequest) {
+        SalesResponse sales = salesService.createSales(salesRequest);
+        return successResponse(HttpStatus.CREATED, "salesResponse", sales);
     }
 
 //    @GetMapping
@@ -51,9 +51,9 @@ public class SalesController {
     }
 
     @GetMapping("/{invoiceNo}")
-    public ResponseEntity<Sales> getSalesByInvoiceNo(@PathVariable String invoiceNo){
-        Sales sales =  salesService.getSalesByInvoiceNo(invoiceNo);
-        return successResponse(HttpStatus.OK,"sales",sales);
+    public ResponseEntity<SalesResponse> getSalesByInvoiceNo(@PathVariable String invoiceNo){
+        SalesResponse sales =  salesService.getSalesByInvoiceNo(invoiceNo);
+        return successResponse(HttpStatus.OK,"salesResponse",sales);
     }
 
 //    @GetMapping
@@ -66,7 +66,7 @@ public class SalesController {
 @GetMapping
 public ResponseEntity<List<SalesResponse>>getAllSales(@RequestParam(required = false) String invoiceNo){
     List<SalesResponse> sales=salesService.getAllSales(invoiceNo);
-    return successResponse(HttpStatus.OK,"sales",sales);
+    return successResponse(HttpStatus.OK,"salesList",sales);
 }
 
 

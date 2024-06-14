@@ -22,5 +22,6 @@ public class ItemDetail {
     private List<Incentive>incentives;
     private double invoiceValue;
     private double finalInvoiceValue;
+    private String stockId;
 }
 
