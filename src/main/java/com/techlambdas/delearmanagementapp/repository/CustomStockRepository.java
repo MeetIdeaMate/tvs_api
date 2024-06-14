@@ -1,8 +1,6 @@
 package com.techlambdas.delearmanagementapp.repository;
-
 import com.techlambdas.delearmanagementapp.constant.TransferType;
 import com.techlambdas.delearmanagementapp.model.Stock;
-import com.techlambdas.delearmanagementapp.model.TransferDetail;
 import com.techlambdas.delearmanagementapp.response.TransferResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
