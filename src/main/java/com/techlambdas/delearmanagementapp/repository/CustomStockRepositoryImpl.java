@@ -45,7 +45,7 @@ public class CustomStockRepositoryImpl implements CustomStockRepository{
             query.addCriteria(Criteria.where("categoryId").in(categoryIdList));
         }
         if (keyValue!=null)
-            query.addCriteria(Criteria.where("mainSpecValue").elemMatch(Criteria.where("$eq").is(keyValue)));
+            query.addCriteria(Criteria.where("itemDetails.mainSpecValue").elemMatch(Criteria.where("$eq").is(keyValue)));
         query.addCriteria(Criteria.where("stockStatus").is(StockStatus.Available));
         return mongoTemplate.find(query, Stock.class);
     }
@@ -67,7 +67,7 @@ public class CustomStockRepositoryImpl implements CustomStockRepository{
             query.addCriteria(Criteria.where("categoryId").in(categoryIdList));
         }
         if (keyValue!=null)
-            query.addCriteria(Criteria.where("mainSpecValue").elemMatch(Criteria.where("$eq").is(keyValue)));
+            query.addCriteria(Criteria.where("itemDetails.mainSpecValue").elemMatch(Criteria.where("$eq").is(keyValue)));
         long count=mongoTemplate.count(query,Stock.class);
         query.with(pageable);
         List<Stock> stocks=mongoTemplate.find(query,Stock.class);
