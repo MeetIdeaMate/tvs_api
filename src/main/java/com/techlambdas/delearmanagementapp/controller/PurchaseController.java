@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import static com.techlambdas.delearmanagementapp.response.AppResponse.successResponse;
 
@@ -73,5 +74,10 @@ public class PurchaseController
     public ResponseEntity<String> cancelPurchase(@PathVariable String purchaseId){
         String result=purchaseService.cancelPurchase(purchaseId);
         return successResponse(HttpStatus.CREATED,"success",result);
+    }
+    @GetMapping("/validate")
+    public ResponseEntity<Boolean> validatePurchaseItem(@RequestParam String partNo,@RequestParam Map<String,String> mainSpecValue) {
+        Boolean isExist = purchaseService.validatePurchaseItem(partNo,mainSpecValue);
+        return successResponse(HttpStatus.OK,"successResponse",isExist);
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -86,5 +87,13 @@ public class CustomPurchaseRepositoryImpl implements CustomPurchaseRepository{
                     .limit(1);
         return mongoTemplate.findOne(query, Purchase.class);
 
+    }
+
+    @Override
+    public Purchase findPuechaseByPartNoAndMainspecValue(String partNo, Map<String, String> mainSpecValue) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("itemDetails.partNo").is(partNo));
+        query.addCriteria(Criteria.where("mainSpecValue").is(mainSpecValue));
+        return mongoTemplate.findOne(query, Purchase.class);
     }
 }

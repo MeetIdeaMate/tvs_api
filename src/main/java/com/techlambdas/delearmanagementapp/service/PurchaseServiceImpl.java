@@ -300,4 +300,13 @@ public class PurchaseServiceImpl implements PurchaseService {
                 throw new DataNotFoundException("Purchase not found this purchaseId : " + purchaseId);
             }
     }
+
+    @Override
+    public Boolean validatePurchaseItem(String partNo, Map<String, String> mainSpecValue) {
+        Purchase purchase=customPurchaseRepository.findPuechaseByPartNoAndMainspecValue(partNo,mainSpecValue);
+        if (Optional.ofNullable(purchase).isPresent()){
+            return true;
+        }
+        return false;
+    }
 }

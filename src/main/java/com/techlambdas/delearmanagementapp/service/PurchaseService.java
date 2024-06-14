@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public interface PurchaseService {
@@ -26,4 +27,6 @@ public interface PurchaseService {
     ItemDetail getItemDetailsByPartNo(String partNo);
 
     String cancelPurchase(String purchaseId);
+
+    Boolean validatePurchaseItem(String partNo, Map<String, String> mainSpecValue);
 }

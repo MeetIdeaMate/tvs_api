@@ -21,12 +21,11 @@ public class Stock {
     private Map<String,String> mainSpecValue;
     private Map<String,String> specificationsValue;
     private int quantity;
-    private int purchaseQuantity;
-    private int salesQuantity;
     private String purchaseId;
-    private String salesId;
     private PurchaseItem purchaseItem;
-    private SalesItem salesItem;
+    private int purchaseQuantity;
+    private List<String>salesIds;
+    private int salesQuantity;
     private String branchId;
     private StockStatus stockStatus;
     private List<TransferDetail> transferDetails;

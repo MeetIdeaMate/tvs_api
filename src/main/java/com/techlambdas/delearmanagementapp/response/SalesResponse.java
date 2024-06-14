@@ -8,7 +8,8 @@ import java.util.List;
 
 @Data
 public class SalesResponse {
-
+    private String salesId;
+    private String stockId;
     private String invoiceType;  // - M-Vehile/E-Vechile/Accessories
     private String invoiceNo;
     private LocalDate invoiceDate;

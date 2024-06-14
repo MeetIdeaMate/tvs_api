@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface SalesService {
 
-    Sales createSales(SalesRequest salesRequest);
+    SalesResponse createSales(SalesRequest salesRequest);
 
     List<SalesResponse> getAllSales(String invoiceNo);
 
@@ -21,7 +21,7 @@ public interface SalesService {
 
      void deleteSales(String invoiceNo);
 
-     Sales getSalesByInvoiceNo(String invoiceNo);
+     SalesResponse getSalesByInvoiceNo(String invoiceNo);
 
 
     List<SalesResponse> getAllSalesView(String invoiceNo);

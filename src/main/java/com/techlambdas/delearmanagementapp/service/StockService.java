@@ -1,6 +1,7 @@
 package com.techlambdas.delearmanagementapp.service;
 
 import com.techlambdas.delearmanagementapp.constant.TransferStatus;
+import com.techlambdas.delearmanagementapp.constant.TransferType;
 import com.techlambdas.delearmanagementapp.model.Sales;
 import com.techlambdas.delearmanagementapp.model.Stock;
 import com.techlambdas.delearmanagementapp.request.SalesRequest;
@@ -19,21 +20,20 @@ import java.util.Optional;
 public interface StockService {
     Stock createStock(StockRequest stockRequest);
 
-    List<StockResponse> getAllStocks(String partNo, String itemName,String engineNo,String frameNo,String categoryName);
+    List<StockResponse> getAllStocks(String partNo, String itemName,String keyValue,String categoryName);
 
-    Stock updateStockDetails(String id, StockRequest stockRequest);
+//    Stock updateStockDetails(String id, StockRequest stockRequest);
 
-    Page<StockResponse> getAllStocksWithPage(String partNo,String itemName,String engineNo,String frameNo, Pageable pageable,String categoryName);
+    Page<StockResponse> getAllStocksWithPage(String partNo,String itemName,String keyValue, Pageable pageable,String categoryName);
 
     List<StockResponse> createStockFromPurchase(String purchaseId, StockAddReq stockAddReq);
 
-    void mapSalesRequestToStock(SalesRequest salesRequest);
+  void updateSalesInfoToStock(Sales sales);
 
     String createTransfer(TransferRequest transferRequest);
 
-    List<TransferResponse> getTransferDetails(String branchId, TransferStatus transferStatus);
+    List<TransferResponse> getTransferDetails(String fromBranchId,String toBranchId, TransferStatus transferStatus, TransferType transferType);
 
-    List<TransferResponse> getTransferReceivedDetails(String branchId, TransferStatus transferStatus);
 
     String approveTransfer(String branchId, String transferId);
 }

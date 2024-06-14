@@ -3,6 +3,7 @@ package com.techlambdas.delearmanagementapp.service;
 import com.techlambdas.delearmanagementapp.constant.Status;
 import com.techlambdas.delearmanagementapp.constant.StockStatus;
 import com.techlambdas.delearmanagementapp.constant.TransferStatus;
+import com.techlambdas.delearmanagementapp.constant.TransferType;
 import com.techlambdas.delearmanagementapp.exception.AlreadyExistException;
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.mapper.CommonMapper;
@@ -61,31 +62,31 @@ public class StockServiceImpl implements StockService{
     }
 
     @Override
-    public List<StockResponse> getAllStocks(String partNo, String itemName, String engineNo, String frameNo,String categoryName) {
-        List<Stock> stocks=customStockRepository.getAllStocks(partNo,itemName,engineNo,frameNo,categoryName);
+    public List<StockResponse> getAllStocks(String partNo, String itemName, String keyValue,String categoryName) {
+        List<Stock> stocks=customStockRepository.getAllStocks(partNo,itemName,keyValue,categoryName);
         return stocks.stream()
                 .map(commonMapper:: toStockResponse)
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public Stock updateStockDetails(String id, StockRequest stockRequest) {
-        try {
-            Stock existingStock=stockRepository.findStockById(id);
-            if (existingStock==null)
-                throw new DataNotFoundException("stocks not found with Id"+id);
-            stockMapper.updateStockDetailFromRequest(stockRequest,existingStock);
-            return stockRepository.save(existingStock);
-        }catch (DataNotFoundException ex){
-            throw new DataNotFoundException("Data not found -- "+ex.getMessage());
-        }catch (Exception ex){
-            throw new RuntimeException("Internal Server Error --"+ex.getMessage(),ex.getCause());
-        }
-    }
+//    @Override
+//    public Stock updateStockDetails(String id, StockRequest stockRequest) {
+//        try {
+//            Stock existingStock=stockRepository.findStockById(id);
+//            if (existingStock==null)
+//                throw new DataNotFoundException("stocks not found with Id"+id);
+//            stockMapper.updateStockDetailFromRequest(stockRequest,existingStock);
+//            return stockRepository.save(existingStock);
+//        }catch (DataNotFoundException ex){
+//            throw new DataNotFoundException("Data not found -- "+ex.getMessage());
+//        }catch (Exception ex){
+//            throw new RuntimeException("Internal Server Error --"+ex.getMessage(),ex.getCause());
+//        }
+//    }
 
     @Override
-    public Page<StockResponse> getAllStocksWithPage(String partNo,String itemName,String engineNo,String frameNo, Pageable pageable,String categoryName) {
-        Page<Stock>stockPage =customStockRepository.getAllStocksWithPage(partNo,itemName,engineNo,frameNo,pageable,categoryName);
+    public Page<StockResponse> getAllStocksWithPage(String partNo,String itemName,String keyValue, Pageable pageable,String categoryName) {
+        Page<Stock>stockPage =customStockRepository.getAllStocksWithPage(partNo,itemName,keyValue,pageable,categoryName);
         List<StockResponse> stockResponses=stockPage.getContent().stream()
                 .map(commonMapper:: toStockResponse)
                 .collect(Collectors.toList());
@@ -110,7 +111,6 @@ public class StockServiceImpl implements StockService{
                     PurchaseItem purchaseItem = stockMapper.itemDetailToPurchaseItem(itemDetail);
                     SalesItem salesItem = stockMapper.itemDetailToSalesItem(itemDetail);
                     stock.setPurchaseItem(purchaseItem);
-                    stock.setSalesItem(salesItem);
                     stock.setStockStatus(StockStatus.Available);
                     stock.setStockId(RandomIdGenerator.getRandomId());
                     stockRepository.save(stock);
@@ -124,14 +124,19 @@ public class StockServiceImpl implements StockService{
                     .collect(Collectors.toList());
     }
     @Override
-    public void mapSalesRequestToStock(SalesRequest salesRequest)
+    public void updateSalesInfoToStock(Sales sales)
     {
-        for (ItemDetail itemDetail:salesRequest.getItemDetails()) {
-            Stock stock = stockMapper.itemDetailToStock(itemDetail, salesRequest.getBranchId());
-            PurchaseItem purchaseItem = stockMapper.itemDetailToPurchaseItem(itemDetail);
-            SalesItem salesItem = stockMapper.itemDetailToSalesItem(itemDetail);
-            stock.setPurchaseItem(purchaseItem);
-            stock.setSalesItem(salesItem);
+        for (ItemDetail itemDetail:sales.getItemDetails()) {
+            Stock stock =stockRepository.findStockByStockId(itemDetail.getStockId());
+            if (Optional.ofNullable(stock.getSalesIds()).isPresent()){
+                stock.getSalesIds().add(sales.getSalesId());
+            }else {
+                List<String> newSalesIds = new ArrayList<>();
+                newSalesIds.add(sales.getSalesId());
+                stock.setSalesIds(newSalesIds);
+            }
+            stock.setQuantity(stock.getQuantity()- itemDetail.getQuantity());
+            stock.setSalesQuantity(stock.getSalesQuantity()+ itemDetail.getQuantity());
             stockRepository.save(stock);
         }
     }
@@ -186,24 +191,30 @@ public class StockServiceImpl implements StockService{
 
 
     @Override
-    public List<TransferResponse> getTransferDetails(String branchId, TransferStatus transferStatus) {
-        List<TransferResponse> transferResponses = customStockRepository.findTransferDetails(branchId);
-        transferResponses.forEach(transferResponse ->
-                transferResponse.setTransferItems(
-                        transferResponse.getTransferItems().stream()
-                                .map(commonMapper::mapTransferItem)
-                                .collect(Collectors.toList())
-                )
-        );
+    public List<TransferResponse> getTransferDetails(String fromBranchId,String toBranchId, TransferStatus transferStatus, TransferType transferType) {
+        List<TransferResponse> transferResponses = customStockRepository.findTransferDetails(fromBranchId,toBranchId,transferType);
+        transferResponses.forEach(transferResponse -> {
+            if (Optional.ofNullable(transferResponse.getReceivedDate()).isPresent()) {
+                if (transferType==TransferType.TRANSFERED) {
+                    transferResponse.setTransferStatus(TransferStatus.COMPLETED);
+                }else if(transferType==TransferType.RECEIVED) {
+                    transferResponse.setTransferStatus(TransferStatus.APPROVED);
+                }
+            }else {
+                if (transferType==TransferType.TRANSFERED) {
+                    transferResponse.setTransferStatus(TransferStatus.INITIATED);
+                }else if(transferType==TransferType.RECEIVED) {
+                    transferResponse.setTransferStatus(TransferStatus.NOT_APPROVED);
+                }
+            }
+            transferResponse.setTransferItems(
+                    transferResponse.getTransferItems().stream()
+                            .map(commonMapper::mapTransferItem)
+                            .collect(Collectors.toList())
+            );
+        });
         return transferResponses;
     }
-
-
-    @Override
-    public List<TransferResponse> getTransferReceivedDetails(String branchId, TransferStatus transferStatus) {
-        return null;
-    }
-
     @Override
     public String approveTransfer(String branchId, String transferId) {
         List<Stock>stocks =customStockRepository.findStocksByTransferId(transferId);
