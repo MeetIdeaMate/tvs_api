@@ -5,10 +5,10 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class SalesRequest {
-    private String stockId;
     private String branchId;
     private String invoiceType;
     private LocalDate invoiceDate;
@@ -25,7 +25,8 @@ public class SalesRequest {
     private double roundOffAmt;
     private double netAmt;
     private PaymentStatus paymentStatus;
-
+    private Map<String,String> mandatoryAddons;
     private Insurance insurance;
     private loanInfo loaninfo;
+    private EvBattery evBattery;
 }

@@ -5,11 +5,11 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class SalesResponse {
     private String salesId;
-    private String stockId;
     private String invoiceType;  // - M-Vehile/E-Vechile/Accessories
     private String invoiceNo;
     private LocalDate invoiceDate;
@@ -33,4 +33,6 @@ public class SalesResponse {
     private double pendingAmt;
     private String branchId;
     private String branchName;
+    private EvBattery evBattery;
+    private Map<String,String> mandatoryAddons;
 }

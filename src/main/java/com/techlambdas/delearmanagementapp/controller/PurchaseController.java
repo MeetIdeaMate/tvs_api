@@ -64,7 +64,7 @@ public class PurchaseController
             @RequestParam(required = false) String branchId
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<PurchaseResponse> purchasesPage = purchaseService.getAllPurchasesWithPage(purchaseNo,p_invoiceNo,p_orderRefNo, pageable,fromDate,toDate);
+        Page<PurchaseResponse> purchasesPage = purchaseService.getAllPurchasesWithPage(purchaseNo,p_invoiceNo,p_orderRefNo, pageable,fromDate,toDate,categoryName,branchId);
 
         return successResponse(HttpStatus.OK,"purchasesWithPage",purchasesPage);
     }

@@ -4,9 +4,11 @@ import lombok.Data;
 import org.springframework.data.annotation.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Document(collection="sales")
@@ -34,6 +36,8 @@ public class Sales {
     private Insurance insurance;
     private loanInfo loaninfo;
     private String branchId;
+    private Map<String,String> mandatoryAddons;
+    private EvBattery evBattery;
 
     @CreatedDate
     private LocalDateTime createdDateTime;

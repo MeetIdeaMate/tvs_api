@@ -1,7 +1,9 @@
 package com.techlambdas.delearmanagementapp.controller;
 
 import com.techlambdas.delearmanagementapp.constant.TransferStatus;
+import com.techlambdas.delearmanagementapp.constant.TransferType;
 import com.techlambdas.delearmanagementapp.model.Stock;
+import com.techlambdas.delearmanagementapp.request.StockAddReq;
 import com.techlambdas.delearmanagementapp.request.StockRequest;
 import com.techlambdas.delearmanagementapp.request.TransferRequest;
 import com.techlambdas.delearmanagementapp.response.StockResponse;

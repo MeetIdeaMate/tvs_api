@@ -42,8 +42,6 @@ public class SalesServiceImpl implements  SalesService{
 
     @Autowired
     private ConfigService configService;
-    @Autowired
-    private StockService stockService;
 
 
     @Autowired
@@ -53,7 +51,6 @@ public class SalesServiceImpl implements  SalesService{
     public SalesResponse createSales(SalesRequest salesRequest) {
         try {
             Sales sales = salesMapper.mapSalesRequestToSales(salesRequest);
-            stockService.mapSalesRequestToStock(salesRequest);
             sales.setInvoiceNo(configService.getNextSalesNoSequence());
             Sales createdSales= salesRepository.save(sales);
             stockService.updateSalesInfoToStock(createdSales);

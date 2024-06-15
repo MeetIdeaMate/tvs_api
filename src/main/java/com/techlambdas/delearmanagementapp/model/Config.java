@@ -18,6 +18,8 @@ public class Config {
     private List<String> configuration;
     private String defaultValue;
     private ConfigType configType;
+    private String configController;//Input/Output
+    private String inputType;//Yes/No/Input textbox/Output is enable the input value is null in default
     @CreatedDate
     private LocalDateTime createdDateTime;
     @CreatedBy
