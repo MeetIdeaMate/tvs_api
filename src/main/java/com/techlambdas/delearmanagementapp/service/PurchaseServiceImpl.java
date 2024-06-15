@@ -17,10 +17,7 @@ import org.springframework.stereotype.Service;
 import com.techlambdas.delearmanagementapp.repository.CustomPurchaseRepository;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -231,8 +228,9 @@ public class PurchaseServiceImpl implements PurchaseService {
     private ItemDetailResponse mapItemDetailToItemDetailResponse(List<ItemDetail> itemDetails) {
         ItemDetail itemDetail=itemDetails.get(0);
         int quantity=itemDetails.size();
-        List<Map<String,String>> mainSpecValues = itemDetails.stream()
+        List<Map<String, String>> mainSpecValues = itemDetails.stream()
                 .map(it -> it.getMainSpecValue())
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         ItemDetailResponse itemDetailResponse =commonMapper.toItemDetailResponse(itemDetail);
         double itemTotalValue=quantity*itemDetail.getUnitRate();
