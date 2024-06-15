@@ -28,8 +28,8 @@ public class PurchaseController
     @Autowired
     private ItemService itemService;
     @PostMapping
-    public ResponseEntity<Purchase> createPurchase(@RequestBody PurchaseRequest purchaseRequest) {
-        Purchase purchase = purchaseService.createPurchase(purchaseRequest);
+    public ResponseEntity<PurchaseResponse> createPurchase(@RequestBody PurchaseRequest purchaseRequest) {
+        PurchaseResponse purchase = purchaseService.createPurchase(purchaseRequest);
         return successResponse(HttpStatus.CREATED,"purchase",purchase);
     }
     @GetMapping
