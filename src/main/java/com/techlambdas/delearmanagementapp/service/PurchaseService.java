@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Service
 public interface PurchaseService {
-    Purchase createPurchase(PurchaseRequest purchaseRequest);
+    PurchaseResponse createPurchase(PurchaseRequest purchaseRequest);
 
     List<PurchaseResponse> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo,LocalDate fromDate,LocalDate toDate,String categoryName,String branchId);
 

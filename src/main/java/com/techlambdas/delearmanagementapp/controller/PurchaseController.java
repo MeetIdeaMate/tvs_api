@@ -31,8 +31,8 @@ public class PurchaseController
     @Autowired
     private ItemService itemService;
     @PostMapping
-    public ResponseEntity<Purchase> createPurchase(@RequestBody PurchaseRequest purchaseRequest) {
-        Purchase purchase = purchaseService.createPurchase(purchaseRequest);
+    public ResponseEntity<PurchaseResponse> createPurchase(@RequestBody PurchaseRequest purchaseRequest) {
+        PurchaseResponse purchase = purchaseService.createPurchase(purchaseRequest);
         return successResponse(HttpStatus.CREATED,"purchase",purchase);
     }
     @GetMapping
@@ -78,8 +78,8 @@ public class PurchaseController
         String result=purchaseService.cancelPurchase(purchaseId);
         return successResponse(HttpStatus.CREATED,"success",result);
     }
-    @GetMapping("/validate")
-    public ResponseEntity<Boolean> validatePurchaseItem(@RequestParam String partNo,@RequestParam Map<String,String> mainSpecValue) {
+    @PostMapping("/validate")
+    public ResponseEntity<Boolean> validatePurchaseItem(@RequestParam String partNo,@RequestBody Map<String,String> mainSpecValue) {
         Boolean isExist = purchaseService.validatePurchaseItem(partNo,mainSpecValue);
         return successResponse(HttpStatus.OK,"successResponse",isExist);
     }

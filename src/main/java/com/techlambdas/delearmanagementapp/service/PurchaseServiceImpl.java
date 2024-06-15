@@ -41,7 +41,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     private CategoryRepository categoryRepository;
 
     @Override
-    public Purchase createPurchase(PurchaseRequest purchaseRequest) {
+    public PurchaseResponse createPurchase(PurchaseRequest purchaseRequest) {
         try {
             Purchase purchase = purchaseMapper.mapPurchaseRequestToPurchase(purchaseRequest);
 
@@ -98,7 +98,8 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchase.setFinalTotalInvoiceAmount(finalInvoiceAmount);
             updateItemRepository(purchaseRequest.getItemDetails());
             purchase.setPurchaseNo(configService.getNextPurchaseNoSequence());
-            return purchaseRepository.save(purchase);
+            Purchase createdPurchase= purchaseRepository.save(purchase);
+            return mapPurchaseToPurchaseResponse(createdPurchase);
         } catch (Exception ex) {
             throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex);
         }

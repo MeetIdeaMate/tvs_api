@@ -45,11 +45,10 @@ public class CustomStockRepositoryImpl implements CustomStockRepository{
             query.addCriteria(Criteria.where("categoryId").in(categoryIdList));
         }
         if (keyValue!=null)
-            query.addCriteria(Criteria.where("mainSpecValue").elemMatch(Criteria.where("$eq").is(keyValue)));
+            query.addCriteria(Criteria.where("itemDetails.mainSpecValue").elemMatch(Criteria.where("$eq").is(keyValue)));
         query.addCriteria(Criteria.where("stockStatus").is(StockStatus.Available));
         return mongoTemplate.find(query, Stock.class);
     }
-
     @Override
     public Page<Stock> getAllStocksWithPage(String partNo,String itemName, String keyValue,Pageable pageable,String categoryName) {
         Query query=new Query();
@@ -68,7 +67,7 @@ public class CustomStockRepositoryImpl implements CustomStockRepository{
             query.addCriteria(Criteria.where("categoryId").in(categoryIdList));
         }
         if (keyValue!=null)
-            query.addCriteria(Criteria.where("mainSpecValue").elemMatch(Criteria.where("$eq").is(keyValue)));
+            query.addCriteria(Criteria.where("itemDetails.mainSpecValue").elemMatch(Criteria.where("$eq").is(keyValue)));
         long count=mongoTemplate.count(query,Stock.class);
         query.with(pageable);
         List<Stock> stocks=mongoTemplate.find(query,Stock.class);
@@ -103,10 +102,10 @@ public class CustomStockRepositoryImpl implements CustomStockRepository{
         stages.add(Aggregation.unwind("transferDetails"));
         stages.add(Aggregation.match(Criteria.where("transferDetails.status").is(Status.CURRENT)));
 
-        if (transferType == TransferType.TRANSFERED &&Optional.ofNullable(fromBranchId).isPresent()) {
+        if (Optional.ofNullable(fromBranchId).isPresent()) {
             stages.add(Aggregation.match(Criteria.where("transferDetails.transferFromBranch").is(fromBranchId)));
         }
-        if (transferType == TransferType.RECEIVED &&Optional.ofNullable(toBranchId).isPresent()) {
+        if (Optional.ofNullable(toBranchId).isPresent()) {
             stages.add(Aggregation.match(Criteria.where("transferDetails.transferToBranch").is(toBranchId)));
         }
         stages.add(Aggregation.lookup("branches", "transferDetails.transferFromBranch", "branchId", "fromBranch"));
