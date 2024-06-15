@@ -19,7 +19,7 @@ public class Config {
     private String defaultValue;
     private ConfigType configType;
     private String configController;//Input/Output
-    private String inputType;//Yes/No/Input textbox/Output is enable the input value is null in default
+    private String inputType;//Yes/No/Input textbox/Output
     @CreatedDate
     private LocalDateTime createdDateTime;
     @CreatedBy
