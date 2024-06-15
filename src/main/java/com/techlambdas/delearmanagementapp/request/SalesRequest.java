@@ -8,7 +8,6 @@ import java.util.List;
 
 @Data
 public class SalesRequest {
-    private String stockId;
     private String branchId;
     private String invoiceType;
     private LocalDate invoiceDate;
