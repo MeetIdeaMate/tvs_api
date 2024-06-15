@@ -150,10 +150,14 @@ public class StockServiceImpl implements StockService{
                  if (stock.getStockId().equals(transferItemReq.getStockId())) {
                      if (transferItemReq.getQuantity() < stock.getQuantity()&&!Optional.ofNullable(stock.getMainSpecValue()).isPresent()) {
                          Stock newStock=new Stock();
-                         newStock=stock;
-                         newStock.setId(null);
                          newStock.setStockId(RandomIdGenerator.getRandomId());
                          newStock.setQuantity(transferItemReq.getQuantity());
+                         newStock.setPurchaseItem(stock.getPurchaseItem());
+                         newStock.setPurchaseQuantity(stock.getPurchaseQuantity());
+                         newStock.setPurchaseId(stock.getPurchaseId());
+                         newStock.setBranchId(stock.getBranchId());
+                         newStock.setPartNo(stock.getPartNo());
+                         newStock.setCategoryId(stock.getCategoryId());
                          stock.setQuantity(stock.getQuantity()- transferItemReq.getQuantity());
                          newStock.setStockStatus(StockStatus.Transfer);
                          stockRepository.save(stock);

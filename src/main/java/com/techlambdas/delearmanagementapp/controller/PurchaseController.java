@@ -2,6 +2,7 @@ package com.techlambdas.delearmanagementapp.controller;
 import com.techlambdas.delearmanagementapp.model.ItemDetail;
 import com.techlambdas.delearmanagementapp.model.Purchase;
 import com.techlambdas.delearmanagementapp.request.PurchaseRequest;
+import com.techlambdas.delearmanagementapp.response.ItemDetailResponse;
 import com.techlambdas.delearmanagementapp.response.PurchaseResponse;
 import com.techlambdas.delearmanagementapp.service.ItemService;
 import com.techlambdas.delearmanagementapp.service.PurchaseService;
@@ -66,8 +67,8 @@ public class PurchaseController
         return successResponse(HttpStatus.OK,"purchasesWithPage",purchasesPage);
     }
     @GetMapping("/ByPartNo/{partNo}")
-    public ResponseEntity<ItemDetail> getPurchasesByPartNo(@PathVariable String partNo) {
-        ItemDetail itemDetail = purchaseService.getItemDetailsByPartNo(partNo);
+    public ResponseEntity<ItemDetailResponse> getPurchasesByPartNo(@PathVariable String partNo) {
+        ItemDetailResponse itemDetail = purchaseService.getItemDetailsByPartNo(partNo);
         return successResponse(HttpStatus.OK,"ItemDetailByPartNo",itemDetail);
     }
     @PatchMapping("/cancel/{purchaseId}")
