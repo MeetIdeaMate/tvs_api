@@ -28,6 +28,7 @@ public abstract class CommonMapper {
     @Mapping(target = "categoryName", source = "categoryId", qualifiedByName = "mapCategoryName")
     @Mapping(target = "hsnSacCode", source = "categoryId", qualifiedByName = "mapHsnSacCode")
     @Mapping(target = "itemName", source = "partNo", qualifiedByName = "mapItemName")
+    @Mapping(target = "categoryId", source = "partNo", qualifiedByName = "mapCategoryId")
     public abstract ItemDetailResponse toItemDetailResponse(ItemDetail itemDetail);
 
 
@@ -51,6 +52,10 @@ public abstract class CommonMapper {
     public String mapItemName(String partNo) {
         return itemRepository.getItemName(partNo);
     }
+    @Named("mapCategoryId")
+    public String mapCategoryId(String partNo) {
+        return itemRepository.getCategoryId(partNo);
+    }
 
 //    @Mapping(target = "categoryName", source = "categoryId", qualifiedByName = "mapCategoryName")
 @Mapping(target = "customerName", source = "customerId", qualifiedByName= "mapCustomerName")
@@ -62,9 +67,14 @@ public abstract class CommonMapper {
         return customerRepository.getCustomerName(customerId);
     }
 
-@Named("mapMobileNo")
+    @Named("mapMobileNo")
     public String mapMobileNo(String customerId){
         return customerRepository.getMobileNo(customerId);
+    }
+
+    @Named("mapAddress")
+    public String mapAddress(String customerId){
+        return customerRepository.getAddress(customerId);
     }
 
     @Mapping(target = "categoryName", source = "categoryId", qualifiedByName = "mapCategoryName")
@@ -80,4 +90,20 @@ public abstract class CommonMapper {
     @Mapping(target = "itemName", source = "partNo", qualifiedByName = "mapItemName")
     @Mapping(target = "customerName", source = "customerId", qualifiedByName= "mapCustomerName")
     public abstract ReceiptResponse ToReceiptResponse(Receipt receipt);
+
+    @Mapping(target = "itemName", source = "partNo", qualifiedByName = "mapItemName")
+    @Mapping(target = "categoryId", source = "partNo", qualifiedByName = "mapCategoryId")
+    @Mapping(target = "categoryName", source = "partNo", qualifiedByName = "mapCategoryNameByPartNo")
+    @Mapping(target = "customerName", source = "customerId", qualifiedByName= "mapCustomerName")
+    @Mapping(target = "mobileNo", source = "customerId", qualifiedByName= "mapMobileNo")
+    @Mapping(target = "address", source = "customerId", qualifiedByName= "mapAddress")
+    public abstract BookingResponse ToBookingResponse(Booking booking);
+
+    @Named("mapCategoryNameByPartNo")
+    public String mapCategoryNameByPartNo(String partNo) {
+        Item item=itemRepository.findByPartNo(partNo);
+        String categoryId=item.getCategoryId();
+        return categoryRepository.getCategoryNameByPartNo(categoryId);
+    }
+
 }

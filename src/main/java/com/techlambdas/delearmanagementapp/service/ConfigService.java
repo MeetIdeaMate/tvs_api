@@ -23,4 +23,5 @@ public interface ConfigService {
     String getNextPurchaseNoSequence();
     String getNextSalesNoSequence();
     String getNextReceiptNoSequence();
+    String getNextBookingNoSequence();
 }
