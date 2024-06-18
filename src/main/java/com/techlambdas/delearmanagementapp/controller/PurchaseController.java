@@ -1,5 +1,4 @@
 package com.techlambdas.delearmanagementapp.controller;
-import com.techlambdas.delearmanagementapp.model.ItemDetail;
 import com.techlambdas.delearmanagementapp.model.Purchase;
 import com.techlambdas.delearmanagementapp.request.PurchaseRequest;
 import com.techlambdas.delearmanagementapp.response.ItemDetailResponse;

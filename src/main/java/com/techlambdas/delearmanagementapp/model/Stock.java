@@ -18,6 +18,7 @@ public class Stock {
     private String stockId;
     private String partNo;
     private String categoryId;
+    private String hsnSacCode;
     private Map<String,String> mainSpecValue;
     private Map<String,String> specificationsValue;
     private int quantity;

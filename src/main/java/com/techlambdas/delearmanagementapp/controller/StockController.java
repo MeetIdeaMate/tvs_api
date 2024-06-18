@@ -6,6 +6,7 @@ import com.techlambdas.delearmanagementapp.model.Stock;
 import com.techlambdas.delearmanagementapp.request.StockAddReq;
 import com.techlambdas.delearmanagementapp.request.StockRequest;
 import com.techlambdas.delearmanagementapp.request.TransferRequest;
+import com.techlambdas.delearmanagementapp.response.StockDTO;
 import com.techlambdas.delearmanagementapp.response.StockResponse;
 import com.techlambdas.delearmanagementapp.response.TransferResponse;
 import com.techlambdas.delearmanagementapp.service.StockService;
@@ -36,7 +37,7 @@ public class StockController {
 
                                                             @RequestParam(required = false) String categoryName,
                                                             @RequestParam(required = false) String branchId){
-        List<StockResponse> stocks=stockService.getAllStocks(partNo,itemName,keyValue,categoryName);
+        List<StockResponse> stocks=stockService.getAllStocks(partNo,itemName,keyValue,categoryName,branchId);
         return successResponse(HttpStatus.OK,"Stocks",stocks);
     }
 //    @PutMapping("/{id}")
@@ -55,7 +56,7 @@ public class StockController {
                                                                    @RequestParam(required = false) String branchId)
     {
         Pageable pageable = PageRequest.of(page,size);
-        Page<StockResponse> stockPage = stockService.getAllStocksWithPage(partNo,itemName,keyValue, pageable,categoryName);
+        Page<StockResponse> stockPage = stockService.getAllStocksWithPage(partNo,itemName,keyValue, pageable,categoryName,branchId);
         return successResponse(HttpStatus.OK,"stockWithPage",stockPage);
     }
     @PatchMapping("/{purchaseId}")
@@ -83,5 +84,18 @@ public class StockController {
     public ResponseEntity<String>approveTransfer(@RequestParam  String branchId, @RequestParam String transferId) {
         String result= stockService.approveTransfer(branchId,transferId);
         return successResponse(HttpStatus.OK,"success",result);
+    }
+    @GetMapping("/cumulative/page")
+    public ResponseEntity<Page<StockDTO>> getCumulativeStockWithPage(@RequestParam(required = false) String partNo,
+                                                              @RequestParam(required = false) String itemName,
+                                                              @RequestParam(required = false) String keyValue,
+                                                              @RequestParam(defaultValue = "0") int page,
+                                                              @RequestParam(defaultValue = "10") int size,
+                                                              @RequestParam(required = false) String categoryName,
+                                                              @RequestParam(required = false) String branchId)
+    {
+        Pageable pageable = PageRequest.of(page,size);
+        Page<StockDTO> stockPage = stockService.getCumulativeStockWithPage(partNo,itemName,keyValue, pageable,categoryName,branchId);
+        return successResponse(HttpStatus.OK,"stockDTOWithPage",stockPage);
     }
 }
