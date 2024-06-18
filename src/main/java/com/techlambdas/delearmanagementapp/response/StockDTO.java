@@ -1,20 +1,17 @@
 package com.techlambdas.delearmanagementapp.response;
 import com.techlambdas.delearmanagementapp.constant.StockStatus;
-import com.techlambdas.delearmanagementapp.model.PurchaseItem;
 import lombok.Data;
-import java.util.Map;
+import java.util.List;
+
 
 @Data
-public class StockResponse {
-    private String stockId;
+public class StockDTO {
     private String partNo;
     private String itemName;
     private String categoryId;
     private String categoryName;
-    private Map<String,String> mainSpecValue;
-    private Map<String,String> specificationsValue;
-    private int quantity;
-    private PurchaseItem purchaseItem;
+    private List<StockItem> stockItems;
+    private int totalQuantity;
     private String branchId;
     private String branchName;
     private String hsnSacCode;

@@ -270,9 +270,8 @@ public class PurchaseServiceImpl implements PurchaseService {
 
 
     @Override
-    public ItemDetail getItemDetailsByPartNo(String partNo) {
+    public ItemDetailResponse getItemDetailsByPartNo(String partNo) {
         Purchase purchase = customPurchaseRepository.findLastPurchaseItemDetailsByPartNo(partNo);
-
         if (purchase == null)
             throw new DataNotFoundException("Purchase not found this partNo : " +partNo);
         ItemDetail existingItem= new ItemDetail();
@@ -284,7 +283,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                     existingItem.setMainSpecValue(null);
                 }
             }
-            return existingItem;
+            ItemDetailResponse itemDetailResponse =commonMapper.toItemDetailResponse(existingItem);
+        return itemDetailResponse;
     }
 
     @Override

@@ -9,6 +9,7 @@ import com.techlambdas.delearmanagementapp.request.StockAddReq;
 import com.techlambdas.delearmanagementapp.request.StockRequest;
 import com.techlambdas.delearmanagementapp.request.TransferRequest;
 import com.techlambdas.delearmanagementapp.response.PurchaseResponse;
+import com.techlambdas.delearmanagementapp.response.StockDTO;
 import com.techlambdas.delearmanagementapp.response.StockResponse;
 import com.techlambdas.delearmanagementapp.response.TransferResponse;
 import org.springframework.data.domain.Page;
@@ -20,11 +21,11 @@ import java.util.Optional;
 public interface StockService {
     Stock createStock(StockRequest stockRequest);
 
-    List<StockResponse> getAllStocks(String partNo, String itemName,String keyValue,String categoryName);
+    List<StockResponse> getAllStocks(String partNo, String itemName,String keyValue,String categoryName,String branchId);
 
 //    Stock updateStockDetails(String id, StockRequest stockRequest);
 
-    Page<StockResponse> getAllStocksWithPage(String partNo,String itemName,String keyValue, Pageable pageable,String categoryName);
+    Page<StockResponse> getAllStocksWithPage(String partNo,String itemName,String keyValue, Pageable pageable,String categoryName,String branchId);
 
     List<StockResponse> createStockFromPurchase(String purchaseId, StockAddReq stockAddReq);
 
@@ -36,4 +37,6 @@ public interface StockService {
 
 
     String approveTransfer(String branchId, String transferId);
+
+    Page<StockDTO> getCumulativeStockWithPage(String partNo, String itemName, String keyValue, Pageable pageable, String categoryName, String branchId);
 }

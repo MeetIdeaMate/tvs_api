@@ -8,6 +8,7 @@ import com.techlambdas.delearmanagementapp.model.Category;
 import com.techlambdas.delearmanagementapp.model.Item;
 import com.techlambdas.delearmanagementapp.model.Stock;
 
+import com.techlambdas.delearmanagementapp.response.StockDTO;
 import com.techlambdas.delearmanagementapp.response.TransferResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,7 +32,7 @@ public class CustomStockRepositoryImpl implements CustomStockRepository{
     private MongoTemplate mongoTemplate;
 
     @Override
-    public List<Stock> getAllStocks(String partNo,String itemName,String keyValue,String categoryName) {
+    public List<Stock> getAllStocks(String partNo,String itemName,String keyValue,String categoryName,String branchId) {
         Query query=new Query();
         query.addCriteria(Criteria.where("quantity").gt(0));
         if (partNo!=null)
@@ -44,17 +45,21 @@ public class CustomStockRepositoryImpl implements CustomStockRepository{
             List<String> categoryIdList= getCategoryNameFromCategory(categoryName);
             query.addCriteria(Criteria.where("categoryId").in(categoryIdList));
         }
+        if (branchId!=null)
+            query.addCriteria(Criteria.where("branchId").is(branchId));
         if (keyValue!=null)
             query.addCriteria(Criteria.where("itemDetails.mainSpecValue").elemMatch(Criteria.where("$eq").is(keyValue)));
         query.addCriteria(Criteria.where("stockStatus").is(StockStatus.Available));
         return mongoTemplate.find(query, Stock.class);
     }
     @Override
-    public Page<Stock> getAllStocksWithPage(String partNo,String itemName, String keyValue,Pageable pageable,String categoryName) {
+    public Page<Stock> getAllStocksWithPage(String partNo,String itemName, String keyValue,Pageable pageable,String categoryName,String branchId) {
         Query query=new Query();
         query.addCriteria(Criteria.where("quantity").gt(0));
 
         query.addCriteria(Criteria.where("stockStatus").is(StockStatus.Available));
+        if (branchId!=null)
+            query.addCriteria(Criteria.where("branchId").is(branchId));
         if (partNo!=null)
             query.addCriteria(Criteria.where("partNo").is(partNo));
         if (itemName!=null)
@@ -153,6 +158,60 @@ public class CustomStockRepositoryImpl implements CustomStockRepository{
         query.addCriteria(Criteria.where("transferDetails.status").is(Status.CURRENT));
         query.addCriteria(Criteria.where("stockStatus").is(StockStatus.Transfer));
         return mongoTemplate.find(query, Stock.class);
+    }
+    @Override
+    public Page<StockDTO> getCumulativeStockWithPage(String partNo, String itemName, String keyValue, Pageable pageable, String categoryName, String branchId) {
+        Criteria criteria = new Criteria();
+        if (partNo != null && !partNo.isEmpty()) {
+            criteria.and("partNo").is(partNo);
+        }
+        if (itemName != null && !itemName.isEmpty()) {
+            criteria.and("itemName").is(itemName);
+        }
+        if (keyValue != null && !keyValue.isEmpty()) {
+            criteria.orOperator(
+                    Criteria.where("mainSpecValue").regex(keyValue, "i"),
+                    Criteria.where("specificationsValue").regex(keyValue, "i")
+            );
+        }
+        if (categoryName != null && !categoryName.isEmpty()) {
+            List<String> categoryIdList = getCategoryNameFromCategory(categoryName);
+            criteria.and("categoryId").in(categoryIdList);
+        }
+        if (branchId != null && !branchId.isEmpty()) {
+            criteria.and("branchId").is(branchId);
+        }
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(criteria),
+                Aggregation.lookup("items", "partNo", "partNo", "item"),
+                Aggregation.unwind("item", true),
+                Aggregation.lookup("branches", "branchId", "branchId", "branch"),
+                Aggregation.unwind("branch", true),
+                Aggregation.lookup("category", "categoryId", "categoryId", "category"),
+                Aggregation.unwind("category", true),
+                Aggregation.group("partNo", "branchId")
+                        .sum("quantity").as("totalQuantity")
+                        .first("categoryId").as("categoryId")
+                        .first("stockStatus").as("stockStatus")
+                        .first("hsnSacCode").as("hsnSacCode")
+                        .first("item.itemName").as("itemName")
+                        .first("branch.branchName").as("branchName")
+                        .first("category.categoryName").as("categoryName")
+                        .push(new BasicDBObject("stockId", "$stockId")
+                                .append("quantity", "$quantity")
+                                .append("mainSpecValue", "$mainSpecValue")
+                        ).as("stockItems"),
+                Aggregation.project("totalQuantity", "partNo", "branchId", "categoryId", "stockStatus", "stockItems","itemName","branchName","categoryName"),
+                Aggregation.skip(pageable.getOffset()),
+                Aggregation.limit(pageable.getPageSize())
+        );
+        AggregationResults<StockDTO> results = mongoTemplate.aggregate(aggregation, "stock", StockDTO.class);
+        List<StockDTO> stockDTOList = results.getMappedResults();
+
+        long totalCount = mongoTemplate.count(Query.query(criteria), Stock.class);
+
+        return new PageImpl<>(stockDTOList, pageable, totalCount);
     }
 
     public List<String>getCategoryNameFromCategory(String categoryName)
