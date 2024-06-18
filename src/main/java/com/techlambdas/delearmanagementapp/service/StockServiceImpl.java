@@ -17,6 +17,7 @@ import com.techlambdas.delearmanagementapp.repository.PurchaseRepository;
 import com.techlambdas.delearmanagementapp.repository.SalesRepository;
 import com.techlambdas.delearmanagementapp.repository.StockRepository;
 import com.techlambdas.delearmanagementapp.request.*;
+import com.techlambdas.delearmanagementapp.response.StockDTO;
 import com.techlambdas.delearmanagementapp.response.StockResponse;
 import com.techlambdas.delearmanagementapp.response.TransferItem;
 import com.techlambdas.delearmanagementapp.response.TransferResponse;
@@ -62,8 +63,8 @@ public class StockServiceImpl implements StockService{
     }
 
     @Override
-    public List<StockResponse> getAllStocks(String partNo, String itemName, String keyValue,String categoryName) {
-        List<Stock> stocks=customStockRepository.getAllStocks(partNo,itemName,keyValue,categoryName);
+    public List<StockResponse> getAllStocks(String partNo, String itemName, String keyValue,String categoryName,String branchId) {
+        List<Stock> stocks=customStockRepository.getAllStocks(partNo,itemName,keyValue,categoryName,branchId);
         return stocks.stream()
                 .map(commonMapper:: toStockResponse)
                 .collect(Collectors.toList());
@@ -85,8 +86,8 @@ public class StockServiceImpl implements StockService{
 //    }
 
     @Override
-    public Page<StockResponse> getAllStocksWithPage(String partNo,String itemName,String keyValue, Pageable pageable,String categoryName) {
-        Page<Stock>stockPage =customStockRepository.getAllStocksWithPage(partNo,itemName,keyValue,pageable,categoryName);
+    public Page<StockResponse> getAllStocksWithPage(String partNo,String itemName,String keyValue, Pageable pageable,String categoryName,String branchId) {
+        Page<Stock>stockPage =customStockRepository.getAllStocksWithPage(partNo,itemName,keyValue,pageable,categoryName,branchId);
         List<StockResponse> stockResponses=stockPage.getContent().stream()
                 .map(commonMapper:: toStockResponse)
                 .collect(Collectors.toList());
@@ -111,6 +112,7 @@ public class StockServiceImpl implements StockService{
                     PurchaseItem purchaseItem = stockMapper.itemDetailToPurchaseItem(itemDetail);
                     SalesItem salesItem = stockMapper.itemDetailToSalesItem(itemDetail);
                     stock.setPurchaseItem(purchaseItem);
+                    stock.setHsnSacCode(itemDetail.getHsnSacCode());
                     stock.setStockStatus(StockStatus.Available);
                     stock.setStockId(RandomIdGenerator.getRandomId());
                     stockRepository.save(stock);
@@ -150,10 +152,14 @@ public class StockServiceImpl implements StockService{
                  if (stock.getStockId().equals(transferItemReq.getStockId())) {
                      if (transferItemReq.getQuantity() < stock.getQuantity()&&!Optional.ofNullable(stock.getMainSpecValue()).isPresent()) {
                          Stock newStock=new Stock();
-                         newStock=stock;
-                         newStock.setId(null);
                          newStock.setStockId(RandomIdGenerator.getRandomId());
                          newStock.setQuantity(transferItemReq.getQuantity());
+                         newStock.setPurchaseItem(stock.getPurchaseItem());
+                         newStock.setPurchaseQuantity(stock.getPurchaseQuantity());
+                         newStock.setPurchaseId(stock.getPurchaseId());
+                         newStock.setBranchId(stock.getBranchId());
+                         newStock.setPartNo(stock.getPartNo());
+                         newStock.setCategoryId(stock.getCategoryId());
                          stock.setQuantity(stock.getQuantity()- transferItemReq.getQuantity());
                          newStock.setStockStatus(StockStatus.Transfer);
                          stockRepository.save(stock);
@@ -231,5 +237,10 @@ public class StockServiceImpl implements StockService{
             stockRepository.save(stock);
         }
         return "Stock Updated Successfully";
+    }
+
+    @Override
+    public Page<StockDTO> getCumulativeStockWithPage(String partNo, String itemName, String keyValue, Pageable pageable, String categoryName, String branchId) {
+        return customStockRepository.getCumulativeStockWithPage(partNo, itemName, keyValue, pageable, categoryName, branchId);
     }
 }
