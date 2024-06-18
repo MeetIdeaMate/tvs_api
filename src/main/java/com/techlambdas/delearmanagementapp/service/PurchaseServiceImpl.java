@@ -183,8 +183,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
     }
     @Override
-    public List<PurchaseResponse> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo,LocalDate fromDate,LocalDate toDate,String categoryName,String branchId) {
-        List<Purchase> purchases = customPurchaseRepository.getAllPurchases(purchaseNo, pInvoiceNo, pOrderRefNo,fromDate,toDate,categoryName,branchId);
+    public List<PurchaseResponse> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo,LocalDate fromDate,LocalDate toDate,String categoryName,String branchId,Boolean isStockUpdated) {
+        List<Purchase> purchases = customPurchaseRepository.getAllPurchases(purchaseNo, pInvoiceNo, pOrderRefNo,fromDate,toDate,categoryName,branchId,isStockUpdated);
         return purchases.stream()
                 .map(commonMapper::toPurchaseResponse)
                 .collect(Collectors.toList());
@@ -206,8 +206,8 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public Page<PurchaseResponse> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable, LocalDate fromDate,LocalDate toDate,String categoryName,String branchId) {
-      Page<Purchase>purchases= customPurchaseRepository.getAllPurchasesWithPage(purchaseNo, pInvoiceNo, pOrderRefNo, pageable,fromDate,toDate,categoryName,branchId);
+    public Page<PurchaseResponse> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable, LocalDate fromDate,LocalDate toDate,String categoryName,String branchId,Boolean isStockUpdated) {
+      Page<Purchase>purchases= customPurchaseRepository.getAllPurchasesWithPage(purchaseNo, pInvoiceNo, pOrderRefNo, pageable,fromDate,toDate,categoryName,branchId,isStockUpdated);
       List<PurchaseResponse> purchaseResponses=mapEntityWithResponse(purchases.getContent());
       return new PageImpl<>(purchaseResponses,pageable,purchases.getTotalElements());
     }
