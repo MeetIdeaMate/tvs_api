@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Document(collection = "bookings")
@@ -16,12 +17,10 @@ public class Booking {
     private String bookingNo;
     private LocalDate bookingDate;
     private String customerId;
-    private String customerName;
     private String partNo;
     private String additionalInfo;
-    private PaymentType paymentType;
-    private double amount;
-    private String excutiveId;  //employeeId
+    private PaidDetail paidDetail;
+    private String executiveId;  //employeeId
     private LocalDate targetInvoiceDate;
     private boolean isCancelled;
 

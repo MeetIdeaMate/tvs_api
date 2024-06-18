@@ -3,6 +3,7 @@ package com.techlambdas.delearmanagementapp.service;
 import com.techlambdas.delearmanagementapp.model.ItemDetail;
 import com.techlambdas.delearmanagementapp.model.Purchase;
 import com.techlambdas.delearmanagementapp.request.PurchaseRequest;
+import com.techlambdas.delearmanagementapp.response.ItemDetailResponse;
 import com.techlambdas.delearmanagementapp.response.PurchaseReport;
 import com.techlambdas.delearmanagementapp.response.PurchaseResponse;
 import org.springframework.data.domain.Page;

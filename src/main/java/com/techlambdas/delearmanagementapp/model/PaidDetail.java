@@ -9,6 +9,6 @@ import java.time.LocalDate;
 public class PaidDetail {
     private String paymentId;
     private LocalDate paymentDate;
-    private String paidAmount;
+    private double paidAmount;
     private PaymentType paymentType;
 }

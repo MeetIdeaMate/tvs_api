@@ -58,11 +58,11 @@ public class BookingServiceImpl implements BookingService{
     }
 
     @Override
-    public Booking getBookingByBookingNo(String bookingNo) {
+    public BookingResponse getBookingByBookingNo(String bookingNo) {
         Booking booking=bookingRepository.findByBookingNo(bookingNo);
         if (!Optional.ofNullable(booking).isPresent())
             throw new DataNotFoundException("Booking not found with this ID : "+bookingNo);
-        return booking;
+        return commonMapper.ToBookingResponse(booking);
     }
 
     @Override
@@ -80,10 +80,10 @@ public class BookingServiceImpl implements BookingService{
     }
 
     @Override
-    public List<Booking> getBookingsByCustomerId(String customerId) {
+    public List<BookingResponse> getBookingsByCustomerId(String customerId) {
         List<Booking> bookings=bookingRepository.findBookingByCustomerId(customerId);
         if (!Optional.ofNullable(bookings).isPresent())
             throw new DataNotFoundException("Booking not found With this CustomerID : "+customerId);
-        return bookings;
+        return bookings.stream().map(commonMapper::ToBookingResponse).collect(Collectors.toList());
     }
 }

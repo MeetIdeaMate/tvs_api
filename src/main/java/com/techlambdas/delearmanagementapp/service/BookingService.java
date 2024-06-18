@@ -16,9 +16,9 @@ public interface BookingService {
 
     Page<BookingResponse> getAllBookingsWithPage(String bookingNo, String customerName, String paymentType, LocalDate fromDate, LocalDate toDate, Pageable pageable);
 
-    Booking getBookingByBookingNo(String bookingNo);
+    BookingResponse getBookingByBookingNo(String bookingNo);
 
     String cancelBooking(String bookingNo);
 
-    List<Booking> getBookingsByCustomerId(String customerId);
+    List<BookingResponse> getBookingsByCustomerId(String customerId);
 }

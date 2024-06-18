@@ -26,6 +26,7 @@ public class SalesResponse {
     private double totalCgst;
     private double totalSgst;
     private double totalInvoiceAmt;
+    private double totalIncentiveAmt;
     private double roundOffAmt;
     private double netAmt;
     private Insurance insurance;

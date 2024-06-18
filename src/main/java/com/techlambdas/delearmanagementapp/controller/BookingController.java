@@ -54,9 +54,9 @@ public class BookingController {
         return successResponse(HttpStatus.OK,"bookingsWithPage",bookingResponses);
     }
     @GetMapping("/{bookingNo}")
-    public ResponseEntity<Booking> getBookingByBookingNo(@PathVariable String bookingNo)
+    public ResponseEntity<BookingResponse> getBookingByBookingNo(@PathVariable String bookingNo)
     {
-        Booking booking=bookingService.getBookingByBookingNo(bookingNo);
+        BookingResponse booking=bookingService.getBookingByBookingNo(bookingNo);
         return successResponse(HttpStatus.OK,"booking",booking);
     }
     @PatchMapping("/cancel/{bookingNo}")
@@ -66,9 +66,9 @@ public class BookingController {
         return successResponse(HttpStatus.CREATED,"success",result);
     }
     @GetMapping("/booking/{customerId}")
-    public ResponseEntity<List<Booking>> getBookingByCustomerId(@PathVariable String customerId)
+    public ResponseEntity<List<BookingResponse>> getBookingByCustomerId(@PathVariable String customerId)
     {
-        List<Booking> bookings=bookingService.getBookingsByCustomerId(customerId);
+        List<BookingResponse> bookings=bookingService.getBookingsByCustomerId(customerId);
         return successResponse(HttpStatus.OK,"bookings",bookings);
     }
 }

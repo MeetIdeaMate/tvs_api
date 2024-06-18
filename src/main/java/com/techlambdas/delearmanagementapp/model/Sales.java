@@ -22,6 +22,7 @@ public class Sales {
     private LocalDate invoiceDate;
     private String billType;   //- Pay / Credit
     private String customerId;
+    private String bookingNo;
     private List<PaidDetail> paidDetails;
     private List<ItemDetail> itemDetails;
     private int totalQty;
@@ -29,6 +30,7 @@ public class Sales {
     private double totalDisc;
     private double totalCgst;
     private double totalSgst;
+    private double totalIncentiveAmount;
     private double totalInvoiceAmt;
     private double roundOffAmt;
     private double netAmt;

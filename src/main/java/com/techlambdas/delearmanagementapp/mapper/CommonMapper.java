@@ -20,6 +20,8 @@ public abstract class CommonMapper {
     protected ItemRepository itemRepository;
     @Autowired
     protected CustomerRepository customerRepository;
+    @Autowired
+    protected EmployeeRepository employeeRepository;
 
     @Mapping(target = "branchName", source = "branchId", qualifiedByName = "mapBranchName")
     @Mapping(target = "vendorName", source = "vendorId", qualifiedByName= "mapVendorName")
@@ -97,6 +99,7 @@ public abstract class CommonMapper {
     @Mapping(target = "customerName", source = "customerId", qualifiedByName= "mapCustomerName")
     @Mapping(target = "mobileNo", source = "customerId", qualifiedByName= "mapMobileNo")
     @Mapping(target = "address", source = "customerId", qualifiedByName= "mapAddress")
+    @Mapping(target = "executiveName", source = "executiveId", qualifiedByName= "mapEmployeeName")
     public abstract BookingResponse ToBookingResponse(Booking booking);
 
     @Named("mapCategoryNameByPartNo")
@@ -106,4 +109,8 @@ public abstract class CommonMapper {
         return categoryRepository.getCategoryNameByPartNo(categoryId);
     }
 
+    @Named("mapEmployeeName")
+    public String mapEmployeeName(String employeeId) {
+        return employeeRepository.getEmployeeName(employeeId);
+    }
 }
