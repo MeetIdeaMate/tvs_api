@@ -31,7 +31,7 @@ public class CustomPurchaseRepositoryImpl implements CustomPurchaseRepository {
 
 
     @Override
-    public List<Purchase> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo,LocalDate fromDate,LocalDate toDate,String categoryName,String branchId) {
+    public List<Purchase> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo,LocalDate fromDate,LocalDate toDate,String categoryName,String branchId,Boolean isStockUpdated) {
         Query query=new Query();
         if (Optional.ofNullable(branchId).isPresent()){
             query.addCriteria(Criteria.where("branchId").is(branchId));
@@ -41,6 +41,8 @@ public class CustomPurchaseRepositoryImpl implements CustomPurchaseRepository {
         }
         if (purchaseNo!=null)
             query.addCriteria(Criteria.where("purchaseNo").is(purchaseNo));
+        if (isStockUpdated!=null)
+            query.addCriteria(Criteria.where("isStockUpdated").in(isStockUpdated));
         if (pInvoiceNo!=null)
             query.addCriteria(Criteria.where("pInvoiceNo").regex(pInvoiceNo));
         if (Optional.ofNullable(categoryName).isPresent()) {
@@ -54,8 +56,11 @@ public class CustomPurchaseRepositoryImpl implements CustomPurchaseRepository {
     }
 
     @Override
-    public Page<Purchase> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable, LocalDate fromDate, LocalDate toDate,String categoryName,String branchId) {
+    public Page<Purchase> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable, LocalDate fromDate, LocalDate toDate,String categoryName,String branchId,Boolean isStockUpdated) {
         Query query=new Query();
+        if (Optional.ofNullable(branchId).isPresent()){
+            query.addCriteria(Criteria.where("branchId").is(branchId));
+        }
         if (fromDate != null && toDate != null) {
             query.addCriteria(Criteria.where("p_invoiceDate").gte(fromDate).lte(toDate));
         }
@@ -71,6 +76,9 @@ public class CustomPurchaseRepositoryImpl implements CustomPurchaseRepository {
             query.addCriteria(Criteria.where("p_invoiceNo").regex(pInvoiceNo));
         if (pOrderRefNo!=null)
             query.addCriteria(Criteria.where("p_orderRefNo").regex(pOrderRefNo));
+        if (isStockUpdated!=null)
+            query.addCriteria(Criteria.where("isStockUpdated").in(isStockUpdated));
+
         long count = mongoTemplate.count(query, Purchase.class);
         query.with(pageable);
         List<Purchase> purchases = mongoTemplate.find(query, Purchase.class);

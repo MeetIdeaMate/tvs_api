@@ -19,11 +19,11 @@ import java.util.Map;
 public interface PurchaseService {
     PurchaseResponse createPurchase(PurchaseRequest purchaseRequest);
 
-    List<PurchaseResponse> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo,LocalDate fromDate,LocalDate toDate,String categoryName,String branchId);
+    List<PurchaseResponse> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo,LocalDate fromDate,LocalDate toDate,String categoryName,String branchId,Boolean isStockUpdated);
 
     Purchase updatePurchase(String purchaseNo, PurchaseRequest purchaseRequest);
 
-    Page<PurchaseResponse> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable, LocalDate fromDate,LocalDate toDate,String categoryName,String branchId);
+    Page<PurchaseResponse> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable, LocalDate fromDate,LocalDate toDate,String categoryName,String branchId,Boolean isStockUpdated);
 
     ItemDetailResponse getItemDetailsByPartNo(String partNo);
 
