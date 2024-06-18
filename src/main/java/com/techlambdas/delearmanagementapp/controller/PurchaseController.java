@@ -1,7 +1,9 @@
 package com.techlambdas.delearmanagementapp.controller;
+import com.techlambdas.delearmanagementapp.model.ItemDetail;
 import com.techlambdas.delearmanagementapp.model.Purchase;
 import com.techlambdas.delearmanagementapp.request.PurchaseRequest;
 import com.techlambdas.delearmanagementapp.response.ItemDetailResponse;
+import com.techlambdas.delearmanagementapp.response.PurchaseReport;
 import com.techlambdas.delearmanagementapp.response.PurchaseResponse;
 import com.techlambdas.delearmanagementapp.service.ItemService;
 import com.techlambdas.delearmanagementapp.service.PurchaseService;
@@ -13,7 +15,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -80,4 +84,11 @@ public class PurchaseController
         Boolean isExist = purchaseService.validatePurchaseItem(partNo,mainSpecValue);
         return successResponse(HttpStatus.OK,"successResponse",isExist);
     }
+    @GetMapping("/report")
+    public ResponseEntity<List<PurchaseReport>> getPurchaseReport(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
+                                                                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate){
+        List<PurchaseReport> purchaseResports=purchaseService.getPurchaseReport(fromDate,toDate);
+        return successResponse(HttpStatus.CREATED,"purchasesReport",purchaseResports);
+    }
+
 }

@@ -4,5 +4,5 @@ import lombok.Data;
 
 
 public enum PaymentType {
-  CASH,CHEQUE,UPI
+  CASH,CHEQUE,UPI,CARD,ADVANCE
 }

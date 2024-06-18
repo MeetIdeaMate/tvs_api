@@ -8,6 +8,7 @@ import java.util.Map;
 @Data
 public class ItemDetail {
     private String partNo;
+    private String itemName;
     private String categoryId;
     private String hsnSacCode;
     private Map<String,String> mainSpecValue;

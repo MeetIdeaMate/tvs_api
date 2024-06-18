@@ -3,11 +3,13 @@ import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.mapper.CommonMapper;
 import com.techlambdas.delearmanagementapp.mapper.PurchaseMapper;
 import com.techlambdas.delearmanagementapp.model.*;
+import com.techlambdas.delearmanagementapp.repository.CategoryRepository;
 import com.techlambdas.delearmanagementapp.repository.PurchaseRepository;
 import com.techlambdas.delearmanagementapp.request.ItemDetailRequest;
 import com.techlambdas.delearmanagementapp.request.ItemRequest;
 import com.techlambdas.delearmanagementapp.request.PurchaseRequest;
 import com.techlambdas.delearmanagementapp.response.ItemDetailResponse;
+import com.techlambdas.delearmanagementapp.response.PurchaseReport;
 import com.techlambdas.delearmanagementapp.response.PurchaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,6 +37,9 @@ public class PurchaseServiceImpl implements PurchaseService {
     private ItemService itemService;
     @Autowired
     private ConfigService configService;
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     @Override
     public PurchaseResponse createPurchase(PurchaseRequest purchaseRequest) {
         try {
@@ -59,6 +64,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                 }
                 for (ItemDetail itemDetail: itemDetails) {
                     double itemTotalValue = itemDetailRequest.getUnitRate();
+
                     double gstAmount = calculateTotalGstAmount(itemDetail);
                     double taxAmount = calculateTotalTaxAmount(itemDetail);
                     double incentiveAmount= calculateTotalIncentiveAmount(itemDetail);
@@ -98,6 +104,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex);
         }
     }
+
 //    private void updateItemDetailWithCalculations(ItemDetail itemDetail, ItemDetailRequest itemDetailRequest) {
 //        double itemTotalValue = itemDetailRequest.getUnitRate();
 //        double gstAmount = calculateTotalGstAmount(itemDetailRequest);
@@ -307,5 +314,12 @@ public class PurchaseServiceImpl implements PurchaseService {
             return true;
         }
         return false;
+    }
+
+
+
+    @Override
+    public List<PurchaseReport> getPurchaseReport(Date fromDate, Date toDate) {
+        return customPurchaseRepository.getPurchaseReport(fromDate, toDate);
     }
 }
