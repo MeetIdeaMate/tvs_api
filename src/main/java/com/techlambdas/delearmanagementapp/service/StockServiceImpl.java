@@ -146,29 +146,33 @@ public class StockServiceImpl implements StockService{
     @Override
     public String createTransfer(TransferRequest transferRequest) {
         String transferId=RandomIdGenerator.getRandomId();
-       for (TransferItemReq transferItemReq:transferRequest.getTransferItems()){
-             List<Stock>stocks=customStockRepository.findByPartNoAndBranchId(transferItemReq.getPartNo(),transferRequest.getTransferFromBranch());
-             for (Stock stock:stocks){
-                 if (stock.getStockId().equals(transferItemReq.getStockId())) {
-                     if (transferItemReq.getQuantity() < stock.getQuantity()&&!Optional.ofNullable(stock.getMainSpecValue()).isPresent()) {
-                         Stock newStock=new Stock();
-                         newStock.setStockId(RandomIdGenerator.getRandomId());
-                         newStock.setQuantity(transferItemReq.getQuantity());
-                         newStock.setPurchaseItem(stock.getPurchaseItem());
-                         newStock.setPurchaseQuantity(stock.getPurchaseQuantity());
-                         newStock.setPurchaseId(stock.getPurchaseId());
-                         newStock.setBranchId(stock.getBranchId());
-                         newStock.setPartNo(stock.getPartNo());
-                         newStock.setCategoryId(stock.getCategoryId());
-                         stock.setQuantity(stock.getQuantity()- transferItemReq.getQuantity());
-                         newStock.setStockStatus(StockStatus.Transfer);
-                         stockRepository.save(stock);
-                         updateTransferDetails(newStock,transferRequest,transferId);
-                     } else {
-                       updateTransferDetails(stock,transferRequest,transferId);
-                 }
-                 }
-             }
+       for (TransferItemReq transferItemReq:transferRequest.getTransferItems()) {
+           List<Stock> stocks = customStockRepository.findByPartNoAndBranchId(transferItemReq.getPartNo(), transferRequest.getTransferFromBranch());
+           if (Optional.ofNullable(stocks).isPresent() || !stocks.isEmpty()) {
+               for (Stock stock : stocks) {
+                   if (stock.getStockId().equals(transferItemReq.getStockId())) {
+                       if (transferItemReq.getQuantity() < stock.getQuantity() && !Optional.ofNullable(stock.getMainSpecValue()).isPresent()) {
+                           Stock newStock = new Stock();
+                           newStock.setStockId(RandomIdGenerator.getRandomId());
+                           newStock.setQuantity(transferItemReq.getQuantity());
+                           newStock.setPurchaseItem(stock.getPurchaseItem());
+                           newStock.setPurchaseQuantity(stock.getPurchaseQuantity());
+                           newStock.setPurchaseId(stock.getPurchaseId());
+                           newStock.setBranchId(stock.getBranchId());
+                           newStock.setPartNo(stock.getPartNo());
+                           newStock.setCategoryId(stock.getCategoryId());
+                           stock.setQuantity(stock.getQuantity() - transferItemReq.getQuantity());
+                           newStock.setStockStatus(StockStatus.Transfer);
+                           stockRepository.save(stock);
+                           updateTransferDetails(newStock, transferRequest, transferId);
+                       } else {
+                           updateTransferDetails(stock, transferRequest, transferId);
+                       }
+                   }
+               }
+           }else {
+               throw new DataNotFoundException("Stocks Not Found Can,t Transfer");
+           }
        }
         return "Transfered Successfully";
     }
@@ -224,19 +228,23 @@ public class StockServiceImpl implements StockService{
     @Override
     public String approveTransfer(String branchId, String transferId) {
         List<Stock>stocks =customStockRepository.findStocksByTransferId(transferId);
-        for (Stock stock:stocks){
-            for (TransferDetail transferDetail:stock.getTransferDetails()){
-                if (transferDetail.getStatus().equals(Status.CURRENT)){
-                    stock.setStockStatus(StockStatus.Available);
-                    transferDetail.setReceivedDate(LocalDateTime.now());
-                    if (transferDetail.getTransferToBranch().equals(branchId)) {
-                        stock.setBranchId(transferDetail.getTransferToBranch());
+        if (Optional.ofNullable(stocks).isPresent()&&!stocks.isEmpty()) {
+            for (Stock stock : stocks) {
+                for (TransferDetail transferDetail : stock.getTransferDetails()) {
+                    if (transferDetail.getStatus().equals(Status.CURRENT)) {
+                        stock.setStockStatus(StockStatus.Available);
+                        transferDetail.setReceivedDate(LocalDateTime.now());
+                        if (transferDetail.getTransferToBranch().equals(branchId)) {
+                            stock.setBranchId(transferDetail.getTransferToBranch());
+                        }
                     }
                 }
+                stockRepository.save(stock);
             }
-            stockRepository.save(stock);
+            return "Stock Updated Successfully";
+        }else {
+            throw new DataNotFoundException( "Stock Not Found This TransferId:"+transferId);
         }
-        return "Stock Updated Successfully";
     }
 
     @Override

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import org.springframework.data.mongodb.core.aggregation.*;
@@ -131,7 +132,7 @@ public class CustomStockRepositoryImpl implements CustomStockRepository{
                 .as("transferItems")
                 .first("transferDetails.transferDate").as("transferDate")
                 .first("transferDetails.receivedDate").as("receivedDate"));
-
+        stages.add(Aggregation.sort(Sort.Direction.DESC, "transferDate"));
         stages.add(Aggregation.project()
                 .and("transferId").as("transferId")
                 .and("fromBranchId").as("fromBranchId")
@@ -209,7 +210,7 @@ public class CustomStockRepositoryImpl implements CustomStockRepository{
         AggregationResults<StockDTO> results = mongoTemplate.aggregate(aggregation, "stock", StockDTO.class);
         List<StockDTO> stockDTOList = results.getMappedResults();
 
-        long totalCount = mongoTemplate.count(Query.query(criteria), Stock.class);
+        long totalCount = stockDTOList.size();
 
         return new PageImpl<>(stockDTOList, pageable, totalCount);
     }
