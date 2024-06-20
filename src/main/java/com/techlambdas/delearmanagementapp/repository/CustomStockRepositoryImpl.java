@@ -10,6 +10,7 @@ import com.techlambdas.delearmanagementapp.model.Stock;
 
 import com.techlambdas.delearmanagementapp.response.StockDTO;
 import com.techlambdas.delearmanagementapp.response.TransferResponse;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -165,9 +166,10 @@ public class CustomStockRepositoryImpl implements CustomStockRepository{
         Criteria criteria = new Criteria();
         if (partNo != null && !partNo.isEmpty()) {
             criteria.and("partNo").is(partNo);
-        }
-        if (itemName != null && !itemName.isEmpty()) {
-            criteria.and("itemName").is(itemName);
+        }else if (itemName!=null&&!itemName.isEmpty())
+        {
+            List<String> itemPartNo = getItemNameFromItems(itemName);
+            criteria.and("partNo").in(itemPartNo);
         }
         if (keyValue != null && !keyValue.isEmpty()) {
             criteria.orOperator(
@@ -209,8 +211,12 @@ public class CustomStockRepositoryImpl implements CustomStockRepository{
         );
         AggregationResults<StockDTO> results = mongoTemplate.aggregate(aggregation, "stock", StockDTO.class);
         List<StockDTO> stockDTOList = results.getMappedResults();
-
-        long totalCount = stockDTOList.size();
+        Aggregation countAggregation = Aggregation.newAggregation(
+                Aggregation.match(criteria),
+                Aggregation.group("partNo", "branchId")
+        );
+        AggregationResults<Document> countResults = mongoTemplate.aggregate(countAggregation, "stock", Document.class);
+        long totalCount = countResults.getMappedResults().size();
 
         return new PageImpl<>(stockDTOList, pageable, totalCount);
     }
