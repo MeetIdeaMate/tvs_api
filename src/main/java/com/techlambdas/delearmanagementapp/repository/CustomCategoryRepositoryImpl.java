@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -24,6 +25,8 @@ public class CustomCategoryRepositoryImpl implements CustomCategoryRepository{
             query.addCriteria(Criteria.where("categoryId").is(categoryId));
         if (categoryName != null)
             query.addCriteria(Criteria.where("categoryName").regex(Pattern.compile(categoryName, Pattern.CASE_INSENSITIVE)));
+        query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
+
         return mongoTemplate.find(query, Category.class);
     }
 
@@ -34,6 +37,7 @@ public class CustomCategoryRepositoryImpl implements CustomCategoryRepository{
             query.addCriteria(Criteria.where("categoryId").is(categoryId));
         if (categoryName != null)
             query.addCriteria(Criteria.where("categoryName").regex(Pattern.compile(categoryName, Pattern.CASE_INSENSITIVE)));
+        query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
         long count = mongoTemplate.count(query, Category.class);
         query.with(pageable);
         List<Category> categorys = mongoTemplate.find(query, Category.class);

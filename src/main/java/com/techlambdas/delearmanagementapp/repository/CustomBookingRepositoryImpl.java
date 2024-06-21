@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -32,6 +33,8 @@ public class CustomBookingRepositoryImpl implements CustomBookingRepository{
         if (Optional.ofNullable(fromDate).isPresent() && Optional.ofNullable(toDate).isPresent()){
             query.addCriteria(Criteria.where("bookingDate").gte(fromDate).lte(toDate));
         }
+        query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
+
         return mongoTemplate.find(query,Booking.class);
     }
 
@@ -47,6 +50,7 @@ public class CustomBookingRepositoryImpl implements CustomBookingRepository{
         if (Optional.ofNullable(fromDate).isPresent() && Optional.ofNullable(toDate).isPresent()){
             query.addCriteria(Criteria.where("bookingDate").gte(fromDate).lte(toDate));
         }
+        query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
         long count=mongoTemplate.count(query,Booking.class);
         query.with(pageable);
         List<Booking> bookings=mongoTemplate.find(query,Booking.class);

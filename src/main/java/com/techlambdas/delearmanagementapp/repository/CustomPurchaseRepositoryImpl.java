@@ -49,6 +49,7 @@ public class CustomPurchaseRepositoryImpl implements CustomPurchaseRepository {
             List<String> categoryIdList= getCategoryNameFromCategory(categoryName);
             query.addCriteria(Criteria.where("itemDetails.categoryId").in(categoryIdList));
         }
+        query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
         query.addCriteria(Criteria.where("isCancelled").is(false));
         if (pOrderRefNo!=null)
             query.addCriteria(Criteria.where("pInvoiceNo").regex(pOrderRefNo));
@@ -78,7 +79,7 @@ public class CustomPurchaseRepositoryImpl implements CustomPurchaseRepository {
             query.addCriteria(Criteria.where("p_orderRefNo").regex(pOrderRefNo));
         if (isStockUpdated!=null)
             query.addCriteria(Criteria.where("isStockUpdated").in(isStockUpdated));
-
+        query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
         long count = mongoTemplate.count(query, Purchase.class);
         query.with(pageable);
         List<Purchase> purchases = mongoTemplate.find(query, Purchase.class);

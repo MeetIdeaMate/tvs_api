@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -27,6 +28,8 @@ public class CustomSalesRepositoryImpl implements  CustomSalesRepository{
     if (Optional.ofNullable(invoiceNo).isPresent()) {
         query.addCriteria(Criteria.where("invoiceNo").is(invoiceNo));
     }
+        query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
+
         return mongoTemplate.find(query, Sales.class);
     }
 
@@ -50,6 +53,8 @@ public class CustomSalesRepositoryImpl implements  CustomSalesRepository{
         } else if (toDate != null) {
             query.addCriteria(Criteria.where("invoiceDate").lte(toDate));
         }
+        query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
+
         long count = mongoTemplate.count(query, Sales.class);
         query.with(pageable);
         List<Sales> sales = mongoTemplate.find(query, Sales.class);
