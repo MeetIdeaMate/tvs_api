@@ -47,6 +47,8 @@ public class CustomStockRepositoryImpl implements CustomStockRepository{
             List<String> categoryIdList= getCategoryNameFromCategory(categoryName);
             query.addCriteria(Criteria.where("categoryId").in(categoryIdList));
         }
+        query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
+
         if (branchId!=null)
             query.addCriteria(Criteria.where("branchId").is(branchId));
         if (keyValue!=null)
@@ -73,6 +75,7 @@ public class CustomStockRepositoryImpl implements CustomStockRepository{
             List<String> categoryIdList= getCategoryNameFromCategory(categoryName);
             query.addCriteria(Criteria.where("categoryId").in(categoryIdList));
         }
+        query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
         if (keyValue!=null)
             query.addCriteria(Criteria.where("itemDetails.mainSpecValue").elemMatch(Criteria.where("$eq").is(keyValue)));
         long count=mongoTemplate.count(query,Stock.class);

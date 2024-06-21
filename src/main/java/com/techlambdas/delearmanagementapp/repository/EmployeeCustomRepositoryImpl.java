@@ -38,7 +38,7 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository{
         if (designation!=null) {
             query.addCriteria(Criteria.where("designation").regex("^.*" + designation + ".*", "i"));
         }
-        query.with(Sort.by(Sort.Order.desc("createdDateTime")));
+        query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
 
         long totalCount = mongoTemplate.count(query, Employee.class);
             query.with(pageable);
