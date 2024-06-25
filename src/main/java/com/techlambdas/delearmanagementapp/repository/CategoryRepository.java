@@ -11,12 +11,6 @@ public interface CategoryRepository extends MongoRepository<Category, String> {
         Category category= findBycategoryId(categoryId);
         return (category !=null)?category.getCategoryName():"unknown Category";
     }
-    default String gethsnSacCode(String categoryId)
-    {
-        Category category= findBycategoryId(categoryId);
-        return (category !=null)?category.getHsnSacCode():"unknown Category";
-    }
-
     default String getCategoryNameByPartNo(String categoryId)
     {
         Category category=findBycategoryId(categoryId);

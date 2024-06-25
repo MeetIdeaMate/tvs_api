@@ -7,7 +7,6 @@ import java.util.Map;
 @Data
 public class CategoryRequest {
     private String categoryName;
-    private String hsnSacCode;
     private Map<Integer,String> mainSpec;
     private Map<Integer,String> specification;
     private Map<String,Integer> taxes;
