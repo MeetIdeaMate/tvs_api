@@ -21,6 +21,7 @@ public class User {
     private String designation;
     private UserStatus userStatus;
     private boolean isPasswordReset;
+    private String branchId;
     @CreatedDate
     private LocalDateTime createdDateTime;
     @CreatedBy

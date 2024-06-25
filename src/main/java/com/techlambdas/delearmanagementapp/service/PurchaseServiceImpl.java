@@ -1,34 +1,30 @@
 package com.techlambdas.delearmanagementapp.service;
-
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.mapper.CommonMapper;
 import com.techlambdas.delearmanagementapp.mapper.PurchaseMapper;
-import com.techlambdas.delearmanagementapp.model.GstDetail;
-import com.techlambdas.delearmanagementapp.model.Incentive;
-import com.techlambdas.delearmanagementapp.model.ItemDetail;
-import com.techlambdas.delearmanagementapp.model.Purchase;
+import com.techlambdas.delearmanagementapp.model.*;
+import com.techlambdas.delearmanagementapp.repository.CategoryRepository;
 import com.techlambdas.delearmanagementapp.repository.PurchaseRepository;
+import com.techlambdas.delearmanagementapp.request.ItemDetailRequest;
+import com.techlambdas.delearmanagementapp.request.ItemRequest;
 import com.techlambdas.delearmanagementapp.request.PurchaseRequest;
-import com.techlambdas.delearmanagementapp.response.ItemDetailsWithPartNoResponse;
+import com.techlambdas.delearmanagementapp.response.ItemDetailResponse;
+import com.techlambdas.delearmanagementapp.response.PurchaseReport;
 import com.techlambdas.delearmanagementapp.response.PurchaseResponse;
-import com.techlambdas.delearmanagementapp.utils.RandomIdGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.techlambdas.delearmanagementapp.repository.CustomPurchaseRepository;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
+
 
 @Service
 public class PurchaseServiceImpl implements PurchaseService {
-    private static final Logger logger = LoggerFactory.getLogger(PurchaseServiceImpl.class);
     @Autowired
     private PurchaseRepository purchaseRepository;
     @Autowired
@@ -37,54 +33,159 @@ public class PurchaseServiceImpl implements PurchaseService {
     private CustomPurchaseRepository customPurchaseRepository;
     @Autowired
     private CommonMapper commonMapper;
+    @Autowired
+    private ItemService itemService;
+    @Autowired
+    private ConfigService configService;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Override
-    public Purchase createPurchase(PurchaseRequest purchaseRequest) {
+    public PurchaseResponse createPurchase(PurchaseRequest purchaseRequest) {
         try {
             Purchase purchase = purchaseMapper.mapPurchaseRequestToPurchase(purchaseRequest);
-            purchase.setPurchaseNo(RandomIdGenerator.getRandomId());
+
+
             double totalGstAmount = 0;
             double totalInvoiceAmount = 0;
             double totalIncentiveAmount = 0;
             double totalTaxAmount = 0;
-            for (ItemDetail itemDetail : purchase.getItemDetails()) {
-                double itemTotalValue = itemDetail.getUnitRate() * itemDetail.getQuantity();
-                double gstAmount = 0;
-                double taxAmount=0;
-                for (GstDetail gstDetail : itemDetail.getGstDetails()) {
-                    double itemGstAmount = itemTotalValue * (gstDetail.getPercentage() / 100);
-                    gstDetail.setGstAmount(itemGstAmount);
-                    gstAmount = gstAmount + itemGstAmount;
-                    double itemtaxAmount=gstDetail.getGstAmount();
-                    taxAmount=taxAmount+itemtaxAmount;
+            double finalInvoiceAmount = 0;
+
+            List<ItemDetail> allItemDetails = new ArrayList<>();
+
+            for (ItemDetailRequest itemDetailRequest : purchaseRequest.getItemDetails()) {
+                List<ItemDetail> itemDetails=new ArrayList<>();
+                if (Optional.ofNullable(itemDetailRequest.getMainSpecValues()).isPresent()) {
+                    itemDetails = purchaseMapper.mapItemDetailRequestToItemDetailsMainSpecPresent(itemDetailRequest);
+                }else {
+                    ItemDetail itemDetail = purchaseMapper.mapItemDetailRequestToItemDetailsWithoutMainSpec(itemDetailRequest);
+                    itemDetails.add(itemDetail);
                 }
-                double incentiveAmount = 0;
-                for (Incentive incentive:itemDetail.getIncentives())
-                {
-                    double itemIncentiveAmount = itemTotalValue * (incentive.getPercentage() / 100);
-                    incentive.setIncentiveAmount(itemIncentiveAmount);
-                    incentiveAmount=incentiveAmount+itemIncentiveAmount;
+                for (ItemDetail itemDetail: itemDetails) {
+                    double itemTotalValue = itemDetailRequest.getUnitRate();
+
+                    double gstAmount = calculateTotalGstAmount(itemDetail);
+                    double taxAmount = calculateTotalTaxAmount(itemDetail);
+                    double incentiveAmount= calculateTotalIncentiveAmount(itemDetail);
+                    if (Optional.ofNullable(itemDetailRequest.getMainSpecValues()).isPresent()) {
+                        double discountAmount=itemDetailRequest.getDiscount()/itemDetailRequest.getQuantity();
+                        itemDetailRequest.setDiscount(discountAmount);
+                        taxAmount=taxAmount/itemDetailRequest.getQuantity();
+                        incentiveAmount=incentiveAmount/itemDetailRequest.getQuantity();
+                    }
+                    itemDetail.setTaxableValue(itemTotalValue);
+                    itemDetail.setInvoiceValue(itemTotalValue + gstAmount);
+                    itemDetail.setFinalInvoiceValue((itemTotalValue + gstAmount+taxAmount)-incentiveAmount);
+                    itemDetail.setGstDetails(itemDetailRequest.getGstDetails());
+                    itemDetail.setIncentives(itemDetailRequest.getIncentives());
+          //        updateItemDetailWithCalculations(itemDetail, itemDetailRequest);
+                    totalGstAmount += gstAmount;
+                    totalTaxAmount += taxAmount;
+                    finalInvoiceAmount +=itemDetail.getFinalInvoiceValue();
+                    totalIncentiveAmount += incentiveAmount;
+                    totalInvoiceAmount += itemDetail.getInvoiceValue();
+                    allItemDetails.add(itemDetail);
                 }
-                itemDetail.setTaxableValue(itemTotalValue);
-                itemDetail.setInvoiceValue(itemTotalValue + gstAmount);
-                totalGstAmount = totalGstAmount + gstAmount;
-                totalInvoiceAmount = totalInvoiceAmount + itemDetail.getInvoiceValue();
-                totalIncentiveAmount=totalIncentiveAmount+incentiveAmount;
-                totalTaxAmount=totalTaxAmount+taxAmount;
+
             }
             purchase.setTotalGstAmount(totalGstAmount);
             purchase.setTotalInvoiceAmount(totalInvoiceAmount);
+            purchase.setTotalValue(totalInvoiceAmount-totalGstAmount);
             purchase.setTotalIncentiveAmount(totalIncentiveAmount);
             purchase.setTotalTaxAmount(totalTaxAmount);
-            return purchaseRepository.save(purchase);
+            purchase.setItemDetails(allItemDetails);
+            purchase.setFinalTotalInvoiceAmount(finalInvoiceAmount);
+            updateItemRepository(purchaseRequest.getItemDetails());
+            purchase.setPurchaseNo(configService.getNextPurchaseNoSequence());
+            Purchase createdPurchase= purchaseRepository.save(purchase);
+            return mapPurchaseToPurchaseResponse(createdPurchase);
         } catch (Exception ex) {
-            throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex.getCause());
+            throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex);
         }
     }
 
+//    private void updateItemDetailWithCalculations(ItemDetail itemDetail, ItemDetailRequest itemDetailRequest) {
+//        double itemTotalValue = itemDetailRequest.getUnitRate();
+//        double gstAmount = calculateTotalGstAmount(itemDetailRequest);
+//        double taxAmount = calculateTotalTaxAmount(itemDetailRequest);
+//        double totalIncentiveAmount= calculateTotalIncentiveAmount(itemDetailRequest);
+//        itemDetail.setTaxableValue(itemTotalValue);
+//        itemDetail.setInvoiceValue(itemTotalValue + gstAmount);
+//        itemDetail.setFinalInvoiceValue(itemTotalValue + gstAmount+taxAmount+totalIncentiveAmount);
+//        itemDetail.setGstDetails(itemDetailRequest.getGstDetails());
+//        itemDetail.setIncentives(itemDetailRequest.getIncentives());
+//    }
+
+    private double calculateTotalGstAmount(ItemDetail itemDetail) {
+        double totalGstAmount = 0;
+        double itemTotalValue = itemDetail.getUnitRate();
+        if (Optional.ofNullable(itemDetail.getGstDetails()).isPresent()) {
+            for (GstDetail gstDetail : itemDetail.getGstDetails()) {
+                double itemGstAmount = itemTotalValue * (gstDetail.getPercentage() / 100);
+                gstDetail.setGstAmount(itemGstAmount);
+                totalGstAmount += itemGstAmount;
+            }
+        }
+        return totalGstAmount;
+    }
+
+    private double calculateTotalTaxAmount(ItemDetail itemDetail) {
+        double totalTaxAmount = 0;
+        double itemTotalValue = itemDetail.getUnitRate();
+        if (Optional.ofNullable(itemDetail.getTaxes()).isPresent()) {
+            for (Taxes tax : itemDetail.getTaxes()) {
+                double itemTaxAmount = itemTotalValue * (tax.getPercentage() / 100);
+                tax.setTaxAmount(itemTaxAmount);
+                totalTaxAmount += itemTaxAmount;
+            }
+        }
+        return totalTaxAmount;
+    }
+
+    private double calculateTotalIncentiveAmount(ItemDetail itemDetail) {
+        double totalIncentiveAmount = 0;
+        double itemTotalValue = itemDetail.getUnitRate();
+        if (Optional.ofNullable(itemDetail.getIncentives()).isPresent()) {
+            for (Incentive incentive : itemDetail.getIncentives()) {
+                double itemIncentiveAmount=0;
+                if (incentive.getIncentiveAmount()>0){
+                    itemIncentiveAmount=incentive.getIncentiveAmount();
+                }else {
+                    itemIncentiveAmount = itemTotalValue * (incentive.getPercentage() / 100);
+                }
+                incentive.setIncentiveAmount(itemIncentiveAmount);
+                totalIncentiveAmount += itemIncentiveAmount;
+            }
+        }
+        return totalIncentiveAmount;
+    }
+
+    private void updateItemRepository(List<ItemDetailRequest> itemDetails) {
+        for (ItemDetailRequest itemDetail : itemDetails) {
+            Item existingItem = itemService.findByPartNo(itemDetail.getPartNo());
+            if (existingItem == null) {
+                ItemRequest newItem = new ItemRequest();
+                newItem.setCategoryId(itemDetail.getCategoryId());
+                if (Optional.ofNullable(itemDetail.getIncentives()).isPresent()) {
+                    if (!itemDetail.getIncentives().isEmpty())
+                     newItem.setIncentive(true);
+
+                }
+                 newItem.setItemName(itemDetail.getItemName());
+                 newItem.setPartNo(itemDetail.getPartNo());
+                 newItem.setHsnSacCode(itemDetail.getHsnSacCode());
+                if (Optional.ofNullable(itemDetail.getTaxes()).isPresent()){
+                    if(!itemDetail.getTaxes().isEmpty())
+                        newItem.setTaxable(true);
+                    }
+                itemService.createItem(newItem);
+            }
+        }
+    }
     @Override
-    public List<PurchaseResponse> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo) {
-        List<Purchase> purchases = customPurchaseRepository.getAllPurchases(purchaseNo, pInvoiceNo, pOrderRefNo);
+    public List<PurchaseResponse> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo,LocalDate fromDate,LocalDate toDate,String categoryName,String branchId,Boolean isStockUpdated) {
+        List<Purchase> purchases = customPurchaseRepository.getAllPurchases(purchaseNo, pInvoiceNo, pOrderRefNo,fromDate,toDate,categoryName,branchId,isStockUpdated);
         return purchases.stream()
                 .map(commonMapper::toPurchaseResponse)
                 .collect(Collectors.toList());
@@ -96,7 +197,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             Purchase existingPurchase = purchaseRepository.findByPurchaseNo(purchaseNo);
             if (existingPurchase == null)
                 throw new DataNotFoundException("purchaseNo not found with ID: " + purchaseNo);
-            purchaseMapper.updatePurchaseFromRequest(purchaseRequest, existingPurchase);
+      //      purchaseMapper.updatePurchaseFromRequest(purchaseRequest, existingPurchase);
             return purchaseRepository.save(existingPurchase);
         } catch (DataNotFoundException ex) {
             throw new DataNotFoundException("Data not found --" + ex.getMessage());
@@ -106,14 +207,79 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public Page<Purchase> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable) {
-        return customPurchaseRepository.getAllPurchasesWithPage(purchaseNo, pInvoiceNo, pOrderRefNo, pageable);
+    public Page<PurchaseResponse> getAllPurchasesWithPage(String purchaseNo, String pInvoiceNo, String pOrderRefNo, Pageable pageable, LocalDate fromDate,LocalDate toDate,String categoryName,String branchId,Boolean isStockUpdated) {
+      Page<Purchase>purchases= customPurchaseRepository.getAllPurchasesWithPage(purchaseNo, pInvoiceNo, pOrderRefNo, pageable,fromDate,toDate,categoryName,branchId,isStockUpdated);
+      List<PurchaseResponse> purchaseResponses=mapEntityWithResponse(purchases.getContent());
+      return new PageImpl<>(purchaseResponses,pageable,purchases.getTotalElements());
     }
 
-    @Override
-    public ItemDetail getItemDetailsByPartNo(String partNo) {
-        Purchase purchase = customPurchaseRepository.findLastPurchaseItemDetailsByPartNo(partNo);
+    private List<PurchaseResponse> mapEntityWithResponse(List<Purchase> purchases) {
+        List<PurchaseResponse>purchaseResponses=new ArrayList<>();
+        for (Purchase purchase:purchases){
+            PurchaseResponse purchaseResponse=mapPurchaseToPurchaseResponse(purchase);
+            purchaseResponses.add(purchaseResponse);
+        }
+        return purchaseResponses;
+    }
 
+    private PurchaseResponse mapPurchaseToPurchaseResponse(Purchase purchase) {
+        PurchaseResponse purchaseResponse=commonMapper.toPurchaseResponse(purchase);
+        Map<String, List<ItemDetail>> itemDetailGroupedByPartNo =purchase.getItemDetails().stream()
+                .collect(Collectors.groupingBy(ItemDetail::getPartNo));
+        List<ItemDetailResponse> itemDetailResponses = new ArrayList<>();
+        for (Map.Entry<String, List<ItemDetail>> entry : itemDetailGroupedByPartNo.entrySet()) {
+            itemDetailResponses.add(mapItemDetailToItemDetailResponse(entry.getValue()));
+        }
+        purchaseResponse.setItemDetails(itemDetailResponses);
+        return purchaseResponse;
+    }
+    private ItemDetailResponse mapItemDetailToItemDetailResponse(List<ItemDetail> itemDetails) {
+        ItemDetail itemDetail=itemDetails.get(0);
+        int quantity=itemDetails.size();
+        List<Map<String, String>> mainSpecValues = itemDetails.stream()
+                .map(it -> it.getMainSpecValue())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        ItemDetailResponse itemDetailResponse =commonMapper.toItemDetailResponse(itemDetail);
+        double itemTotalValue=quantity*itemDetail.getUnitRate();
+        double gstAmount=0;
+        if (Optional.of(itemDetailResponse.getGstDetails()).isPresent()) {
+            for (GstDetail gstDetail : itemDetailResponse.getGstDetails()) {
+                double itemGstAmount = itemTotalValue * (gstDetail.getPercentage() / 100);
+                gstDetail.setGstAmount(itemGstAmount);
+                gstAmount += itemGstAmount;
+            }
+        }
+        double incentiveAmount=0;
+        if (Optional.of(itemDetailResponse.getIncentives()).isPresent()) {
+        for (Incentive incentive:itemDetailResponse.getIncentives())
+        {
+            double itemIncentiveAmount = itemTotalValue * (incentive.getPercentage() / 100);
+            incentive.setIncentiveAmount(itemIncentiveAmount);
+            incentiveAmount +=itemIncentiveAmount;
+        }
+        }
+        double taxAmount=0;
+        if (Optional.of(itemDetailResponse.getTaxes()).isPresent()) {
+            for (Taxes taxes : itemDetailResponse.getTaxes()) {
+                double itemTaxAmount = itemTotalValue * (taxes.getPercentage() / 100);
+                taxes.setTaxAmount(itemTaxAmount);
+                taxAmount += itemTaxAmount;
+            }
+        }
+        itemDetailResponse.setTaxableValue(itemTotalValue);
+        itemDetailResponse.setInvoiceValue(itemTotalValue + gstAmount);
+        itemDetailResponse.setFinalInvoiceValue(itemTotalValue+gstAmount+incentiveAmount+taxAmount);
+        itemDetailResponse.setMainSpecValues(mainSpecValues);
+        itemDetailResponse.setValue(quantity*itemDetail.getUnitRate());
+        itemDetailResponse.setQuantity(quantity);
+        return itemDetailResponse;
+    }
+
+
+    @Override
+    public ItemDetailResponse getItemDetailsByPartNo(String partNo) {
+        Purchase purchase = customPurchaseRepository.findLastPurchaseItemDetailsByPartNo(partNo);
         if (purchase == null)
             throw new DataNotFoundException("Purchase not found this partNo : " +partNo);
         ItemDetail existingItem= new ItemDetail();
@@ -125,6 +291,36 @@ public class PurchaseServiceImpl implements PurchaseService {
                     existingItem.setMainSpecValue(null);
                 }
             }
-            return existingItem;
+            ItemDetailResponse itemDetailResponse =commonMapper.toItemDetailResponse(existingItem);
+        return itemDetailResponse;
+    }
+
+    @Override
+    public String cancelPurchase(String purchaseId) {
+        Optional<Purchase> existingPurchase = purchaseRepository.findByPurchaseId(purchaseId);
+            if (existingPurchase.isPresent()){
+               Purchase purchase= existingPurchase.get();
+               purchase.setCancelled(true);
+               purchaseRepository.save(purchase);
+               return "Cancelled Successfully";
+            }else {
+                throw new DataNotFoundException("Purchase not found this purchaseId : " + purchaseId);
+            }
+    }
+
+    @Override
+    public Boolean validatePurchaseItem(String partNo, Map<String, String> mainSpecValue) {
+        Purchase purchase=customPurchaseRepository.findPuechaseByPartNoAndMainspecValue(partNo,mainSpecValue);
+        if (Optional.ofNullable(purchase).isPresent()){
+            return true;
+        }
+        return false;
+    }
+
+
+
+    @Override
+    public List<PurchaseReport> getPurchaseReport(Date fromDate, Date toDate) {
+        return customPurchaseRepository.getPurchaseReport(fromDate, toDate);
     }
 }

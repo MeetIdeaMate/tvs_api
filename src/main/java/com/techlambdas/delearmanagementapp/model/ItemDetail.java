@@ -8,7 +8,9 @@ import java.util.Map;
 @Data
 public class ItemDetail {
     private String partNo;
+    private String itemName;
     private String categoryId;
+    private String hsnSacCode;
     private Map<String,String> mainSpecValue;
     private Map<String,String> specificationsValue;
     private double unitRate;
@@ -21,5 +23,6 @@ public class ItemDetail {
     private List<Incentive>incentives;
     private double invoiceValue;
     private double finalInvoiceValue;
+    private String stockId;
 }
 

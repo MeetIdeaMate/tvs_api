@@ -11,5 +11,9 @@ public interface EmployeeRepository extends MongoRepository<Employee,String> {
 
     Employee findEmployeeByMobileNumber(String mobileNumber);
 
-
+    default String getEmployeeName(String employeeId)
+    {
+        Employee employee = findByEmployeeId(employeeId);
+        return (employee !=null)?employee.getEmployeeName():"unknown Employee";
+    }
 }

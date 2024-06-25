@@ -68,4 +68,9 @@ public class ItemServiceImpl implements ItemService{
         Optional<Item> itemOptional = itemRepository.findByCategoryIdAndPartNo(categoryId, partNo);
         return itemOptional.orElseThrow(() -> new RuntimeException("Item not found"));
     }
+
+    @Override
+    public Item findByPartNo(String partNo) {
+        return itemRepository.findByPartNo(partNo);
+    }
 }

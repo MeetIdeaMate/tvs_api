@@ -13,13 +13,13 @@ import java.util.List;
 public class Purchase {
     @Id
     private String id;
+    private String purchaseId;
     private String purchaseNo;
     private String vendorId;
     private String branchId;
     private String p_invoiceNo;
     private LocalDate p_invoiceDate;
     private String p_orderRefNo;
-    private GstType gstType;
     private List<ItemDetail> itemDetails;
     private int totalQty;
     private double totalValue;
@@ -28,6 +28,8 @@ public class Purchase {
     private double totalIncentiveAmount;
     private double totalInvoiceAmount;
     private double finalTotalInvoiceAmount;
+    private boolean isCancelled;
+    private boolean isStockUpdated;
     @CreatedDate
     private LocalDateTime createdDateTime;
     @CreatedBy

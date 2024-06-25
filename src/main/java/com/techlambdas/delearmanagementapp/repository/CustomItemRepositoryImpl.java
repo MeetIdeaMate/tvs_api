@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -25,6 +26,8 @@ public class CustomItemRepositoryImpl implements CustomItemRepository{
             query.addCriteria(Criteria.where("itemName").regex(Pattern.compile(itemName, Pattern.CASE_INSENSITIVE)));
         if (partNo!=null)
             query.addCriteria(Criteria.where("partNo").regex(partNo));
+        query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
+
         return mongoTemplate.find(query, Item.class);
     }
 
@@ -37,6 +40,7 @@ public class CustomItemRepositoryImpl implements CustomItemRepository{
             query.addCriteria(Criteria.where("itemName").regex(Pattern.compile(itemName, Pattern.CASE_INSENSITIVE)));
         if (partNo!=null)
             query.addCriteria(Criteria.where("partNo").regex(partNo));
+        query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
         long count = mongoTemplate.count(query, Item.class);
         query.with(pageable);
         List<Item> items = mongoTemplate.find(query, Item.class);

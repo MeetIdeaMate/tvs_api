@@ -10,4 +10,5 @@ public class ItemRequest
     private String categoryId;
     private boolean isTaxable;
     private boolean isIncentive;
+    private String hsnSacCode;
 }

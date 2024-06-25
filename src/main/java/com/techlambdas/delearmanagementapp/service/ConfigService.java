@@ -20,5 +20,8 @@ public interface ConfigService {
     Config addConfigValue(String configId, String configValue);
 
     Config removeConfigValue(String configId, String configValue);
-
+    String getNextPurchaseNoSequence();
+    String getNextSalesNoSequence();
+    String getNextReceiptNoSequence();
+    String getNextBookingNoSequence();
 }

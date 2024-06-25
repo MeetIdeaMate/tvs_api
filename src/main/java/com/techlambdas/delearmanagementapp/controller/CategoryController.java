@@ -30,12 +30,12 @@ public class CategoryController
     public ResponseEntity<List<Category>>getAllCategory(@RequestParam(required = false) String categoryId,
                                                      @RequestParam(required = false) String categoryName){
         List<Category> categorys=categoryService.getAllCategorys(categoryId,categoryName);
-        return new ResponseEntity<>(categorys, HttpStatus.OK);
+        return successResponse(HttpStatus.OK,"categoryList",categorys);
     }
     @PutMapping("/{categoryId}")
     public ResponseEntity<Category> updateCategory(@PathVariable String categoryId,@RequestBody CategoryRequest categoryRequest){
         Category category=categoryService.updateCategory(categoryId,categoryRequest);
-        return new ResponseEntity<>(category, HttpStatus.OK);
+        return successResponse(HttpStatus.OK,"category",category);
     }
     @GetMapping("/page")
     public ResponseEntity<Page<Category>> getAllCategoryWithPage(

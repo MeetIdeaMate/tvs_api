@@ -16,8 +16,11 @@ public class Config {
     @Indexed(unique = true)
     private String configId;
     private List<String> configuration;
+    private String configController;//Input/Output
+    private String inputType;//Yes/No/Input textbox/Output
     private String defaultValue;
     private ConfigType configType;
+
     @CreatedDate
     private LocalDateTime createdDateTime;
     @CreatedBy
@@ -26,5 +29,4 @@ public class Config {
     private LocalDateTime updatedDateTime;
     @LastModifiedBy
     private String updatedBy;
-
 }

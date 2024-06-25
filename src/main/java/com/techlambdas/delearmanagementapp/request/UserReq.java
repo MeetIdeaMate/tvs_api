@@ -9,4 +9,5 @@ public class UserReq {
     private String mobileNo;
     private String passWord;
     private String useRefId;
+    private String branchId;
 }

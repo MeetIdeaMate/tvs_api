@@ -86,6 +86,7 @@ public class UserServiceImpl implements UserService{
         loginResponse.setToken(token);
         loginResponse.setPasswordReset(user.isPasswordReset());
         loginResponse.setUseRefId(user.getUseRefId());
+        loginResponse.setBranchId(user.getBranchId());
         return loginResponse;
     }
 
@@ -109,6 +110,7 @@ public class UserServiceImpl implements UserService{
         user.setUseRefId(userReq.getUseRefId());
         user.setUserStatus(UserStatus.ACTIVE);
         user.setPasswordReset(false);
+        user.setBranchId(userReq.getBranchId());
        user.setPassword(bCryptPasswordEncoder.encode(userReq.getPassWord()));
         return userRepository.save(user);
     }
