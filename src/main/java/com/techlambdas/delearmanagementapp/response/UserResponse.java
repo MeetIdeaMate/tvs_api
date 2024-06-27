@@ -1,10 +1,11 @@
 package com.techlambdas.delearmanagementapp.response;
 
+import com.techlambdas.delearmanagementapp.constant.UserStatus;
 import lombok.Data;
 
 @Data
-public class LoginResponse {
-    private String token;
+public class UserResponse{
+    private String id;
     private String userId;
     private String userName;
     private String designation;
@@ -12,4 +13,7 @@ public class LoginResponse {
     private boolean isPasswordReset;
     private String branchId;
     private String branchName;
+    private String mobileNumber;
+    private String password;
+    private UserStatus userStatus;
 }

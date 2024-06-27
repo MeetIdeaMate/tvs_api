@@ -7,6 +7,7 @@ import com.techlambdas.delearmanagementapp.request.UserPwdChangReq;
 import com.techlambdas.delearmanagementapp.request.UserReq;
 import com.techlambdas.delearmanagementapp.request.UserUpdateReq;
 import com.techlambdas.delearmanagementapp.response.LoginResponse;
+import com.techlambdas.delearmanagementapp.response.UserResponse;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -22,11 +23,11 @@ public interface UserService {
 
     User getUserByMobileNo(String mobileNo);
 
-    List<User> getAllUser();
+    List<UserResponse> getAllUser();
 
     String getUserNameByUserId(String createdBy);
 
-    Page<User> getUsersByPagination(String userName, String mobileNumber, String designation, int page, int pageSize);
+    Page<UserResponse> getUsersByPagination(String userName, String mobileNumber, String designation, int page, int pageSize);
 
     void deleteUser(String userId);
 

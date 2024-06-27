@@ -113,4 +113,7 @@ public abstract class CommonMapper {
     public String mapEmployeeName(String employeeId) {
         return employeeRepository.getEmployeeName(employeeId);
     }
+
+    @Mapping(target = "branchName", source = "branchId", qualifiedByName = "mapBranchName")
+    public abstract UserResponse mapToUserResponse(User user);
 }
