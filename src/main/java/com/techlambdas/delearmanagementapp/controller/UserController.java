@@ -7,6 +7,7 @@ import com.techlambdas.delearmanagementapp.request.UserPwdChangReq;
 import com.techlambdas.delearmanagementapp.request.UserReq;
 import com.techlambdas.delearmanagementapp.request.UserUpdateReq;
 import com.techlambdas.delearmanagementapp.response.LoginResponse;
+import com.techlambdas.delearmanagementapp.response.UserResponse;
 import com.techlambdas.delearmanagementapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -37,7 +38,7 @@ public class UserController {
         return successResponse(HttpStatus.OK,"login",loginResponse);
     }
     @PostMapping
-    public ResponseEntity<User>createUser(@RequestBody UserReq userReq){
+    public ResponseEntity<UserResponse>createUser(@RequestBody UserReq userReq){
         User user=userService.createUser(userReq);
         return successResponse(HttpStatus.CREATED,"user",user);
     }
@@ -47,17 +48,17 @@ public class UserController {
         return successResponse(HttpStatus.OK,"user",user);
     }
     @GetMapping("/getByPagination")
-    public ResponseEntity<Page<User>> getUsersByPagination(@RequestParam(value = "userName", required = false) String userName,
-                                                            @RequestParam (value = "mobileNumber", required = false) String mobileNumber,
-                                                           @RequestParam (value = "designation", required = false ) String designation,
-                                                           @RequestParam(value = "page", defaultValue = "0") int page,
-                                                           @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
-        Page<User> users = userService.getUsersByPagination(userName,mobileNumber,designation,page,pageSize);
+    public ResponseEntity<Page<UserResponse>> getUsersByPagination(@RequestParam(value = "userName", required = false) String userName,
+                                                                   @RequestParam (value = "mobileNumber", required = false) String mobileNumber,
+                                                                   @RequestParam (value = "designation", required = false ) String designation,
+                                                                   @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                   @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
+        Page<UserResponse> users = userService.getUsersByPagination(userName,mobileNumber,designation,page,pageSize);
         return successResponse(HttpStatus.OK,"userWithPage",users);
     }
     @GetMapping
-    public ResponseEntity<List<User>>getAllUser(){
-       List<User> users=userService.getAllUser();
+    public ResponseEntity<List<UserResponse >>getAllUser(){
+       List<UserResponse> users=userService.getAllUser();
         return successResponse(HttpStatus.OK,"userList",users);
     }
     @PutMapping
