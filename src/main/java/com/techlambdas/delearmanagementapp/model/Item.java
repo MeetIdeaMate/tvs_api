@@ -19,6 +19,7 @@ public class Item {
     private String categoryId;
     private boolean isTaxable;
     private boolean isIncentive;
+    private String hsnSacCode;
     @CreatedDate
     private LocalDateTime createdDateTime;
     @CreatedBy

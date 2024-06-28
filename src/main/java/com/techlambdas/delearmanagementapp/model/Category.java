@@ -14,7 +14,6 @@ public class Category {
     private String id;
     private String categoryId;
     private String categoryName;
-    private String hsnSacCode;
     private Map<Integer,String> mainSpec;
     private Map<Integer,String> specification;
     private Map<String,Integer> taxes;

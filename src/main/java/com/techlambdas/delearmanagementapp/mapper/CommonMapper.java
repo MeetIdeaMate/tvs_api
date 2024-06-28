@@ -28,7 +28,7 @@ public abstract class CommonMapper {
     public abstract PurchaseResponse toPurchaseResponse(Purchase purchase) ;
 
     @Mapping(target = "categoryName", source = "categoryId", qualifiedByName = "mapCategoryName")
-    @Mapping(target = "hsnSacCode", source = "categoryId", qualifiedByName = "mapHsnSacCode")
+    @Mapping(target = "hsnSacCode", source = "partNo", qualifiedByName = "mapHsnSacCode")
     @Mapping(target = "itemName", source = "partNo", qualifiedByName = "mapItemName")
     @Mapping(target = "categoryId", source = "partNo", qualifiedByName = "mapCategoryId")
     public abstract ItemDetailResponse toItemDetailResponse(ItemDetail itemDetail);
@@ -47,8 +47,8 @@ public abstract class CommonMapper {
         return categoryRepository.getCategoryName(categoryId);
     }
     @Named("mapHsnSacCode")
-    public String mapHsnSacCode(String categoryId) {
-        return categoryRepository.gethsnSacCode(categoryId);
+    public String mapHsnSacCode(String partNo) {
+        return itemRepository.gethsnSacCode(partNo);
     }
     @Named("mapItemName")
     public String mapItemName(String partNo) {
@@ -60,7 +60,7 @@ public abstract class CommonMapper {
     }
 
 //    @Mapping(target = "categoryName", source = "categoryId", qualifiedByName = "mapCategoryName")
-@Mapping(target = "customerName", source = "customerId", qualifiedByName= "mapCustomerName")
+    @Mapping(target = "customerName", source = "customerId", qualifiedByName= "mapCustomerName")
     @Mapping(target = "mobileNo", source = "customerId", qualifiedByName= "mapMobileNo")
     public abstract SalesResponse toSalesResponse(Sales sales);
 
@@ -80,7 +80,7 @@ public abstract class CommonMapper {
     }
 
     @Mapping(target = "categoryName", source = "categoryId", qualifiedByName = "mapCategoryName")
-    @Mapping(target = "hsnSacCode", source = "categoryId", qualifiedByName = "mapHsnSacCode")
+    @Mapping(target = "hsnSacCode", source = "partNo", qualifiedByName = "mapHsnSacCode")
     @Mapping(target = "itemName", source = "partNo", qualifiedByName = "mapItemName")
     @Mapping(target = "branchName", source = "branchId", qualifiedByName = "mapBranchName")
     public abstract StockResponse toStockResponse(Stock stock);
@@ -113,4 +113,7 @@ public abstract class CommonMapper {
     public String mapEmployeeName(String employeeId) {
         return employeeRepository.getEmployeeName(employeeId);
     }
+
+    @Mapping(target = "branchName", source = "branchId", qualifiedByName = "mapBranchName")
+    public abstract UserResponse  mapToUserResponse(User user);
 }

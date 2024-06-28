@@ -20,4 +20,10 @@ public interface ItemRepository extends MongoRepository<Item,String> {
         Item item= findByPartNo(partNo);
         return (item !=null)?item.getCategoryId():"unknown item";
     }
+
+    default String gethsnSacCode(String partNo)
+    {
+        Item item= findByPartNo(partNo);
+        return (item !=null)?item.getHsnSacCode():"unknown PartNo";
+    }
 }

@@ -19,4 +19,5 @@ public class PurchaseReport {
     private List<Incentive> incentives;
     private double totalIncentive;
     private double finalInvoiceValue;
+    private double overallAmount;
 }

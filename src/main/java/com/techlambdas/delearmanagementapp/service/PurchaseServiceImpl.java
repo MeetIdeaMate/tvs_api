@@ -174,6 +174,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                 }
                  newItem.setItemName(itemDetail.getItemName());
                  newItem.setPartNo(itemDetail.getPartNo());
+                 newItem.setHsnSacCode(itemDetail.getHsnSacCode());
                 if (Optional.ofNullable(itemDetail.getTaxes()).isPresent()){
                     if(!itemDetail.getTaxes().isEmpty())
                         newItem.setTaxable(true);

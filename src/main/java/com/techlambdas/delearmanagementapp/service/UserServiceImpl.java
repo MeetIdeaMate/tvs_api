@@ -5,7 +5,10 @@ import com.techlambdas.delearmanagementapp.constant.UserStatus;
 import com.techlambdas.delearmanagementapp.exception.AlreadyExistException;
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.exception.InvalidDataException;
+import com.techlambdas.delearmanagementapp.mapper.CommonMapper;
+import com.techlambdas.delearmanagementapp.model.Branch;
 import com.techlambdas.delearmanagementapp.model.User;
+import com.techlambdas.delearmanagementapp.repository.BranchRepository;
 import com.techlambdas.delearmanagementapp.repository.UserCustomRepository;
 import com.techlambdas.delearmanagementapp.repository.UserRepository;
 import com.techlambdas.delearmanagementapp.request.LoginReq;
@@ -13,10 +16,12 @@ import com.techlambdas.delearmanagementapp.request.UserPwdChangReq;
 import com.techlambdas.delearmanagementapp.request.UserReq;
 import com.techlambdas.delearmanagementapp.request.UserUpdateReq;
 import com.techlambdas.delearmanagementapp.response.LoginResponse;
+import com.techlambdas.delearmanagementapp.response.UserResponse;
 import com.techlambdas.delearmanagementapp.utils.RandomIdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,6 +34,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -38,6 +44,8 @@ public class UserServiceImpl implements UserService{
     private JwtUtils jwtUtils;
     @Autowired
     private UserDetailsService userDetailsService;
+    @Autowired
+    private BranchRepository branchRepository;
 
     @Autowired
     private UserCustomRepository userCustomRepository;
@@ -46,6 +54,8 @@ public class UserServiceImpl implements UserService{
     private AuthenticationManager authenticationManager;
     @Autowired
     private PasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    private CommonMapper commonMapper;
 
     @Override
     public String changePassword(UserPwdChangReq userPwdChangReq) {
@@ -87,6 +97,8 @@ public class UserServiceImpl implements UserService{
         loginResponse.setPasswordReset(user.isPasswordReset());
         loginResponse.setUseRefId(user.getUseRefId());
         loginResponse.setBranchId(user.getBranchId());
+        Branch branch=branchRepository.findByBranchId(user.getBranchId());
+        loginResponse.setBranchName(branch.getBranchName());
         return loginResponse;
     }
 
@@ -135,8 +147,9 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public List<User> getAllUser() {
-        return userRepository.findAll();
+    public List<UserResponse > getAllUser() {
+        List<User> user = userRepository.findAll();
+        return user.stream().map(commonMapper::mapToUserResponse).collect(Collectors.toList());
     }
     @Override
     public String getUserNameByUserId(String createdBy) {
@@ -145,10 +158,12 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public Page<User> getUsersByPagination(String userName, String mobileNumber, String designation, int page, int pageSize) {
+    public Page<UserResponse> getUsersByPagination(String userName, String mobileNumber, String designation, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page,pageSize);
         Page<User> userList = userCustomRepository.getAllUsersWithPage(userName,mobileNumber,designation,pageable);
-        return userList;
+        List<UserResponse> userResponseList= userList.stream()
+                .map(commonMapper::mapToUserResponse).collect(Collectors.toList());
+        return new PageImpl<>(userResponseList, pageable, userList.getTotalElements());
     }
 
     @Override
