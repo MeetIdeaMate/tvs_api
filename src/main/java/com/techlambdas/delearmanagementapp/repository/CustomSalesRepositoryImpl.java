@@ -23,10 +23,24 @@ public class CustomSalesRepositoryImpl implements  CustomSalesRepository{
     private MongoTemplate mongoTemplate;
 
     @Override
-    public List<Sales> getAllSales(String invoiceNo) {
+    public List<Sales> getAllSales(String invoiceNo,String customerName,String mobileNo,String partNo,String paymentType) {
         Query query=new Query();
     if (Optional.ofNullable(invoiceNo).isPresent()) {
         query.addCriteria(Criteria.where("invoiceNo").is(invoiceNo));
+    }
+    if (Optional.ofNullable(customerName).isPresent()) {
+        List<String> customerNameFromCustomer=getCustomerNameFromCustomer(customerName);
+        query.addCriteria(Criteria.where("customerId").in(customerNameFromCustomer));
+    }
+    if (Optional.ofNullable(mobileNo).isPresent()) {
+        List<String> mobileNoFromCustomer = getCustomerMobileFromCustomer(mobileNo);
+        query.addCriteria(Criteria.where("customerId").in(mobileNoFromCustomer));
+    }
+    if (Optional.ofNullable(partNo).isPresent()) {
+        query.addCriteria(Criteria.where("itemDetails.partNo").is(partNo));
+    }
+    if (Optional.ofNullable(paymentType).isPresent()) {
+        query.addCriteria(Criteria.where("paidDetails.paymentType").is(paymentType));
     }
         query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
 
@@ -34,7 +48,7 @@ public class CustomSalesRepositoryImpl implements  CustomSalesRepository{
     }
 
     @Override
-    public Page<Sales> getAllSalesWithPage(String invoiceNo, String categoryName, LocalDate fromDate , LocalDate toDate ,Pageable pageable ) {
+    public Page<Sales> getAllSalesWithPage(String invoiceNo, String categoryName,String customerName,String mobileNo,String partNo,String paymentType, LocalDate fromDate , LocalDate toDate ,Pageable pageable ) {
         Query query=new Query();
         if (Optional.ofNullable(invoiceNo).isPresent()) {
             query.addCriteria(Criteria.where("invoiceNo").is(invoiceNo));
@@ -43,11 +57,24 @@ public class CustomSalesRepositoryImpl implements  CustomSalesRepository{
             List<String> categoryFromCatName = getCategoryNameFromCategory(categoryName);
             query.addCriteria(Criteria.where("itemDetails.categoryId").in(categoryFromCatName));
         }
+        if (Optional.ofNullable(customerName).isPresent()) {
+            List<String> customerNameFromCustomer=getCustomerNameFromCustomer(customerName);
+            query.addCriteria(Criteria.where("customerId").in(customerNameFromCustomer));
+        }
+        if (Optional.ofNullable(mobileNo).isPresent()) {
+            List<String> mobileNoFromCustomer = getCustomerMobileFromCustomer(mobileNo);
+            query.addCriteria(Criteria.where("customerId").in(mobileNoFromCustomer));
+        }
+        if (Optional.ofNullable(partNo).isPresent()) {
+            query.addCriteria(Criteria.where("itemDetails.partNo").is(partNo));
+        }
+        if (Optional.ofNullable(paymentType).isPresent()) {
+            query.addCriteria(Criteria.where("paidDetails.paymentType").is(paymentType));
+        }
 
         if (fromDate != null && toDate != null) {
             query.addCriteria(Criteria.where("invoiceDate").gte(fromDate).lte(toDate));
         }
-
         else if (fromDate != null) {
             query.addCriteria(Criteria.where("invoiceDate").gte(fromDate));
         } else if (toDate != null) {
@@ -71,5 +98,24 @@ public class CustomSalesRepositoryImpl implements  CustomSalesRepository{
         List<Category> categoryList=mongoTemplate.find(query, Category.class);
         return categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
     }
+    public List<String> getCustomerNameFromCustomer(String customerName)
+    {
+        Query query = new Query();
+        if (customerName != null) {
+            query.addCriteria(Criteria.where("customerName").regex("^.*" + customerName + ".*", "i"));
+        }
+        List<Customer> customerList = mongoTemplate.find(query, Customer.class);
+        return customerList.stream().map(Customer::getCustomerId).collect(Collectors.toList());
+    }
+    public List<String> getCustomerMobileFromCustomer(String mobileNo)
+    {
+        Query query = new Query();
+        if (mobileNo != null) {
+            query.addCriteria(Criteria.where("mobileNo").regex("^.*" + mobileNo + ".*", "i"));
+        }
+        List<Customer> customerList = mongoTemplate.find(query, Customer.class);
+        return customerList.stream().map(Customer::getCustomerId).collect(Collectors.toList());
+    }
+
 
 }

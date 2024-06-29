@@ -1,6 +1,8 @@
 package com.techlambdas.delearmanagementapp.service;
 
+import com.techlambdas.delearmanagementapp.model.PaidDetail;
 import com.techlambdas.delearmanagementapp.model.Sales;
+import com.techlambdas.delearmanagementapp.request.PaidDetailReq;
 import com.techlambdas.delearmanagementapp.request.SalesRequest;
 import com.techlambdas.delearmanagementapp.request.SalesUpdateReq;
 import com.techlambdas.delearmanagementapp.response.SalesResponse;
@@ -15,7 +17,7 @@ public interface SalesService {
 
     SalesResponse createSales(SalesRequest salesRequest);
 
-    List<SalesResponse> getAllSales(String invoiceNo);
+    List<SalesResponse> getAllSales(String invoiceNo, String customerName,String mobileNo,String partNo,String paymentType);
 
      Sales updateSales(SalesUpdateReq salesUpdateReq);
 
@@ -24,8 +26,12 @@ public interface SalesService {
      SalesResponse getSalesByInvoiceNo(String invoiceNo);
 
 
-    List<SalesResponse> getAllSalesView(String invoiceNo);
+//    List<SalesResponse> getAllSalesView(String invoiceNo);
 
 
-    Page<SalesResponse> getAllSalesWithPage(String invoiceNo, String categoryName, LocalDate fromDate , LocalDate toDate, Pageable pageable);
+    Page<SalesResponse> getAllSalesWithPage(String invoiceNo, String categoryName,String customerName,String mobileNo,String partNo,String paymentType, LocalDate fromDate , LocalDate toDate, Pageable pageable);
+
+    String updatePaymentDetails(String salesId, PaidDetailReq paidDetailReq);
+
+    String cancelPaymentDetails(String salesId, String paymentId);
 }

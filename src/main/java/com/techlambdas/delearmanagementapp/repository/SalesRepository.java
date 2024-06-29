@@ -10,6 +10,8 @@ public interface SalesRepository extends MongoRepository<Sales,String> {
 
     Sales findByInvoiceNo(String invoiceNo);
 
+    Sales findBySalesId(String salesId);
+
 //  List<Sales> findByCustomerName(String customerName);
 
 
