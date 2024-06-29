@@ -1,6 +1,7 @@
 package com.techlambdas.delearmanagementapp.repository;
 
 
+import com.techlambdas.delearmanagementapp.model.Customer;
 import com.techlambdas.delearmanagementapp.model.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
@@ -14,4 +15,9 @@ public interface UserRepository extends MongoRepository<User,String> {
     User findUserByUserId(String userId);
     Optional<User> findByUserName(String username);
 
+    default String getUserName(String createBy)
+    {
+        User user = findUserByUserId(createBy);
+        return (user !=null)?user.getUserName():"unknown User";
+    }
 }

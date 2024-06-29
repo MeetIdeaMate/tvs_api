@@ -22,6 +22,8 @@ public abstract class CommonMapper {
     protected CustomerRepository customerRepository;
     @Autowired
     protected EmployeeRepository employeeRepository;
+    @Autowired
+    protected UserRepository userRepository;
 
     @Mapping(target = "branchName", source = "branchId", qualifiedByName = "mapBranchName")
     @Mapping(target = "vendorName", source = "vendorId", qualifiedByName= "mapVendorName")
@@ -62,11 +64,16 @@ public abstract class CommonMapper {
 //    @Mapping(target = "categoryName", source = "categoryId", qualifiedByName = "mapCategoryName")
     @Mapping(target = "customerName", source = "customerId", qualifiedByName= "mapCustomerName")
     @Mapping(target = "mobileNo", source = "customerId", qualifiedByName= "mapMobileNo")
+    @Mapping(target = "userName", source = "createdBy", qualifiedByName = "mapUserName")
     public abstract SalesResponse toSalesResponse(Sales sales);
 
     @Named("mapCustomerName")
     public String mapCustomerName(String customerId) {
         return customerRepository.getCustomerName(customerId);
+    }
+    @Named("mapUserName")
+    public String mapUserName(String createBy) {
+        return userRepository.getUserName(createBy);
     }
 
     @Named("mapMobileNo")

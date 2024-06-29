@@ -1,6 +1,8 @@
 package com.techlambdas.delearmanagementapp.controller;
 
+import com.techlambdas.delearmanagementapp.model.PaidDetail;
 import com.techlambdas.delearmanagementapp.model.Sales;
+import com.techlambdas.delearmanagementapp.request.PaidDetailReq;
 import com.techlambdas.delearmanagementapp.request.SalesRequest;
 import com.techlambdas.delearmanagementapp.request.SalesUpdateReq;
 import com.techlambdas.delearmanagementapp.response.SalesResponse;
@@ -64,8 +66,12 @@ public class SalesController {
 
 
 @GetMapping
-public ResponseEntity<List<SalesResponse>>getAllSales(@RequestParam(required = false) String invoiceNo){
-    List<SalesResponse> sales=salesService.getAllSales(invoiceNo);
+public ResponseEntity<List<SalesResponse>>getAllSales(@RequestParam(required = false) String invoiceNo,
+                                                      @RequestParam(required = false) String customerName,
+                                                      @RequestParam(required = false) String mobileNo,
+                                                      @RequestParam(required = false) String partNo,
+                                                      @RequestParam(required = false) String paymentType){
+    List<SalesResponse> sales=salesService.getAllSales(invoiceNo, customerName, mobileNo, partNo, paymentType);
     return successResponse(HttpStatus.OK,"salesList",sales);
 }
 
@@ -74,14 +80,26 @@ public ResponseEntity<List<SalesResponse>>getAllSales(@RequestParam(required = f
     public ResponseEntity<Page<SalesResponse>> getAllSalesWithPage(
             @RequestParam(required = false) String invoiceNo,
             @RequestParam(required = false) String categoryName,
+            @RequestParam(required = false) String customerName,
+            @RequestParam(required = false) String mobileNo,
+            @RequestParam(required = false) String partNo,
+            @RequestParam(required = false) String paymentType,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<SalesResponse> salesPage = salesService.getAllSalesWithPage(invoiceNo,categoryName, fromDate,toDate,pageable);
+        Page<SalesResponse> salesPage = salesService.getAllSalesWithPage(invoiceNo,categoryName,customerName,mobileNo,partNo,paymentType, fromDate,toDate,pageable);
         return successResponse(HttpStatus.OK,"salesWithPage",salesPage);
     }
-
-
+    @PatchMapping("/{salesId}")
+    public ResponseEntity<String> updatePaymentDetails(@PathVariable String salesId, @RequestBody PaidDetailReq paidDetailReq) {
+        String result = salesService.updatePaymentDetails(salesId, paidDetailReq);
+        return successResponse(HttpStatus.OK, "success", result);
+    }
+    @PatchMapping("/cancel/{salesId}")
+    public ResponseEntity<String> cancelPaymentDetails(@PathVariable String salesId,@RequestParam String paymentId) {
+        String result=salesService.cancelPaymentDetails(salesId,paymentId);
+        return successResponse(HttpStatus.OK, "success", result);
+    }
 }

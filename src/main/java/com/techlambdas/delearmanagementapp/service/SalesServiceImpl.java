@@ -11,9 +11,11 @@ import com.techlambdas.delearmanagementapp.repository.CustomSalesRepository;
 import com.techlambdas.delearmanagementapp.repository.SalesRepository;
 import com.techlambdas.delearmanagementapp.repository.StockRepository;
 import com.techlambdas.delearmanagementapp.request.ItemDetailRequest;
+import com.techlambdas.delearmanagementapp.request.PaidDetailReq;
 import com.techlambdas.delearmanagementapp.request.SalesRequest;
 import com.techlambdas.delearmanagementapp.request.SalesUpdateReq;
 import com.techlambdas.delearmanagementapp.response.SalesResponse;
+import com.techlambdas.delearmanagementapp.utils.RandomIdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -58,6 +60,13 @@ public class SalesServiceImpl implements  SalesService{
         try {
             Sales sales = salesMapper.mapSalesRequestToSales(salesRequest);
             sales.setInvoiceNo(configService.getNextSalesNoSequence());
+            for (PaidDetail paidDetail:sales.getPaidDetails())
+            {
+                List<PaidDetail> newList = new ArrayList<>();
+                paidDetail.setPaymentId(RandomIdGenerator.getRandomId());
+                newList.add(paidDetail);
+                sales.setPaidDetails(newList);
+            }
             double totalCgst = 0;
             double totalSgst=0;
             for (ItemDetail itemDetail:sales.getItemDetails())
@@ -104,11 +113,24 @@ public class SalesServiceImpl implements  SalesService{
     }
 
     @Override
-    public List<SalesResponse> getAllSales(String invoiceNo) {
-        List<Sales> sales = customSalesRepository.getAllSales(invoiceNo);
+    public List<SalesResponse> getAllSales(String invoiceNo,String customerName,String mobileNo ,String partNo, String paymentType) {
+        List<Sales> sales = customSalesRepository.getAllSales(invoiceNo, customerName, mobileNo, partNo, paymentType);
         return sales.stream()
-                .map(commonMapper::toSalesResponse)
-                .collect(Collectors.toList());
+                .map(sale -> {
+                    double balance = 0;
+                    double paidAmount = 0;
+                    for (PaidDetail paidDetail : sale.getPaidDetails()) {
+                        if (paidDetail.isCancelled())                        {
+                            paidAmount = paidAmount + paidDetail.getPaidAmount();
+                        }
+                    }
+                    balance = sale.getTotalInvoiceAmt() - paidAmount;
+
+                    SalesResponse salesResponse = commonMapper.toSalesResponse(sale);
+                    salesResponse.setPendingAmt(balance);
+                    salesResponse.setTotalPaidAmt(paidAmount);
+                    return salesResponse;
+                }).collect(Collectors.toList());
 //        return salesRepository.findAll();
     }
 
@@ -135,22 +157,89 @@ public class SalesServiceImpl implements  SalesService{
         return commonMapper.toSalesResponse(sales);
     }
 
-    @Override
-    public List<SalesResponse> getAllSalesView(String invoiceNo) {
-        List<Sales> sales = customSalesRepository.getAllSales(invoiceNo);
-        return sales.stream()
-                .map(commonMapper::toSalesResponse)
-                .collect(Collectors.toList());
-    }
+//    @Override
+//    public List<SalesResponse> getAllSalesView(String invoiceNo) {
+//        List<Sales> sales = customSalesRepository.getAllSales(invoiceNo);
+//        return sales.stream()
+//                .map(commonMapper::toSalesResponse)
+//                .collect(Collectors.toList());
+//    }
 
     @Override
-    public Page<SalesResponse> getAllSalesWithPage(String invoiceNo, String categoryName , LocalDate fromDate , LocalDate toDate, Pageable pageable) {
-        Page<Sales>sales= customSalesRepository.getAllSalesWithPage(invoiceNo, categoryName ,fromDate , toDate ,pageable);
+    public Page<SalesResponse> getAllSalesWithPage(String invoiceNo, String categoryName ,String customerName,String mobileNo,String partNo,String paymentType, LocalDate fromDate , LocalDate toDate, Pageable pageable) {
+        Page<Sales>sales= customSalesRepository.getAllSalesWithPage(invoiceNo, categoryName,customerName,mobileNo,partNo,paymentType,fromDate , toDate ,pageable);
         List<SalesResponse>salesResponses=sales.stream()
-                .map(commonMapper::toSalesResponse)
-                .collect(Collectors.toList());
+                .map(sale -> {
+                    double balance = 0;
+                    double paidAmount = 0;
+                    for (PaidDetail paidDetail : sale.getPaidDetails()) {
+                        if (paidDetail.isCancelled())                        {
+                            paidAmount = paidAmount + paidDetail.getPaidAmount();
+                        }
+                    }
+                    balance = sale.getTotalInvoiceAmt() - paidAmount;
+
+                    SalesResponse salesResponse = commonMapper.toSalesResponse(sale);
+                    salesResponse.setPendingAmt(balance);
+                    salesResponse.setTotalPaidAmt(paidAmount);
+                    return salesResponse;
+                }).collect(Collectors.toList());
         return new PageImpl<>(salesResponses,pageable,sales.getTotalElements());
     }
 
+    @Override
+    public String updatePaymentDetails(String salesId, PaidDetailReq paidDetailReq) {
+        Sales sales = salesRepository.findBySalesId(salesId);
+        if (sales == null) {
+            throw new RuntimeException("Sales not found with id: " + salesId);
+        }
+        PaidDetail paidDetail = new PaidDetail();
+        paidDetail.setPaidAmount(paidDetailReq.getPaidAmount());
+        paidDetail.setPaymentDate(paidDetailReq.getPaymentDate());
+        paidDetail.setPaymentType(paidDetailReq.getPaymentType());
+        paidDetail.setPaymentId(RandomIdGenerator.getRandomId());
+        if (sales.getPaidDetails()!=null)
+        {
+            double paidAmount = sales.getPaidDetails()
+                    .stream()
+                    .filter(pd->!pd.isCancelled())
+                    .mapToDouble(pd->pd.getPaidAmount())
+                    .sum();
+            if (paidAmount + paidDetailReq.getPaidAmount() > sales.getTotalInvoiceAmt()) {
+                return "Paid Amount is greater than total invoice amount";
+            }
+            else
+            {
+                sales.getPaidDetails().add(paidDetail);
+            }
+        }else
+        {
+            List<PaidDetail> paidDetailList = new ArrayList<>();
+            paidDetailList.add(paidDetail);
+            sales.setPaidDetails(paidDetailList);
+        }
+        double paidAmount = sales.getPaidDetails().stream()
+                .mapToDouble(pd -> pd.getPaidAmount())
+                .sum();
+        if (paidAmount == sales.getTotalInvoiceAmt()) {
+            sales.setPaymentStatus(PaymentStatus.COMPLETED);}
+        salesRepository.save(sales);
+        return "payment successful";
+    }
 
+    @Override
+    public String cancelPaymentDetails(String salesId, String paymentId) {
+        Sales sales = salesRepository.findBySalesId(salesId);
+        if (sales == null) {
+            throw new RuntimeException("Sales not found with id: " + salesId);
+        }
+        for (PaidDetail paidDetail : sales.getPaidDetails()) {
+            if (paidDetail.getPaymentId().equals(paymentId)) {
+                paidDetail.setCancelled(true);
+                break;
+            }
+        }
+        salesRepository.save(sales);
+        return "payment cancelled";
+    }
 }

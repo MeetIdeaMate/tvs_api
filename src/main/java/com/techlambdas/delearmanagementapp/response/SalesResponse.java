@@ -26,6 +26,7 @@ public class SalesResponse {
     private double totalCgst;
     private double totalSgst;
     private double totalInvoiceAmt;
+    private double totalPaidAmt;
     private double totalIncentiveAmt;
     private double roundOffAmt;
     private double netAmt;
@@ -36,4 +37,6 @@ public class SalesResponse {
     private String branchName;
     private EvBattery evBattery;
     private Map<String,String> mandatoryAddons;
+    private String createdBy;
+    private String userName;
 }

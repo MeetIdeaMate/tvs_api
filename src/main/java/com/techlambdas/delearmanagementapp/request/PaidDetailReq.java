@@ -1,15 +1,12 @@
-package com.techlambdas.delearmanagementapp.model;
+package com.techlambdas.delearmanagementapp.request;
 
 import com.techlambdas.delearmanagementapp.constant.PaymentType;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.time.LocalDate;
 
 @Data
-public class PaidDetail {
-    private String paymentId;
+public class PaidDetailReq {
     private LocalDate paymentDate;
     private double paidAmount;
     private PaymentType paymentType;
