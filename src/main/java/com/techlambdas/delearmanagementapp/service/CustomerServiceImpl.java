@@ -1,8 +1,10 @@
 package com.techlambdas.delearmanagementapp.service;
 
+import com.techlambdas.delearmanagementapp.exception.AlreadyExistException;
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.mapper.CustomerMapper;
 import com.techlambdas.delearmanagementapp.model.Customer;
+import com.techlambdas.delearmanagementapp.model.Employee;
 import com.techlambdas.delearmanagementapp.repository.CustomCustomerRepository;
 import com.techlambdas.delearmanagementapp.repository.CustomerRepository;
 import com.techlambdas.delearmanagementapp.request.CustomerRequest;
@@ -26,6 +28,9 @@ public class CustomerServiceImpl implements CustomerService{
     @Override
     public Customer createCustomer(CustomerRequest customerRequest) {
         try {
+            Customer existingCustomer=customerRepository.findCustomerByMobileNo(customerRequest.getMobileNo());
+            if (existingCustomer!=null)
+                throw new AlreadyExistException("MobileNumber Already Exist:"+existingCustomer.getMobileNo());
             Customer customer =  customerMapper.customerRequestToCustomer(customerRequest);
             String generatedId= RandomIdGenerator.getRandomId();
             customer.setCustomerId(generatedId);
