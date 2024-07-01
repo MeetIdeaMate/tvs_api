@@ -29,4 +29,6 @@ public interface CustomerRepository extends MongoRepository<Customer,String> {
         Customer customer=findByCustomerId(customerId);
         return (customer!=null)?customer.getAddress():"unknown customer";
     }
+
+    Customer findCustomerByMobileNo(String mobileNo);
 }
