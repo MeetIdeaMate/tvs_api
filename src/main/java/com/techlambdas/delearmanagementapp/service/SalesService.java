@@ -1,6 +1,7 @@
 package com.techlambdas.delearmanagementapp.service;
 
 import com.techlambdas.delearmanagementapp.model.PaidDetail;
+import com.techlambdas.delearmanagementapp.model.PaymentStatus;
 import com.techlambdas.delearmanagementapp.model.Sales;
 import com.techlambdas.delearmanagementapp.request.PaidDetailReq;
 import com.techlambdas.delearmanagementapp.request.SalesRequest;
@@ -17,7 +18,7 @@ public interface SalesService {
 
     SalesResponse createSales(SalesRequest salesRequest);
 
-    List<SalesResponse> getAllSales(String invoiceNo, String customerName,String mobileNo,String partNo,String paymentType);
+    List<SalesResponse> getAllSales(String invoiceNo, String customerName, String mobileNo, String partNo, String paymentType, Boolean isCancelled, PaymentStatus paymentStatus,String billType);
 
      Sales updateSales(SalesUpdateReq salesUpdateReq);
 
@@ -29,9 +30,11 @@ public interface SalesService {
 //    List<SalesResponse> getAllSalesView(String invoiceNo);
 
 
-    Page<SalesResponse> getAllSalesWithPage(String invoiceNo, String categoryName,String customerName,String mobileNo,String partNo,String paymentType, LocalDate fromDate , LocalDate toDate, Pageable pageable);
+    Page<SalesResponse> getAllSalesWithPage(String invoiceNo, String categoryName,String customerName,String mobileNo,String partNo,String paymentType,Boolean isCancelled,String branchName,String billType,PaymentStatus paymentStatus,LocalDate fromDate , LocalDate toDate, Pageable pageable);
 
     String updatePaymentDetails(String salesId, PaidDetailReq paidDetailReq);
 
-    String cancelPaymentDetails(String salesId, String paymentId);
+    String cancelPaymentDetails(String salesId, String paymentId,String reason);
+
+    String cancelSales(String salesId, String reason);
 }

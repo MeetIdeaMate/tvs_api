@@ -12,7 +12,7 @@ public interface EmployeeService {
 
     Page<EmployeeResponse> getEmployeesByPagination(String employeeName, String mobileNumber, String designation,String branchId,String branchName, int page, int pageSize);
 
-    List<EmployeeResponse> getAllEmployees(String employeeName, String mobileNumber);
+    List<EmployeeResponse> getAllEmployees(String employeeName, String mobileNumber,String branchId,String branchName);
 
     EmployeeResponse getEmployeeById(String employeeId);
 

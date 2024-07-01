@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface CustomBookingRepository {
-    List<Booking> getAllBookings(String bookingNo, String customerName, String paymentType, LocalDate fromDate, LocalDate toDate);
+    List<Booking> getAllBookings(String bookingNo, String customerName, String paymentType,String branchId,String branchName,LocalDate fromDate, LocalDate toDate);
 
-    Page<Booking> getAllBookingsWithPage(String bookingNo, String customerName, String paymentType, LocalDate fromDate, LocalDate toDate, Pageable pageable);
+    Page<Booking> getAllBookingsWithPage(String bookingNo, String customerName, String paymentType,String branchId,String branchName, LocalDate fromDate, LocalDate toDate, Pageable pageable);
 }

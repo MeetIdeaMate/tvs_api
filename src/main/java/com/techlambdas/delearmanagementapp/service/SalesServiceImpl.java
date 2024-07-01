@@ -113,14 +113,14 @@ public class SalesServiceImpl implements  SalesService{
     }
 
     @Override
-    public List<SalesResponse> getAllSales(String invoiceNo,String customerName,String mobileNo ,String partNo, String paymentType) {
-        List<Sales> sales = customSalesRepository.getAllSales(invoiceNo, customerName, mobileNo, partNo, paymentType);
+    public List<SalesResponse> getAllSales(String invoiceNo,String customerName,String mobileNo ,String partNo, String paymentType,Boolean isCancelled,PaymentStatus paymentStatus,String billType) {
+        List<Sales> sales = customSalesRepository.getAllSales(invoiceNo, customerName, mobileNo, partNo, paymentType,isCancelled,paymentStatus,billType);
         return sales.stream()
                 .map(sale -> {
                     double balance = 0;
                     double paidAmount = 0;
                     for (PaidDetail paidDetail : sale.getPaidDetails()) {
-                        if (paidDetail.isCancelled())                        {
+                        if (!paidDetail.isCancelled())                        {
                             paidAmount = paidAmount + paidDetail.getPaidAmount();
                         }
                     }
@@ -166,8 +166,8 @@ public class SalesServiceImpl implements  SalesService{
 //    }
 
     @Override
-    public Page<SalesResponse> getAllSalesWithPage(String invoiceNo, String categoryName ,String customerName,String mobileNo,String partNo,String paymentType, LocalDate fromDate , LocalDate toDate, Pageable pageable) {
-        Page<Sales>sales= customSalesRepository.getAllSalesWithPage(invoiceNo, categoryName,customerName,mobileNo,partNo,paymentType,fromDate , toDate ,pageable);
+    public Page<SalesResponse> getAllSalesWithPage(String invoiceNo, String categoryName ,String customerName,String mobileNo,String partNo,String paymentType,Boolean isCancelled,String branchName,String billType,PaymentStatus paymentStatus,LocalDate fromDate , LocalDate toDate, Pageable pageable) {
+        Page<Sales>sales= customSalesRepository.getAllSalesWithPage(invoiceNo, categoryName,customerName,mobileNo,partNo,paymentType,isCancelled,branchName,billType,paymentStatus,fromDate , toDate ,pageable);
         List<SalesResponse>salesResponses=sales.stream()
                 .map(sale -> {
                     double balance = 0;
@@ -228,7 +228,7 @@ public class SalesServiceImpl implements  SalesService{
     }
 
     @Override
-    public String cancelPaymentDetails(String salesId, String paymentId) {
+    public String cancelPaymentDetails(String salesId, String paymentId,String reason) {
         Sales sales = salesRepository.findBySalesId(salesId);
         if (sales == null) {
             throw new RuntimeException("Sales not found with id: " + salesId);
@@ -236,10 +236,27 @@ public class SalesServiceImpl implements  SalesService{
         for (PaidDetail paidDetail : sales.getPaidDetails()) {
             if (paidDetail.getPaymentId().equals(paymentId)) {
                 paidDetail.setCancelled(true);
+                paidDetail.setReason(reason);
                 break;
             }
         }
         salesRepository.save(sales);
         return "payment cancelled";
+    }
+
+    @Override
+    public String cancelSales(String salesId, String reason) {
+        Sales sales = salesRepository.findBySalesId(salesId);
+        if (sales == null) {
+            throw new RuntimeException("Sales not found with id: " + salesId);
+        }
+        if (sales.getSalesId().equals(salesId))
+        {
+            sales.setCancelled(true);
+            sales.setReason(reason);
+        }
+        Sales cancelSales=salesRepository.save(sales);
+        stockService.salesCancelInfoToStock(cancelSales);
+        return "Sales cancelled";
     }
 }

@@ -64,7 +64,8 @@ public abstract class CommonMapper {
 //    @Mapping(target = "categoryName", source = "categoryId", qualifiedByName = "mapCategoryName")
     @Mapping(target = "customerName", source = "customerId", qualifiedByName= "mapCustomerName")
     @Mapping(target = "mobileNo", source = "customerId", qualifiedByName= "mapMobileNo")
-    @Mapping(target = "userName", source = "createdBy", qualifiedByName = "mapUserName")
+    @Mapping(target = "createdByName", source = "createdBy", qualifiedByName = "mapUserName")
+    @Mapping(target = "branchName", source = "branchId", qualifiedByName = "mapBranchName")
     public abstract SalesResponse toSalesResponse(Sales sales);
 
     @Named("mapCustomerName")
@@ -107,6 +108,7 @@ public abstract class CommonMapper {
     @Mapping(target = "mobileNo", source = "customerId", qualifiedByName= "mapMobileNo")
     @Mapping(target = "address", source = "customerId", qualifiedByName= "mapAddress")
     @Mapping(target = "executiveName", source = "executiveId", qualifiedByName= "mapEmployeeName")
+    @Mapping(target = "branchName", source = "branchId", qualifiedByName = "mapBranchName")
     public abstract BookingResponse ToBookingResponse(Booking booking);
 
     @Named("mapCategoryNameByPartNo")

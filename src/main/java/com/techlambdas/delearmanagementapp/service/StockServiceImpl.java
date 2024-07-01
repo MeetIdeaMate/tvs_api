@@ -251,4 +251,17 @@ public class StockServiceImpl implements StockService{
     public Page<StockDTO> getCumulativeStockWithPage(String partNo, String itemName, String keyValue, Pageable pageable, String categoryName, String branchId) {
         return customStockRepository.getCumulativeStockWithPage(partNo, itemName, keyValue, pageable, categoryName, branchId);
     }
+
+    @Override
+    public void salesCancelInfoToStock(Sales cancelSales) {
+        for (ItemDetail itemDetail : cancelSales.getItemDetails()) {
+            Stock stock = stockRepository.findStockByStockId(itemDetail.getStockId());
+            if (Optional.ofNullable(stock.getSalesIds()).isPresent()) {
+                stock.getSalesIds().remove(cancelSales.getSalesId());
+            }
+            stock.setQuantity(stock.getQuantity() + itemDetail.getQuantity());
+            stock.setSalesQuantity(stock.getSalesQuantity() - itemDetail.getQuantity());
+            stockRepository.save(stock);
+        }
+    }
 }

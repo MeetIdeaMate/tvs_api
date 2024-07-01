@@ -10,5 +10,5 @@ public class PaidDetailReq {
     private LocalDate paymentDate;
     private double paidAmount;
     private PaymentType paymentType;
-    private boolean isCancelled;
+    private String paymentReference;
 }

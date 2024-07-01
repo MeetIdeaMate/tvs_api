@@ -99,6 +99,7 @@ public class UserServiceImpl implements UserService{
         loginResponse.setBranchId(user.getBranchId());
         Branch branch=branchRepository.findByBranchId(user.getBranchId());
         loginResponse.setBranchName(branch.getBranchName());
+        loginResponse.setMainBranch(branch.isMainBranch());
         return loginResponse;
     }
 

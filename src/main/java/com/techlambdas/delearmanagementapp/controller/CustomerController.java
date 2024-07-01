@@ -30,8 +30,10 @@ public class CustomerController {
     public ResponseEntity<List<Customer>>getAllCustomers(@RequestParam (required = false)String customerId,
                                                          @RequestParam (required = false)String customerName,
                                                          @RequestParam (required = false)String mobileNo,
-                                                         @RequestParam (required = false)String city){
-        List<Customer> customers=customerService.getAllCustomers(customerId,customerName,mobileNo,city);
+                                                         @RequestParam (required = false)String city,
+                                                         @RequestParam (required = false)String branchId,
+                                                         @RequestParam (required = false)String branchName){
+        List<Customer> customers=customerService.getAllCustomers(customerId,customerName,mobileNo,city,branchId,branchName);
         return successResponse(HttpStatus.OK,"customers",customers);
     }
     @GetMapping("/page")
@@ -40,11 +42,13 @@ public class CustomerController {
             @RequestParam(required = false) String customerName,
             @RequestParam(required = false) String mobileNo,
             @RequestParam(required = false) String city,
+            @RequestParam (required = false)String branchId,
+            @RequestParam (required = false)String branchName,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<Customer> customersPage = customerService.getAllCustomersWithPage(customerId, customerName, mobileNo, city, pageable);
+        Page<Customer> customersPage = customerService.getAllCustomersWithPage(customerId, customerName, mobileNo, city,branchId,branchName, pageable);
 
         return successResponse(HttpStatus.OK,"customersWithPage",customersPage);
     }
