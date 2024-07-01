@@ -173,7 +173,7 @@ public class SalesServiceImpl implements  SalesService{
                     double balance = 0;
                     double paidAmount = 0;
                     for (PaidDetail paidDetail : sale.getPaidDetails()) {
-                        if (paidDetail.isCancelled())                        {
+                        if (!paidDetail.isCancelled())                        {
                             paidAmount = paidAmount + paidDetail.getPaidAmount();
                         }
                     }
