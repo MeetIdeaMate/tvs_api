@@ -12,4 +12,5 @@ public class LoginResponse {
     private boolean isPasswordReset;
     private String branchId;
     private String branchName;
+    private boolean isMainBranch;
 }

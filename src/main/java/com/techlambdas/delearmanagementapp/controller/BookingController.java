@@ -34,23 +34,27 @@ public class BookingController {
     public ResponseEntity<List<Booking>> getAllBookings(@RequestParam(required = false) String bookingNo,
                                                         @RequestParam(required = false) String customerName,
                                                         @RequestParam(required = false) String paymentType,
+                                                        @RequestParam (required = false)String branchId,
+                                                        @RequestParam (required = false)String branchName,
                                                         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
                                                         @RequestParam(required = false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate)
     {
-        List<BookingResponse> bookingResponses=bookingService.getAllBookings(bookingNo,customerName,paymentType,fromDate,toDate);
+        List<BookingResponse> bookingResponses=bookingService.getAllBookings(bookingNo,customerName,paymentType,branchId,branchName,fromDate,toDate);
         return successResponse(HttpStatus.OK,"bookings",bookingResponses);
     }
     @GetMapping("/page")
     public ResponseEntity<Page<Booking>> getAllBookingsWithPage(@RequestParam(required = false) String bookingNo,
                                                                 @RequestParam(required = false) String customerName,
                                                                 @RequestParam(required = false) String paymentType,
+                                                                @RequestParam (required = false)String branchId,
+                                                                @RequestParam (required = false)String branchName,
                                                                 @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
                                                                 @RequestParam(required = false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
                                                                 @RequestParam(defaultValue = "0") int page,
                                                                 @RequestParam(defaultValue = "10") int size)
     {
         Pageable pageable= PageRequest.of(page,size);
-        Page<BookingResponse> bookingResponses=bookingService.getAllBookingsWithPage(bookingNo,customerName,paymentType,fromDate,toDate,pageable);
+        Page<BookingResponse> bookingResponses=bookingService.getAllBookingsWithPage(bookingNo,customerName,paymentType,branchId,branchName,fromDate,toDate,pageable);
         return successResponse(HttpStatus.OK,"bookingsWithPage",bookingResponses);
     }
     @GetMapping("/{bookingNo}")

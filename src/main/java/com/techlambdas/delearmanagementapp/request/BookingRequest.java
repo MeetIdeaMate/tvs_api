@@ -15,4 +15,5 @@ public class BookingRequest {
     private PaidDetail paidDetail;
     private String executiveId;
     private LocalDate targetInvoiceDate;
+    private String branchId;
 }

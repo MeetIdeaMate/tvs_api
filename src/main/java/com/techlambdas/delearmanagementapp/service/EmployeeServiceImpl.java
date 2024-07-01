@@ -68,8 +68,8 @@ public class EmployeeServiceImpl implements EmployeeService{
         return new PageImpl<>(employeeResponses, pageable, employees.getTotalElements());
     }
     @Override
-    public List<EmployeeResponse> getAllEmployees(String employeeName, String mobileNumber) {
-        List<Employee> employees= findAllEmployees(employeeName,mobileNumber);
+    public List<EmployeeResponse> getAllEmployees(String employeeName, String mobileNumber,String branchId,String branchName) {
+        List<Employee> employees=employeeCustomRepository.getAllEmployees(employeeName,mobileNumber,branchId,branchName);
         List<EmployeeResponse>employeeResponses=new ArrayList<>();
         for (Employee employee:employees){
             EmployeeResponse employeeResponse=mapEmployeeResponseWithEntity(employee);
@@ -150,21 +150,5 @@ public class EmployeeServiceImpl implements EmployeeService{
         LocalDate currentDate = LocalDate.now();
         int age= Period.between(employeeResponse.getDateOfBirth(), currentDate).getYears();
         employeeResponse.setAge(age);
-    }
-
-    private List<Employee> findAllEmployees(String employeeName, String mobileNumber) {
-        Query query = new Query();
-        if (employeeName != null) {
-            Criteria criteria = new Criteria();
-            Pattern regex = Pattern.compile("^" + employeeName, Pattern.CASE_INSENSITIVE);
-            criteria = Criteria.where("employeeName").regex(regex);
-            query.addCriteria(criteria);
-        }
-        if (mobileNumber!=null)
-        {
-                query.addCriteria(Criteria.where("mobileNumber").regex("^.*" + mobileNumber + ".*", "i"));
-        }
-        query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
-        return mongoTemplate.find(query, Employee.class);
     }
 }

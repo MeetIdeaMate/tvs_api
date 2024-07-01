@@ -36,8 +36,8 @@ public class CustomerServiceImpl implements CustomerService{
     }
 
     @Override
-    public List<Customer> getAllCustomers(String customerId, String customerName, String mobileNo, String city) {
-        List<Customer>customers=customCustomerRepository.getAllCustomers(customerId,customerName,mobileNo,city);
+    public List<Customer> getAllCustomers(String customerId, String customerName, String mobileNo, String city,String branchId,String branchName) {
+        List<Customer>customers=customCustomerRepository.getAllCustomers(customerId,customerName,mobileNo,city,branchId,branchName);
         return customers;
     }
 
@@ -50,9 +50,9 @@ public class CustomerServiceImpl implements CustomerService{
     }
 
     @Override
-    public Page<Customer> getAllCustomersWithPage(String customerId, String customerName, String mobileNo, String city, Pageable pageable) {
+    public Page<Customer> getAllCustomersWithPage(String customerId, String customerName, String mobileNo, String city,String branchId,String branchName, Pageable pageable) {
 
-        return customCustomerRepository.getAllCustomersWithPage(customerId,customerName,mobileNo,city,pageable);
+        return customCustomerRepository.getAllCustomersWithPage(customerId,customerName,mobileNo,city,branchId,branchName,pageable);
     }
 
     @Override

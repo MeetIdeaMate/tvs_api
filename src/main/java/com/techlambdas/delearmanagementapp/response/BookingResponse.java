@@ -22,4 +22,6 @@ public class BookingResponse {
     private boolean isCancelled;
     private String executiveId;
     private String executiveName;
+    private String branchId;
+    private String branchName;
 }

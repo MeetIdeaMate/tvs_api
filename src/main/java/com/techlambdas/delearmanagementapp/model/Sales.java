@@ -40,6 +40,8 @@ public class Sales {
     private String branchId;
     private Map<String,String> mandatoryAddons;
     private EvBattery evBattery;
+    private String reason;
+    private boolean isCancelled;
 
     @CreatedDate
     private LocalDateTime createdDateTime;

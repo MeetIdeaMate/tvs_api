@@ -22,19 +22,23 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository{
     private MongoTemplate mongoTemplate;
     @Override
     public Page<Employee> getAllEmployeesWithPage(String employeeName, String mobileNumber, String designation,String branchId,String branchName, Pageable pageable) {
-            Query query = new Query();
+        Query query = new Query();
 
-            if (employeeName != null) {
-                Criteria criteria = Criteria.where("employeeName").regex("^" + employeeName, "i");
-                query.addCriteria(criteria);
-            }
+        if (employeeName != null) {
+            Criteria criteria = Criteria.where("employeeName").regex("^" + employeeName, "i");
+            query.addCriteria(criteria);
+        }
         if (branchName != null) {
             List<String> branchIds = getBranchNameFromBranch(branchName);
             query.addCriteria(Criteria.where("branchId").in(branchIds));
         }
-            if (mobileNumber!=null) {
-                query.addCriteria(Criteria.where("mobileNumber").regex("^.*" + mobileNumber + ".*", "i"));
-            }
+        if (branchId !=null)
+        {
+            query.addCriteria(Criteria.where("branchId").is(branchId));
+        }
+        if (mobileNumber!=null) {
+            query.addCriteria(Criteria.where("mobileNumber").regex("^.*" + mobileNumber + ".*", "i"));
+        }
         if (designation!=null) {
             query.addCriteria(Criteria.where("designation").regex("^.*" + designation + ".*", "i"));
         }
@@ -46,6 +50,30 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository{
 
             return new PageImpl<>(employeeList, pageable, totalCount);
     }
+
+    @Override
+    public List<Employee> getAllEmployees(String employeeName, String mobileNumber, String branchId, String branchName) {
+        Query query = new Query();
+
+        if (employeeName != null) {
+            Criteria criteria = Criteria.where("employeeName").regex("^" + employeeName, "i");
+            query.addCriteria(criteria);
+        }
+        if (branchName != null) {
+            List<String> branchIds = getBranchNameFromBranch(branchName);
+            query.addCriteria(Criteria.where("branchId").in(branchIds));
+        }
+        if (branchId !=null)
+        {
+            query.addCriteria(Criteria.where("branchId").is(branchId));
+        }
+        if (mobileNumber!=null) {
+            query.addCriteria(Criteria.where("mobileNumber").regex("^.*" + mobileNumber + ".*", "i"));
+        }
+        query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
+        return mongoTemplate.find(query, Employee.class);
+    }
+
     public List<String>getBranchNameFromBranch(String branchName)
     {
         Query query=new Query();

@@ -17,6 +17,7 @@ public class Booking {
     private String bookingNo;
     private LocalDate bookingDate;
     private String customerId;
+    private String branchId;
     private String partNo;
     private String additionalInfo;
     private PaidDetail paidDetail;

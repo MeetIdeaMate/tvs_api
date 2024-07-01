@@ -12,9 +12,9 @@ import java.util.List;
 public interface BookingService {
     Booking createBooking(BookingRequest bookingRequest);
 
-    List<BookingResponse> getAllBookings(String bookingNo, String customerName, String paymentType, LocalDate fromDate, LocalDate toDate);
+    List<BookingResponse> getAllBookings(String bookingNo, String customerName, String paymentType,String branchId,String branchName, LocalDate fromDate, LocalDate toDate);
 
-    Page<BookingResponse> getAllBookingsWithPage(String bookingNo, String customerName, String paymentType, LocalDate fromDate, LocalDate toDate, Pageable pageable);
+    Page<BookingResponse> getAllBookingsWithPage(String bookingNo, String customerName, String paymentType,String branchId,String branchName, LocalDate fromDate, LocalDate toDate, Pageable pageable);
 
     BookingResponse getBookingByBookingNo(String bookingNo);
 

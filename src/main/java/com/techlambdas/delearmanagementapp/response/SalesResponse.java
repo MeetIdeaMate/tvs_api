@@ -38,5 +38,7 @@ public class SalesResponse {
     private EvBattery evBattery;
     private Map<String,String> mandatoryAddons;
     private String createdBy;
-    private String userName;
+    private String createdByName;
+    private String reason;
+    private boolean isCancelled;
 }

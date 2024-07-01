@@ -39,9 +39,10 @@ public class EmployeeController {
     }
     @GetMapping
     public ResponseEntity<List<EmployeeResponse>> getAllEmployees(@RequestParam(value = "employeeName", required = false) String employeeName,
-
-                                                          @RequestParam(value = "mobileNo", required = false) String mobileNumber) {
-       List<EmployeeResponse> employees= employeeService.getAllEmployees(employeeName, mobileNumber);
+                                                                  @RequestParam(value = "mobileNo", required = false) String mobileNumber,
+                                                                  @RequestParam(value = "branchId",required = false)String branchId,
+                                                                  @RequestParam(value = "branch",required = false)String branchName) {
+       List<EmployeeResponse> employees= employeeService.getAllEmployees(employeeName, mobileNumber,branchId,branchName);
         return successResponse(HttpStatus.OK,"employeeList",employees);
     }
 

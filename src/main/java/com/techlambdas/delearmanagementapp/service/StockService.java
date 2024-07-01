@@ -39,4 +39,6 @@ public interface StockService {
     String approveTransfer(String branchId, String transferId);
 
     Page<StockDTO> getCumulativeStockWithPage(String partNo, String itemName, String keyValue, Pageable pageable, String categoryName, String branchId);
+
+    void salesCancelInfoToStock(Sales cancelSales);
 }

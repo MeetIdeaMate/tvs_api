@@ -1,4 +1,4 @@
-package com.techlambdas.delearmanagementapp.model;
+package com.techlambdas.delearmanagementapp.response;
 
 import com.techlambdas.delearmanagementapp.constant.PaymentType;
 import lombok.Data;
@@ -6,9 +6,8 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class PaidDetail {
+public class PaidDetailRes {
     private String paymentId;
-    private String paymentReference;
     private LocalDate paymentDate;
     private double paidAmount;
     private PaymentType paymentType;

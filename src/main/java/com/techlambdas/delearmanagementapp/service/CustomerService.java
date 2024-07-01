@@ -12,11 +12,11 @@ public interface CustomerService {
 
     Customer createCustomer(CustomerRequest customerRequest);
 
-    List<Customer> getAllCustomers(String customerId, String customerName, String mobileNo, String city);
+    List<Customer> getAllCustomers(String customerId, String customerName, String mobileNo, String city,String branchId,String branchName);
 
     Customer getCustomerByCustomerId(String customerId);
 
-    Page<Customer> getAllCustomersWithPage(String customerId, String customerName, String mobileNo, String city, Pageable pageable);
+    Page<Customer> getAllCustomersWithPage(String customerId, String customerName, String mobileNo, String city,String branchId,String branchName, Pageable pageable);
 
 
     Customer updateCustomer(String customerId,CustomerRequest customerRequest);
