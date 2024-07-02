@@ -223,6 +223,11 @@ public class StockServiceImpl implements StockService{
                             .collect(Collectors.toList())
             );
         });
+        if (transferStatus!=null){
+            return transferResponses.stream()
+                    .filter(transferResponse -> transferResponse.getTransferStatus() == transferStatus)
+                    .collect(Collectors.toList());
+        }
         return transferResponses;
     }
     @Override
