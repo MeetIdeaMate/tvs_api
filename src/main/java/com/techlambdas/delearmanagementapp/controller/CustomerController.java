@@ -3,6 +3,7 @@ package com.techlambdas.delearmanagementapp.controller;
 
 import com.techlambdas.delearmanagementapp.model.Customer;
 import com.techlambdas.delearmanagementapp.request.CustomerRequest;
+import com.techlambdas.delearmanagementapp.response.CustomerResponse;
 import com.techlambdas.delearmanagementapp.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,22 +23,22 @@ public class CustomerController {
     @Autowired
     private CustomerService customerService;
     @PostMapping
-    public ResponseEntity<Customer> createCustomer(@RequestBody CustomerRequest customerRequest){
-        Customer customer=customerService.createCustomer(customerRequest);
+    public ResponseEntity<CustomerResponse> createCustomer(@RequestBody CustomerRequest customerRequest){
+        CustomerResponse customer=customerService.createCustomer(customerRequest);
         return new ResponseEntity<>(customer, HttpStatus.CREATED);
     }
     @GetMapping
-    public ResponseEntity<List<Customer>>getAllCustomers(@RequestParam (required = false)String customerId,
+    public ResponseEntity<List<CustomerResponse>>getAllCustomers(@RequestParam (required = false)String customerId,
                                                          @RequestParam (required = false)String customerName,
                                                          @RequestParam (required = false)String mobileNo,
                                                          @RequestParam (required = false)String city,
                                                          @RequestParam (required = false)String branchId,
                                                          @RequestParam (required = false)String branchName){
-        List<Customer> customers=customerService.getAllCustomers(customerId,customerName,mobileNo,city,branchId,branchName);
+        List<CustomerResponse> customers=customerService.getAllCustomers(customerId,customerName,mobileNo,city,branchId,branchName);
         return successResponse(HttpStatus.OK,"customers",customers);
     }
     @GetMapping("/page")
-    public ResponseEntity<Page<Customer>> getAllCustomersWithPage(
+    public ResponseEntity<Page<CustomerResponse>> getAllCustomersWithPage(
             @RequestParam(required = false) String customerId,
             @RequestParam(required = false) String customerName,
             @RequestParam(required = false) String mobileNo,
@@ -48,7 +49,7 @@ public class CustomerController {
             @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<Customer> customersPage = customerService.getAllCustomersWithPage(customerId, customerName, mobileNo, city,branchId,branchName, pageable);
+        Page<CustomerResponse> customersPage = customerService.getAllCustomersWithPage(customerId, customerName, mobileNo, city,branchId,branchName, pageable);
 
         return successResponse(HttpStatus.OK,"customersWithPage",customersPage);
     }

@@ -59,7 +59,7 @@ public class CustomSalesRepositoryImpl implements  CustomSalesRepository{
     }
 
     @Override
-    public Page<Sales> getAllSalesWithPage(String invoiceNo, String categoryName,String customerName,String mobileNo,String partNo,String paymentType,Boolean isCancelled,String branchName,String billType,PaymentStatus paymentStatus,LocalDate fromDate , LocalDate toDate ,Pageable pageable ) {
+    public Page<Sales> getAllSalesWithPage(String invoiceNo, String categoryName,String customerName,String mobileNo,String partNo,String paymentType,Boolean isCancelled,String branchName,String branchId,String billType,PaymentStatus paymentStatus,LocalDate fromDate , LocalDate toDate ,Pageable pageable ) {
         Query query=new Query();
         if (Optional.ofNullable(invoiceNo).isPresent()) {
             query.addCriteria(Criteria.where("invoiceNo").is(invoiceNo));
@@ -89,8 +89,11 @@ public class CustomSalesRepositoryImpl implements  CustomSalesRepository{
             List<String> branchNameFromBranch=getBranchNameFromBranch(branchName);
             query.addCriteria(Criteria.where("branchId").in(branchNameFromBranch));
         }
+        if (Optional.ofNullable(branchId).isPresent()) {
+            query.addCriteria(Criteria.where("branchId").is(branchId));
+        }
         if (Optional.ofNullable(paymentStatus).isPresent()){
-            query.addCriteria(Criteria.where("paymentStatus").in(paymentStatus));
+            query.addCriteria(Criteria.where("paymentStatus").is(paymentStatus));
         }
         if (Optional.ofNullable(billType).isPresent()){
             query.addCriteria(Criteria.where("billType").regex(Pattern.compile(billType,Pattern.CASE_INSENSITIVE)));
@@ -104,11 +107,9 @@ public class CustomSalesRepositoryImpl implements  CustomSalesRepository{
             query.addCriteria(Criteria.where("invoiceDate").lte(toDate));
         }
         query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
-
         long count = mongoTemplate.count(query, Sales.class);
         query.with(pageable);
         List<Sales> sales = mongoTemplate.find(query, Sales.class);
-
         return new PageImpl<>(sales, pageable, count);
     }
 

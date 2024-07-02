@@ -27,7 +27,7 @@ public interface UserService {
 
     String getUserNameByUserId(String createdBy);
 
-    Page<UserResponse> getUsersByPagination(String userName, String mobileNumber, String designation, int page, int pageSize);
+    Page<UserResponse> getUsersByPagination(String userName, String mobileNumber, String designation,String branchId, int page, int pageSize);
 
     void deleteUser(String userId);
 

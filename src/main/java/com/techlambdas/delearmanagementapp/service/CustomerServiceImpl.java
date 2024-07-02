@@ -2,15 +2,17 @@ package com.techlambdas.delearmanagementapp.service;
 
 import com.techlambdas.delearmanagementapp.exception.AlreadyExistException;
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
+import com.techlambdas.delearmanagementapp.mapper.CommonMapper;
 import com.techlambdas.delearmanagementapp.mapper.CustomerMapper;
 import com.techlambdas.delearmanagementapp.model.Customer;
-import com.techlambdas.delearmanagementapp.model.Employee;
 import com.techlambdas.delearmanagementapp.repository.CustomCustomerRepository;
 import com.techlambdas.delearmanagementapp.repository.CustomerRepository;
 import com.techlambdas.delearmanagementapp.request.CustomerRequest;
+import com.techlambdas.delearmanagementapp.response.CustomerResponse;
 import com.techlambdas.delearmanagementapp.utils.RandomIdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -23,10 +25,12 @@ public class CustomerServiceImpl implements CustomerService{
     @Autowired
     private CustomerMapper customerMapper;
     @Autowired
+    private CommonMapper commonMapper;
+    @Autowired
     private CustomCustomerRepository customCustomerRepository;
 
     @Override
-    public Customer createCustomer(CustomerRequest customerRequest) {
+    public CustomerResponse createCustomer(CustomerRequest customerRequest) {
         try {
             Customer existingCustomer=customerRepository.findCustomerByMobileNo(customerRequest.getMobileNo());
             if (existingCustomer!=null)
@@ -34,16 +38,17 @@ public class CustomerServiceImpl implements CustomerService{
             Customer customer =  customerMapper.customerRequestToCustomer(customerRequest);
             String generatedId= RandomIdGenerator.getRandomId();
             customer.setCustomerId(generatedId);
-            return customerRepository.save(customer);
+           Customer createdCustomer= customerRepository.save(customer);
+           return commonMapper.mapToCustomerResponse(createdCustomer);
         } catch (Exception ex) {
             throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex.getCause());
         }
     }
 
     @Override
-    public List<Customer> getAllCustomers(String customerId, String customerName, String mobileNo, String city,String branchId,String branchName) {
+    public List<CustomerResponse> getAllCustomers(String customerId, String customerName, String mobileNo, String city,String branchId,String branchName) {
         List<Customer>customers=customCustomerRepository.getAllCustomers(customerId,customerName,mobileNo,city,branchId,branchName);
-        return customers;
+        return commonMapper.mapToCustomerResponses(customers);
     }
 
     @Override
@@ -55,9 +60,11 @@ public class CustomerServiceImpl implements CustomerService{
     }
 
     @Override
-    public Page<Customer> getAllCustomersWithPage(String customerId, String customerName, String mobileNo, String city,String branchId,String branchName, Pageable pageable) {
+    public Page<CustomerResponse> getAllCustomersWithPage(String customerId, String customerName, String mobileNo, String city,String branchId,String branchName, Pageable pageable) {
 
-        return customCustomerRepository.getAllCustomersWithPage(customerId,customerName,mobileNo,city,branchId,branchName,pageable);
+       Page<Customer>customerPage= customCustomerRepository.getAllCustomersWithPage(customerId,customerName,mobileNo,city,branchId,branchName,pageable);
+       List<CustomerResponse>customerResponses=commonMapper.mapToCustomerResponses(customerPage.getContent());
+       return new PageImpl<>(customerResponses,pageable,customerPage.getTotalElements());
     }
 
     @Override

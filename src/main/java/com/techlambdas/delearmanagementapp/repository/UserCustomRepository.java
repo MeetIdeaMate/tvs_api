@@ -7,5 +7,5 @@ import org.springframework.data.domain.Pageable;
 
 public interface UserCustomRepository {
 
-     Page<User> getAllUsersWithPage(String userName, String mobileNumber, String designation, Pageable pageable);
+     Page<User> getAllUsersWithPage(String userName, String mobileNumber, String designation,String branchId, Pageable pageable);
 }

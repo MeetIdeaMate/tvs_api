@@ -31,7 +31,7 @@ public class BookingController {
         return successResponse(HttpStatus.CREATED,"booking",booking);
     }
     @GetMapping
-    public ResponseEntity<List<Booking>> getAllBookings(@RequestParam(required = false) String bookingNo,
+    public ResponseEntity<List<BookingResponse>> getAllBookings(@RequestParam(required = false) String bookingNo,
                                                         @RequestParam(required = false) String customerName,
                                                         @RequestParam(required = false) String paymentType,
                                                         @RequestParam (required = false)String branchId,
@@ -43,7 +43,7 @@ public class BookingController {
         return successResponse(HttpStatus.OK,"bookings",bookingResponses);
     }
     @GetMapping("/page")
-    public ResponseEntity<Page<Booking>> getAllBookingsWithPage(@RequestParam(required = false) String bookingNo,
+    public ResponseEntity<Page<BookingResponse>> getAllBookingsWithPage(@RequestParam(required = false) String bookingNo,
                                                                 @RequestParam(required = false) String customerName,
                                                                 @RequestParam(required = false) String paymentType,
                                                                 @RequestParam (required = false)String branchId,

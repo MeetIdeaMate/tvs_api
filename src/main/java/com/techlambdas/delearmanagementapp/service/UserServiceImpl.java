@@ -159,9 +159,9 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public Page<UserResponse> getUsersByPagination(String userName, String mobileNumber, String designation, int page, int pageSize) {
+    public Page<UserResponse> getUsersByPagination(String userName, String mobileNumber, String designation,String branchId, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page,pageSize);
-        Page<User> userList = userCustomRepository.getAllUsersWithPage(userName,mobileNumber,designation,pageable);
+        Page<User> userList = userCustomRepository.getAllUsersWithPage(userName,mobileNumber,designation,branchId,pageable);
         List<UserResponse> userResponseList= userList.stream()
                 .map(commonMapper::mapToUserResponse).collect(Collectors.toList());
         return new PageImpl<>(userResponseList, pageable, userList.getTotalElements());

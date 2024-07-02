@@ -51,9 +51,10 @@ public class UserController {
     public ResponseEntity<Page<UserResponse>> getUsersByPagination(@RequestParam(value = "userName", required = false) String userName,
                                                                    @RequestParam (value = "mobileNumber", required = false) String mobileNumber,
                                                                    @RequestParam (value = "designation", required = false ) String designation,
+                                                                   @RequestParam(required = false) String branchId,
                                                                    @RequestParam(value = "page", defaultValue = "0") int page,
                                                                    @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
-        Page<UserResponse> users = userService.getUsersByPagination(userName,mobileNumber,designation,page,pageSize);
+        Page<UserResponse> users = userService.getUsersByPagination(userName,mobileNumber,designation,branchId,page,pageSize);
         return successResponse(HttpStatus.OK,"userWithPage",users);
     }
     @GetMapping

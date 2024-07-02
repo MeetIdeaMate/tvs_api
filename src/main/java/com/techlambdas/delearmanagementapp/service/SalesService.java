@@ -30,7 +30,7 @@ public interface SalesService {
 //    List<SalesResponse> getAllSalesView(String invoiceNo);
 
 
-    Page<SalesResponse> getAllSalesWithPage(String invoiceNo, String categoryName,String customerName,String mobileNo,String partNo,String paymentType,Boolean isCancelled,String branchName,String billType,PaymentStatus paymentStatus,LocalDate fromDate , LocalDate toDate, Pageable pageable);
+    Page<SalesResponse> getAllSalesWithPage(String invoiceNo, String categoryName,String customerName,String mobileNo,String partNo,String paymentType,Boolean isCancelled,String branchName,String branchId,String billType,PaymentStatus paymentStatus,LocalDate fromDate , LocalDate toDate, Pageable pageable);
 
     String updatePaymentDetails(String salesId, PaidDetailReq paidDetailReq);
 

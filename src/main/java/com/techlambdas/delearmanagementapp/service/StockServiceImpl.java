@@ -238,6 +238,7 @@ public class StockServiceImpl implements StockService{
                 for (TransferDetail transferDetail : stock.getTransferDetails()) {
                     if (transferDetail.getStatus().equals(Status.CURRENT)) {
                         stock.setStockStatus(StockStatus.Available);
+                        stock.setBranchId(branchId);
                         transferDetail.setReceivedDate(LocalDateTime.now());
                         if (transferDetail.getTransferToBranch().equals(branchId)) {
                             stock.setBranchId(transferDetail.getTransferToBranch());

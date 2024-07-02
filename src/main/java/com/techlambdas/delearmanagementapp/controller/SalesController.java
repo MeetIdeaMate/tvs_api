@@ -90,6 +90,7 @@ public ResponseEntity<List<SalesResponse>>getAllSales(@RequestParam(required = f
             @RequestParam(required = false) String paymentType,
             @RequestParam(required = false) Boolean isCancelled,
             @RequestParam(required = false) String branchName,
+            @RequestParam(required = false) String branchId,
             @RequestParam(required = false) String billType,
             @RequestParam(required = false) PaymentStatus paymentStatus,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
@@ -97,7 +98,7 @@ public ResponseEntity<List<SalesResponse>>getAllSales(@RequestParam(required = f
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<SalesResponse> salesPage = salesService.getAllSalesWithPage(invoiceNo,categoryName,customerName,mobileNo,partNo,paymentType,isCancelled,branchName,billType,paymentStatus,fromDate,toDate,pageable);
+        Page<SalesResponse> salesPage = salesService.getAllSalesWithPage(invoiceNo,categoryName,customerName,mobileNo,partNo,paymentType,isCancelled,branchName,branchId,billType,paymentStatus,fromDate,toDate,pageable);
         return successResponse(HttpStatus.OK,"salesWithPage",salesPage);
     }
     @PatchMapping("/{salesId}")

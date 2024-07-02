@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
@@ -21,7 +22,7 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public Page<User> getAllUsersWithPage(String userName, String mobileNumber, String designation, Pageable pageable) {
+    public Page<User> getAllUsersWithPage(String userName, String mobileNumber, String designation,String branchId, Pageable pageable) {
         Query query = new Query();
         if (userName!=null) {
 
@@ -33,6 +34,9 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
         }
         if (designation!=null){
             query.addCriteria(Criteria.where("designation").is( designation ));
+        }
+        if (Optional.ofNullable(branchId).isPresent()){
+            query.addCriteria(Criteria.where("branchId").is(branchId));
         }
         query.with(Sort.by(Sort.Order.desc("createdDateTime")));
         long totalCount = mongoTemplate.count(query, User.class);

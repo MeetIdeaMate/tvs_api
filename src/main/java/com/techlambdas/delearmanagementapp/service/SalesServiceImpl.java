@@ -101,6 +101,14 @@ public class SalesServiceImpl implements  SalesService{
             }
             paidDetail.addAll(salesRequest.getPaidDetails());
             sales.setPaidDetails(paidDetail);
+            double paidAmount = sales.getPaidDetails().stream()
+                    .mapToDouble(pd -> pd.getPaidAmount())
+                    .sum();
+            if (paidAmount==sales.getNetAmt()){
+                sales.setPaymentStatus(PaymentStatus.COMPLETED);
+            }else {
+                sales.setPaymentStatus(PaymentStatus.PENDING);
+            }
             sales.setTotalCgst(totalCgst);
             sales.setTotalSgst(totalSgst);
             Sales createdSales= salesRepository.save(sales);
@@ -166,8 +174,8 @@ public class SalesServiceImpl implements  SalesService{
 //    }
 
     @Override
-    public Page<SalesResponse> getAllSalesWithPage(String invoiceNo, String categoryName ,String customerName,String mobileNo,String partNo,String paymentType,Boolean isCancelled,String branchName,String billType,PaymentStatus paymentStatus,LocalDate fromDate , LocalDate toDate, Pageable pageable) {
-        Page<Sales>sales= customSalesRepository.getAllSalesWithPage(invoiceNo, categoryName,customerName,mobileNo,partNo,paymentType,isCancelled,branchName,billType,paymentStatus,fromDate , toDate ,pageable);
+    public Page<SalesResponse> getAllSalesWithPage(String invoiceNo, String categoryName ,String customerName,String mobileNo,String partNo,String paymentType,Boolean isCancelled,String branchName,String branchId,String billType,PaymentStatus paymentStatus,LocalDate fromDate , LocalDate toDate, Pageable pageable) {
+        Page<Sales>sales= customSalesRepository.getAllSalesWithPage(invoiceNo, categoryName,customerName,mobileNo,partNo,paymentType,isCancelled,branchName,branchId,billType,paymentStatus,fromDate , toDate ,pageable);
         List<SalesResponse>salesResponses=sales.stream()
                 .map(sale -> {
                     double balance = 0;
