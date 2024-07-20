@@ -4,9 +4,9 @@ import lombok.Data;
 
 @Data
 public class loanInfo {
-    // loan id ,bank name , loan amt , invoiceno
     private String loanId;
     private String bankName;
+    private String branchName;
     private double loanAmt;
-//    private String invoiceNo;
+    private boolean isCredited;
 }

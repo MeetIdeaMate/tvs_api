@@ -1,5 +1,6 @@
 package com.techlambdas.delearmanagementapp.controller;
 
+import com.techlambdas.delearmanagementapp.constant.PaymentType;
 import com.techlambdas.delearmanagementapp.model.Booking;
 import com.techlambdas.delearmanagementapp.request.BookingRequest;
 import com.techlambdas.delearmanagementapp.response.BookingResponse;
@@ -33,7 +34,7 @@ public class BookingController {
     @GetMapping
     public ResponseEntity<List<BookingResponse>> getAllBookings(@RequestParam(required = false) String bookingNo,
                                                         @RequestParam(required = false) String customerName,
-                                                        @RequestParam(required = false) String paymentType,
+                                                        @RequestParam(required = false) PaymentType paymentType,
                                                         @RequestParam (required = false)String branchId,
                                                         @RequestParam (required = false)String branchName,
                                                         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
@@ -45,7 +46,7 @@ public class BookingController {
     @GetMapping("/page")
     public ResponseEntity<Page<BookingResponse>> getAllBookingsWithPage(@RequestParam(required = false) String bookingNo,
                                                                 @RequestParam(required = false) String customerName,
-                                                                @RequestParam(required = false) String paymentType,
+                                                                @RequestParam(required = false) PaymentType paymentType,
                                                                 @RequestParam (required = false)String branchId,
                                                                 @RequestParam (required = false)String branchName,
                                                                 @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,

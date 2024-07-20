@@ -17,7 +17,7 @@ public class Customer {
     private String emailId;
     private String aadharNo;
     private String accountNo;
-    private String branchId;
+//    private String branchId;
     private String ifsc;
     private String city;
     private String address;

@@ -60,7 +60,6 @@ public class CustomStockRepositoryImpl implements CustomStockRepository{
     public Page<Stock> getAllStocksWithPage(String partNo,String itemName, String keyValue,Pageable pageable,String categoryName,String branchId) {
         Query query=new Query();
         query.addCriteria(Criteria.where("quantity").gt(0));
-
         query.addCriteria(Criteria.where("stockStatus").is(StockStatus.Available));
         if (branchId!=null)
             query.addCriteria(Criteria.where("branchId").is(branchId));
@@ -187,7 +186,7 @@ public class CustomStockRepositoryImpl implements CustomStockRepository{
         if (branchId != null && !branchId.isEmpty()) {
             criteria.and("branchId").is(branchId);
         }
-
+        criteria.and("quantity").gt(0);
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(criteria),
                 Aggregation.lookup("items", "partNo", "partNo", "item"),

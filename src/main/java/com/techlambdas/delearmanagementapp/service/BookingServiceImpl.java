@@ -1,5 +1,7 @@
 package com.techlambdas.delearmanagementapp.service;
 
+import com.techlambdas.delearmanagementapp.constant.BookingStatus;
+import com.techlambdas.delearmanagementapp.constant.PaymentType;
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.mapper.BookingMapper;
 import com.techlambdas.delearmanagementapp.mapper.CommonMapper;
@@ -8,6 +10,7 @@ import com.techlambdas.delearmanagementapp.repository.BookingRepository;
 import com.techlambdas.delearmanagementapp.repository.CustomBookingRepository;
 import com.techlambdas.delearmanagementapp.request.BookingRequest;
 import com.techlambdas.delearmanagementapp.response.BookingResponse;
+import com.techlambdas.delearmanagementapp.utils.RandomIdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -37,6 +40,8 @@ public class BookingServiceImpl implements BookingService{
         try {
             Booking booking=bookingMapper.mapBookingRequestToBooking(bookingRequest);
             booking.setBookingNo(configService.getNextBookingNoSequence());
+            booking.setBookingStatus(BookingStatus.INPROGRESS);
+            booking.getPaidDetail().setPaymentId(RandomIdGenerator.getRandomId());
             return bookingRepository.save(booking);
         }catch (Exception ex){
             throw new RuntimeException("Internal Server Error -- "+ex.getMessage(),ex.getCause());
@@ -44,13 +49,13 @@ public class BookingServiceImpl implements BookingService{
     }
 
     @Override
-    public List<BookingResponse> getAllBookings(String bookingNo, String customerName, String paymentType,String branchId,String branchName, LocalDate fromDate, LocalDate toDate) {
+    public List<BookingResponse> getAllBookings(String bookingNo, String customerName, PaymentType paymentType, String branchId, String branchName, LocalDate fromDate, LocalDate toDate) {
        List<Booking> bookings=customBookingRepository.getAllBookings(bookingNo,customerName,paymentType,branchId,branchName,fromDate,toDate);
        return bookings.stream().map(commonMapper::ToBookingResponse).collect(Collectors.toList());
     }
 
     @Override
-    public Page<BookingResponse> getAllBookingsWithPage(String bookingNo, String customerName, String paymentType,String branchId,String branchName, LocalDate fromDate, LocalDate toDate, Pageable pageable) {
+    public Page<BookingResponse> getAllBookingsWithPage(String bookingNo, String customerName, PaymentType paymentType,String branchId,String branchName, LocalDate fromDate, LocalDate toDate, Pageable pageable) {
         Page<Booking> bookings=customBookingRepository.getAllBookingsWithPage(bookingNo,customerName,paymentType,branchId,branchName,fromDate,toDate,pageable);
         List<BookingResponse> bookingResponses=bookings.stream()
                 .map(commonMapper::ToBookingResponse).collect(Collectors.toList());
@@ -71,7 +76,7 @@ public class BookingServiceImpl implements BookingService{
         if (existingBooking.isPresent())
         {
             Booking booking=existingBooking.get();
-            booking.setCancelled(true);
+            booking.setBookingStatus(BookingStatus.CANCELLED);
             bookingRepository.save(booking);
             return "Cancelled successfully";
         }else {
@@ -81,7 +86,7 @@ public class BookingServiceImpl implements BookingService{
 
     @Override
     public List<BookingResponse> getBookingsByCustomerId(String customerId) {
-        List<Booking> bookings=bookingRepository.findBookingByCustomerId(customerId);
+        List<Booking> bookings=customBookingRepository.findBookingByCustomerId(customerId);
         if (!Optional.ofNullable(bookings).isPresent())
             throw new DataNotFoundException("Booking not found With this CustomerID : "+customerId);
         return bookings.stream().map(commonMapper::ToBookingResponse).collect(Collectors.toList());

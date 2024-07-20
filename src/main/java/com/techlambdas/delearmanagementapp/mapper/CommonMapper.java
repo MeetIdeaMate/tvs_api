@@ -127,7 +127,7 @@ public abstract class CommonMapper {
 
     @Mapping(target = "branchName", source = "branchId", qualifiedByName = "mapBranchName")
     public abstract UserResponse  mapToUserResponse(User user);
-    @Mapping(target = "branchName", source = "branchId", qualifiedByName = "mapBranchName")
+
     public abstract CustomerResponse mapToCustomerResponse(Customer createdCustomer);
     @Mapping(target = "branchName", source = "branchId", qualifiedByName = "mapBranchName")
     public abstract List<CustomerResponse> mapToCustomerResponses(List<Customer> customers);

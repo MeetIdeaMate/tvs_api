@@ -11,8 +11,8 @@ public class CustomerResponse {
     private String emailId;
     private String aadharNo;
     private String accountNo;
-    private String branchId;
-    private String branchName;
+//    private String branchId;
+//    private String branchName;
     private String ifsc;
     private String city;
     private String address;

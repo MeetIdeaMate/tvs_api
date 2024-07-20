@@ -1,5 +1,6 @@
 package com.techlambdas.delearmanagementapp.response;
 
+import com.techlambdas.delearmanagementapp.constant.BookingStatus;
 import com.techlambdas.delearmanagementapp.model.PaidDetail;
 import lombok.Data;
 
@@ -19,9 +20,11 @@ public class BookingResponse {
     private String itemName;
     private String additionalInfo;
     private PaidDetail paidDetail;
-    private boolean isCancelled;
     private String executiveId;
     private String executiveName;
     private String branchId;
     private String branchName;
+    private LocalDate targetInvoiceDate;
+    private BookingStatus bookingStatus;
+
 }

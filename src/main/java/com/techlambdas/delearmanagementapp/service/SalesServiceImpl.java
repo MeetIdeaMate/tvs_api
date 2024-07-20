@@ -1,5 +1,6 @@
 package com.techlambdas.delearmanagementapp.service;
 
+import com.techlambdas.delearmanagementapp.constant.BookingStatus;
 import com.techlambdas.delearmanagementapp.constant.PaymentType;
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.mapper.CommonMapper;
@@ -21,19 +22,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class SalesServiceImpl implements  SalesService{
-
     @Autowired
     private SalesMapper salesMapper;
-
     @Autowired
     private SalesRepository salesRepository;
     @Autowired
@@ -42,16 +39,12 @@ public class SalesServiceImpl implements  SalesService{
     private StockRepository stockRepository;
     @Autowired
     private StockService stockService;
-
     @Autowired
     private CustomSalesRepository customSalesRepository;
-
     @Autowired
     private ConfigService configService;
-
     @Autowired
     private BookingRepository bookingRepository;
-
     @Autowired
     private CommonMapper commonMapper;
 
@@ -69,17 +62,21 @@ public class SalesServiceImpl implements  SalesService{
             }
             double totalCgst = 0;
             double totalSgst=0;
+            double totalIgst=0;
             for (ItemDetail itemDetail:sales.getItemDetails())
             {
-                for (GstDetail gstDetail:itemDetail.getGstDetails())
-                {
-                    if (gstDetail.getGstName().toString()=="CGST"|| gstDetail.getGstName().toString()=="SGST")
-                    {
-                        totalCgst=totalCgst+gstDetail.getGstAmount();
-                        totalSgst=totalSgst+gstDetail.getGstAmount();
+                for (GstDetail gstDetail : itemDetail.getGstDetails()) {
+                    GstType gstName = gstDetail.getGstName();
+                    if (gstName == GstType.CGST) {
+                        totalCgst += gstDetail.getGstAmount();
+                    } else if (gstName == GstType.SGST) {
+                        totalSgst += gstDetail.getGstAmount();
+                    }else if (gstName==GstType.IGST){
+                        totalIgst=gstDetail.getGstAmount();
                     }
-                    sales.setTotalTaxableAmt(itemDetail.getTaxableValue());
                 }
+                sales.setTotalTaxableAmt(itemDetail.getTaxableValue());
+
                 for (Incentive incentive:itemDetail.getIncentives())
                 {
                     sales.setTotalIncentiveAmount(incentive.getIncentiveAmount());
@@ -98,6 +95,8 @@ public class SalesServiceImpl implements  SalesService{
                 newPaidDetail.setPaidAmount(bookingPaidDetail.getPaidAmount());
                 newPaidDetail.setPaymentType(PaymentType.ADVANCE);
                 paidDetail.add(newPaidDetail);
+                booking.setBookingStatus(BookingStatus.COMPLETED);
+                bookingRepository.save(booking);
             }
             paidDetail.addAll(salesRequest.getPaidDetails());
             sales.setPaidDetails(paidDetail);
@@ -111,6 +110,7 @@ public class SalesServiceImpl implements  SalesService{
             }
             sales.setTotalCgst(totalCgst);
             sales.setTotalSgst(totalSgst);
+            sales.setTotalIgst(totalIgst);
             Sales createdSales= salesRepository.save(sales);
             stockService.updateSalesInfoToStock(createdSales);
             return commonMapper.toSalesResponse(createdSales);
@@ -119,7 +119,6 @@ public class SalesServiceImpl implements  SalesService{
             throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex.getCause());
         }
     }
-
     @Override
     public List<SalesResponse> getAllSales(String invoiceNo,String customerName,String mobileNo ,String partNo, String paymentType,Boolean isCancelled,PaymentStatus paymentStatus,String billType) {
         List<Sales> sales = customSalesRepository.getAllSales(invoiceNo, customerName, mobileNo, partNo, paymentType,isCancelled,paymentStatus,billType);
@@ -229,7 +228,7 @@ public class SalesServiceImpl implements  SalesService{
         double paidAmount = sales.getPaidDetails().stream()
                 .mapToDouble(pd -> pd.getPaidAmount())
                 .sum();
-        if (paidAmount == sales.getTotalInvoiceAmt()) {
+        if (paidAmount == sales.getNetAmt()) {
             sales.setPaymentStatus(PaymentStatus.COMPLETED);}
         salesRepository.save(sales);
         return "payment successful";

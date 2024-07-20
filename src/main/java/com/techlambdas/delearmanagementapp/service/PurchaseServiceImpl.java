@@ -44,14 +44,11 @@ public class PurchaseServiceImpl implements PurchaseService {
     public PurchaseResponse createPurchase(PurchaseRequest purchaseRequest) {
         try {
             Purchase purchase = purchaseMapper.mapPurchaseRequestToPurchase(purchaseRequest);
-
-
             double totalGstAmount = 0;
             double totalInvoiceAmount = 0;
             double totalIncentiveAmount = 0;
             double totalTaxAmount = 0;
             double finalInvoiceAmount = 0;
-
             List<ItemDetail> allItemDetails = new ArrayList<>();
 
             for (ItemDetailRequest itemDetailRequest : purchaseRequest.getItemDetails()) {

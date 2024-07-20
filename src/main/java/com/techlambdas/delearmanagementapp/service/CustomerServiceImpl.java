@@ -46,8 +46,8 @@ public class CustomerServiceImpl implements CustomerService{
     }
 
     @Override
-    public List<CustomerResponse> getAllCustomers(String customerId, String customerName, String mobileNo, String city,String branchId,String branchName) {
-        List<Customer>customers=customCustomerRepository.getAllCustomers(customerId,customerName,mobileNo,city,branchId,branchName);
+    public List<CustomerResponse> getAllCustomers(String customerId, String customerName, String mobileNo, String city) {
+        List<Customer>customers=customCustomerRepository.getAllCustomers(customerId,customerName,mobileNo,city);
         return commonMapper.mapToCustomerResponses(customers);
     }
 
@@ -60,9 +60,9 @@ public class CustomerServiceImpl implements CustomerService{
     }
 
     @Override
-    public Page<CustomerResponse> getAllCustomersWithPage(String customerId, String customerName, String mobileNo, String city,String branchId,String branchName, Pageable pageable) {
+    public Page<CustomerResponse> getAllCustomersWithPage(String customerId, String customerName, String mobileNo, String city, Pageable pageable) {
 
-       Page<Customer>customerPage= customCustomerRepository.getAllCustomersWithPage(customerId,customerName,mobileNo,city,branchId,branchName,pageable);
+       Page<Customer>customerPage= customCustomerRepository.getAllCustomersWithPage(customerId,customerName,mobileNo,city,pageable);
        List<CustomerResponse>customerResponses=commonMapper.mapToCustomerResponses(customerPage.getContent());
        return new PageImpl<>(customerResponses,pageable,customerPage.getTotalElements());
     }

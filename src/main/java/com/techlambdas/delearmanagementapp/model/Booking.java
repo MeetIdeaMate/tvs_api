@@ -1,13 +1,11 @@
 package com.techlambdas.delearmanagementapp.model;
 
-import com.techlambdas.delearmanagementapp.constant.PaymentType;
+import com.techlambdas.delearmanagementapp.constant.BookingStatus;
 import lombok.Data;
 import org.springframework.data.annotation.*;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Document(collection = "bookings")
@@ -23,8 +21,7 @@ public class Booking {
     private PaidDetail paidDetail;
     private String executiveId;  //employeeId
     private LocalDate targetInvoiceDate;
-    private boolean isCancelled;
-
+    private BookingStatus bookingStatus;
     @CreatedDate
     private LocalDateTime createdDateTime;
     @CreatedBy

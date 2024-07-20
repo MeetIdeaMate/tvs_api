@@ -22,7 +22,7 @@ public class CustomCustomerRepositoryImpl implements CustomCustomerRepository{
     private MongoTemplate mongoTemplate;
 
     @Override
-    public List<Customer> getAllCustomers(String customerId, String customerName, String mobileNo, String city,String branchId,String branchName) {
+    public List<Customer> getAllCustomers(String customerId, String customerName, String mobileNo, String city) {
 
         Query query=new Query();
         if (customerId!=null)
@@ -31,14 +31,14 @@ public class CustomCustomerRepositoryImpl implements CustomCustomerRepository{
             query.addCriteria(Criteria.where("customerName").regex(Pattern.compile(customerName, Pattern.CASE_INSENSITIVE)));
         if (mobileNo!=null)
             query.addCriteria(Criteria.where("mobileNo").regex(mobileNo));
-        if (branchName != null) {
-            List<String> branchIds = getBranchNameFromBranch(branchName);
-            query.addCriteria(Criteria.where("branchId").in(branchIds));
-        }
-        if (branchId !=null)
-        {
-            query.addCriteria(Criteria.where("branchId").is(branchId));
-        }
+//        if (branchName != null) {
+//            List<String> branchIds = getBranchNameFromBranch(branchName);
+//            query.addCriteria(Criteria.where("branchId").in(branchIds));
+//        }
+//        if (branchId !=null)
+//        {
+//            query.addCriteria(Criteria.where("branchId").is(branchId));
+//        }
         if (city!=null)
             query.addCriteria(Criteria.where("city").regex(Pattern.compile(city,Pattern.CASE_INSENSITIVE)));
         query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
@@ -46,20 +46,20 @@ public class CustomCustomerRepositoryImpl implements CustomCustomerRepository{
     }
 
     @Override
-    public Page<Customer> getAllCustomersWithPage(String customerId, String customerName, String mobileNo, String city,String branchId,String branchName, Pageable pageable) {
+    public Page<Customer> getAllCustomersWithPage(String customerId, String customerName, String mobileNo, String city, Pageable pageable) {
         Query query=new Query();
         if (customerId!=null)
             query.addCriteria(Criteria.where("customerId").is(customerId));
         if (customerName != null)
             query.addCriteria(Criteria.where("customerName").regex(Pattern.compile(customerName, Pattern.CASE_INSENSITIVE)));
-        if (branchName != null) {
-            List<String> branchIds = getBranchNameFromBranch(branchName);
-            query.addCriteria(Criteria.where("branchId").in(branchIds));
-        }
-        if (branchId !=null)
-        {
-            query.addCriteria(Criteria.where("branchId").is(branchId));
-        }
+//        if (branchName != null) {
+//            List<String> branchIds = getBranchNameFromBranch(branchName);
+//            query.addCriteria(Criteria.where("branchId").in(branchIds));
+//        }
+//        if (branchId !=null)
+//        {
+//            query.addCriteria(Criteria.where("branchId").is(branchId));
+//        }
         if (mobileNo!=null)
             query.addCriteria(Criteria.where("mobileNo").regex(mobileNo));
         if (city!=null)

@@ -30,6 +30,7 @@ public class Sales {
     private double totalDisc;
     private double totalCgst;
     private double totalSgst;
+    private double totalIgst;
     private double totalIncentiveAmount;
     private double totalInvoiceAmt;
     private double roundOffAmt;

@@ -19,7 +19,6 @@ import com.techlambdas.delearmanagementapp.repository.StockRepository;
 import com.techlambdas.delearmanagementapp.request.*;
 import com.techlambdas.delearmanagementapp.response.StockDTO;
 import com.techlambdas.delearmanagementapp.response.StockResponse;
-import com.techlambdas.delearmanagementapp.response.TransferItem;
 import com.techlambdas.delearmanagementapp.response.TransferResponse;
 import com.techlambdas.delearmanagementapp.utils.RandomIdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;

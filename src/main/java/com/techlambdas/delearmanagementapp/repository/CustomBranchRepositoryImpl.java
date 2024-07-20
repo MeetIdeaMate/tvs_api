@@ -51,7 +51,7 @@ public class CustomBranchRepositoryImpl implements CustomBranchRepository {
         if (city!=null)
             query.addCriteria(Criteria.where("city").regex(Pattern.compile(city,Pattern.CASE_INSENSITIVE)));
         query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
-        long count = mongoTemplate.count(query, Customer.class);
+        long count = mongoTemplate.count(query, Branch.class);
         query.with(pageable);
         List<Branch> branches = mongoTemplate.find(query, Branch.class);
 
