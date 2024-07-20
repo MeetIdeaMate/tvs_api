@@ -11,7 +11,6 @@ import com.techlambdas.delearmanagementapp.repository.BookingRepository;
 import com.techlambdas.delearmanagementapp.repository.CustomSalesRepository;
 import com.techlambdas.delearmanagementapp.repository.SalesRepository;
 import com.techlambdas.delearmanagementapp.repository.StockRepository;
-import com.techlambdas.delearmanagementapp.request.ItemDetailRequest;
 import com.techlambdas.delearmanagementapp.request.PaidDetailReq;
 import com.techlambdas.delearmanagementapp.request.SalesRequest;
 import com.techlambdas.delearmanagementapp.request.SalesUpdateReq;
@@ -131,8 +130,7 @@ public class SalesServiceImpl implements  SalesService{
                             paidAmount = paidAmount + paidDetail.getPaidAmount();
                         }
                     }
-                    balance = sale.getTotalInvoiceAmt() - paidAmount;
-
+                    balance = sale.getNetAmt() - paidAmount;
                     SalesResponse salesResponse = commonMapper.toSalesResponse(sale);
                     salesResponse.setPendingAmt(balance);
                     salesResponse.setTotalPaidAmt(paidAmount);
@@ -184,7 +182,7 @@ public class SalesServiceImpl implements  SalesService{
                             paidAmount = paidAmount + paidDetail.getPaidAmount();
                         }
                     }
-                    balance = sale.getTotalInvoiceAmt() - paidAmount;
+                    balance = sale.getNetAmt() - paidAmount;
 
                     SalesResponse salesResponse = commonMapper.toSalesResponse(sale);
                     salesResponse.setPendingAmt(balance);
