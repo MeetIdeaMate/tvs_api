@@ -210,7 +210,7 @@ public class SalesServiceImpl implements  SalesService{
                     .filter(pd->!pd.isCancelled())
                     .mapToDouble(pd->pd.getPaidAmount())
                     .sum();
-            if (paidAmount + paidDetailReq.getPaidAmount() > sales.getTotalInvoiceAmt()) {
+            if (paidAmount + paidDetailReq.getPaidAmount() > sales.getNetAmt()) {
                 return "Paid Amount is greater than total invoice amount";
             }
             else
