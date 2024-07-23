@@ -36,7 +36,7 @@ public class SalesResponse {
     private double pendingAmt;
     private String branchId;
     private String branchName;
-    private EvBattery evBattery;
+    private Map<String,String> evBattery;
     private Map<String,String> mandatoryAddons;
     private String createdBy;
     private String createdByName;

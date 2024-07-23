@@ -89,7 +89,6 @@ public class AccountHeadServiceImpl implements AccountHeadService {
         } catch (Exception ex) {
             throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex.getCause());
         }
-
     }
 
     @Override

@@ -41,6 +41,7 @@ public class ConfigServiceImpl implements ConfigService{
                 throw new InvalidDataException("Cannot Empty The Config Value");
             config.setConfiguration(configReq.getConfiguration());
             config.setConfigType(ConfigType.USER);
+            config.setInputType(configReq.getInputType());
             config.setDefaultValue(configReq.getDefaultValue());
             return configRepository.save(config);
         }catch (Exception e){
@@ -65,8 +66,8 @@ public class ConfigServiceImpl implements ConfigService{
         if (config.getConfigType()==ConfigType.NON_EDIT){
             throw new UnsupportedOperationException("Can't Edit ONLY ADD");
         }
-        config.setConfigId(configReq.getConfigId());
         config.setConfiguration(configReq.getConfiguration());
+        config.setInputType(configReq.getInputType());
         config.setDefaultValue(configReq.getDefaultValue());
         return configRepository.save(config);
     }

@@ -40,7 +40,7 @@ public class Sales {
     private loanInfo loaninfo;
     private String branchId;
     private Map<String,String> mandatoryAddons;
-    private EvBattery evBattery;
+    private Map<String,String>  evBattery;
     private String reason;
     private boolean isCancelled;
 

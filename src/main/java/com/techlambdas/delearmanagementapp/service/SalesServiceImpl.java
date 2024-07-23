@@ -63,6 +63,9 @@ public class SalesServiceImpl implements  SalesService{
             double totalCgst = 0;
             double totalSgst=0;
             double totalIgst=0;
+            double totalIncentiveAmount=0;
+            double totalInvoiceAmount=0;
+            double totalDiscountAmount=0;
             for (ItemDetail itemDetail:sales.getItemDetails())
             {
                 for (GstDetail gstDetail : itemDetail.getGstDetails()) {
@@ -79,11 +82,14 @@ public class SalesServiceImpl implements  SalesService{
 
                 for (Incentive incentive:itemDetail.getIncentives())
                 {
-                    sales.setTotalIncentiveAmount(incentive.getIncentiveAmount());
+                    totalIncentiveAmount +=incentive.getIncentiveAmount();
                 }
-                sales.setTotalInvoiceAmt(itemDetail.getFinalInvoiceValue());
-                sales.setTotalDisc(itemDetail.getDiscount());
+                totalInvoiceAmount +=itemDetail.getFinalInvoiceValue();
+                totalDiscountAmount +=itemDetail.getDiscount();
             }
+            sales.setTotalIncentiveAmount(totalIncentiveAmount);
+            sales.setTotalInvoiceAmt(totalInvoiceAmount);
+            sales.setTotalDisc(totalDiscountAmount);
             List<PaidDetail> paidDetail= new ArrayList<>();
             Booking booking=bookingRepository.findByBookingNo(salesRequest.getBookingNo());
             if (booking !=null && booking.getPaidDetail()!=null)
@@ -131,8 +137,7 @@ public class SalesServiceImpl implements  SalesService{
                             paidAmount = paidAmount + paidDetail.getPaidAmount();
                         }
                     }
-                    balance = sale.getTotalInvoiceAmt() - paidAmount;
-
+                    balance = sale.getNetAmt() - paidAmount;
                     SalesResponse salesResponse = commonMapper.toSalesResponse(sale);
                     salesResponse.setPendingAmt(balance);
                     salesResponse.setTotalPaidAmt(paidAmount);
@@ -184,8 +189,7 @@ public class SalesServiceImpl implements  SalesService{
                             paidAmount = paidAmount + paidDetail.getPaidAmount();
                         }
                     }
-                    balance = sale.getTotalInvoiceAmt() - paidAmount;
-
+                    balance = sale.getNetAmt() - paidAmount;
                     SalesResponse salesResponse = commonMapper.toSalesResponse(sale);
                     salesResponse.setPendingAmt(balance);
                     salesResponse.setTotalPaidAmt(paidAmount);
