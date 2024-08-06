@@ -13,8 +13,10 @@ public class AccessControl {
     @Id
     private String id;
     private String departmentId;
-    private String userId;
+    private String branchId;
+    private String designation;
     private String role;
+    private String userId;
     private List<Menu>menus;
     private List<UiComponent>uiComponents;
     @CreatedDate

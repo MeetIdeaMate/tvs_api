@@ -9,5 +9,5 @@ public interface AccessControlService {
     AccessControl createAccessControl(AccessControlRequest request);
     AccessControl updateAccessControl(String id, AccessControlRequest request);
     AccessControl getAccessControlById(String id);
-    List<AccessControl> getAllAccessControls();
+    List<AccessControl> getAllAccessControls(String userId,String departmentId,String role,String designation,String branchId);
 }

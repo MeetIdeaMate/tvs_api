@@ -11,8 +11,10 @@ import java.util.List;
 
 public class AccessControlRequest {
     private String departmentId;
+    private String branchId;
     private String userId;
     private String role;
+    private String designation;
     private List<Menu> menus;
     private List<UiComponent>uiComponents;
 }

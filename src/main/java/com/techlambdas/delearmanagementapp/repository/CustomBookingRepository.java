@@ -1,5 +1,6 @@
 package com.techlambdas.delearmanagementapp.repository;
 
+import com.techlambdas.delearmanagementapp.constant.BookingStatus;
 import com.techlambdas.delearmanagementapp.constant.PaymentType;
 import com.techlambdas.delearmanagementapp.model.Booking;
 import org.springframework.data.domain.Page;
@@ -9,9 +10,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface CustomBookingRepository {
-    List<Booking> getAllBookings(String bookingNo, String customerName, PaymentType paymentType, String branchId, String branchName, LocalDate fromDate, LocalDate toDate);
+    List<Booking> getAllBookings(String bookingNo, String customerName, PaymentType paymentType, String branchId, String branchName, LocalDate fromDate, LocalDate toDate, BookingStatus bookingStatus);
 
-    Page<Booking> getAllBookingsWithPage(String bookingNo, String customerName, PaymentType paymentType,String branchId,String branchName, LocalDate fromDate, LocalDate toDate, Pageable pageable);
+    Page<Booking> getAllBookingsWithPage(String bookingNo, String customerName, PaymentType paymentType,String branchId,String branchName, LocalDate fromDate, LocalDate toDate, Pageable pageable,BookingStatus bookingStatus);
 
     List<Booking> findBookingByCustomerId(String customerId);
 }

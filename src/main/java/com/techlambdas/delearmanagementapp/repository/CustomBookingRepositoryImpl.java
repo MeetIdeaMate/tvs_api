@@ -27,7 +27,7 @@ public class CustomBookingRepositoryImpl implements CustomBookingRepository{
     private MongoTemplate mongoTemplate;
 
     @Override
-    public List<Booking> getAllBookings(String bookingNo, String customerName, PaymentType paymentType, String branchId, String branchName, LocalDate fromDate, LocalDate toDate) {
+    public List<Booking> getAllBookings(String bookingNo, String customerName, PaymentType paymentType, String branchId, String branchName, LocalDate fromDate, LocalDate toDate,BookingStatus bookingStatus) {
         Query query=new Query();
         if (Optional.ofNullable(bookingNo).isPresent())
             query.addCriteria(Criteria.where("bookingNo").is(bookingNo));
@@ -47,15 +47,19 @@ public class CustomBookingRepositoryImpl implements CustomBookingRepository{
         if (Optional.ofNullable(branchId).isPresent())
         {
             query.addCriteria(Criteria.where("branchId").is(branchId));
+        }if (Optional.ofNullable(bookingStatus).isPresent()){
+            query.addCriteria(Criteria.where("bookingStatus").is(bookingStatus));
+        }else {
+            query.addCriteria(Criteria.where("bookingStatus").ne(BookingStatus.CANCELLED));
+
         }
-        query.addCriteria(Criteria.where("bookingStatus").ne(BookingStatus.CANCELLED));
         query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
 
         return mongoTemplate.find(query,Booking.class);
     }
 
     @Override
-    public Page<Booking> getAllBookingsWithPage(String bookingNo, String customerName, PaymentType paymentType,String branchId,String branchName,LocalDate fromDate, LocalDate toDate, Pageable pageable) {
+    public Page<Booking> getAllBookingsWithPage(String bookingNo, String customerName, PaymentType paymentType,String branchId,String branchName,LocalDate fromDate, LocalDate toDate, Pageable pageable,BookingStatus bookingStatus) {
         Query query=new Query();
         if (Optional.ofNullable(bookingNo).isPresent())
             query.addCriteria(Criteria.where("bookingNo").is(bookingNo));
@@ -76,8 +80,12 @@ public class CustomBookingRepositoryImpl implements CustomBookingRepository{
         {
             query.addCriteria(Criteria.where("branchId").is(branchId));
         }
-        query.addCriteria(Criteria.where("bookingStatus").ne(BookingStatus.CANCELLED));
+        if (Optional.ofNullable(bookingStatus).isPresent()){
+            query.addCriteria(Criteria.where("bookingStatus").is(bookingStatus));
+        }else {
+            query.addCriteria(Criteria.where("bookingStatus").ne(BookingStatus.CANCELLED));
 
+        }
         query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
         long count=mongoTemplate.count(query,Booking.class);
         query.with(pageable);

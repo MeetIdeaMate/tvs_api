@@ -49,14 +49,14 @@ public class BookingServiceImpl implements BookingService{
     }
 
     @Override
-    public List<BookingResponse> getAllBookings(String bookingNo, String customerName, PaymentType paymentType, String branchId, String branchName, LocalDate fromDate, LocalDate toDate) {
-       List<Booking> bookings=customBookingRepository.getAllBookings(bookingNo,customerName,paymentType,branchId,branchName,fromDate,toDate);
+    public List<BookingResponse> getAllBookings(String bookingNo, String customerName, PaymentType paymentType, String branchId, String branchName, LocalDate fromDate, LocalDate toDate,BookingStatus bookingStatus) {
+       List<Booking> bookings=customBookingRepository.getAllBookings(bookingNo,customerName,paymentType,branchId,branchName,fromDate,toDate,bookingStatus);
        return bookings.stream().map(commonMapper::ToBookingResponse).collect(Collectors.toList());
     }
 
     @Override
-    public Page<BookingResponse> getAllBookingsWithPage(String bookingNo, String customerName, PaymentType paymentType,String branchId,String branchName, LocalDate fromDate, LocalDate toDate, Pageable pageable) {
-        Page<Booking> bookings=customBookingRepository.getAllBookingsWithPage(bookingNo,customerName,paymentType,branchId,branchName,fromDate,toDate,pageable);
+    public Page<BookingResponse> getAllBookingsWithPage(String bookingNo, String customerName, PaymentType paymentType,String branchId,String branchName, LocalDate fromDate, LocalDate toDate, Pageable pageable,BookingStatus bookingStatus) {
+        Page<Booking> bookings=customBookingRepository.getAllBookingsWithPage(bookingNo,customerName,paymentType,branchId,branchName,fromDate,toDate,pageable,bookingStatus);
         List<BookingResponse> bookingResponses=bookings.stream()
                 .map(commonMapper::ToBookingResponse).collect(Collectors.toList());
         return new PageImpl<>(bookingResponses,pageable,bookings.getTotalElements());
