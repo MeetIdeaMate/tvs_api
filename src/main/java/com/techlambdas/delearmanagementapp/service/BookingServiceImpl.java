@@ -1,5 +1,6 @@
 package com.techlambdas.delearmanagementapp.service;
 
+import com.techlambdas.delearmanagementapp.config.JwtUtils;
 import com.techlambdas.delearmanagementapp.constant.BookingStatus;
 import com.techlambdas.delearmanagementapp.constant.PaymentType;
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
@@ -8,6 +9,7 @@ import com.techlambdas.delearmanagementapp.mapper.CommonMapper;
 import com.techlambdas.delearmanagementapp.model.Booking;
 import com.techlambdas.delearmanagementapp.repository.BookingRepository;
 import com.techlambdas.delearmanagementapp.repository.CustomBookingRepository;
+import com.techlambdas.delearmanagementapp.request.AccountRequest;
 import com.techlambdas.delearmanagementapp.request.BookingRequest;
 import com.techlambdas.delearmanagementapp.response.BookingResponse;
 import com.techlambdas.delearmanagementapp.utils.RandomIdGenerator;
@@ -34,6 +36,8 @@ public class BookingServiceImpl implements BookingService{
     private CustomBookingRepository customBookingRepository;
     @Autowired
     private CommonMapper commonMapper;
+    @Autowired
+    private AccountService accountService;
 
     @Override
     public Booking createBooking(BookingRequest bookingRequest) {
@@ -42,10 +46,26 @@ public class BookingServiceImpl implements BookingService{
             booking.setBookingNo(configService.getNextBookingNoSequence());
             booking.setBookingStatus(BookingStatus.INPROGRESS);
             booking.getPaidDetail().setPaymentId(RandomIdGenerator.getRandomId());
-            return bookingRepository.save(booking);
+            Booking createdBooking=bookingRepository.save(booking);
+            generateAccountRequest(createdBooking);
+             return createdBooking;
         }catch (Exception ex){
             throw new RuntimeException("Internal Server Error -- "+ex.getMessage(),ex.getCause());
         }
+    }
+
+    private void generateAccountRequest(Booking createdBooking) {
+        AccountRequest accountRequest=new AccountRequest();
+        accountRequest.setAccountHeadCode("ACCBOOK001");
+        accountRequest.setAmount(createdBooking.getPaidDetail().getPaidAmount());
+        accountRequest.setTransactDate(createdBooking.getBookingDate());
+        accountRequest.setTransactDate(createdBooking.getPaidDetail().getPaymentDate());
+        accountRequest.setFinancialYear(RandomIdGenerator.calculateFinancialYear());
+        accountRequest.setAccountHeadName("BOOKING");
+        accountRequest.setTransactorId(JwtUtils.getUserIdFromToken().get());
+        accountRequest.setTransactDesc("BOOKING AMOUNT");
+        accountRequest.setTransactRefNo(createdBooking.getBookingNo());
+        accountService.createAccountEntry(accountRequest);
     }
 
     @Override

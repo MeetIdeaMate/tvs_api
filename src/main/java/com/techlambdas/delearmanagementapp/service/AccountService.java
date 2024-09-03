@@ -41,6 +41,6 @@ public interface AccountService {
 
         Statement uploadFile(MultipartFile file);
 
-        //   List<Account> getFilAcc( LocalDate tranasactDate);
+        //   List<Account> getFilAcc( LocalDate tranasactDate)
 
 }
