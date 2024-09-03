@@ -44,7 +44,6 @@ public class CustomerServiceImpl implements CustomerService{
             throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex.getCause());
         }
     }
-
     @Override
     public List<CustomerResponse> getAllCustomers(String customerId, String customerName, String mobileNo, String city) {
         List<Customer>customers=customCustomerRepository.getAllCustomers(customerId,customerName,mobileNo,city);

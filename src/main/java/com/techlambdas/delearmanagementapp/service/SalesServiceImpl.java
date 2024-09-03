@@ -1,5 +1,6 @@
 package com.techlambdas.delearmanagementapp.service;
 
+import com.techlambdas.delearmanagementapp.config.JwtUtils;
 import com.techlambdas.delearmanagementapp.constant.BookingStatus;
 import com.techlambdas.delearmanagementapp.constant.PaymentType;
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
@@ -11,10 +12,7 @@ import com.techlambdas.delearmanagementapp.repository.BookingRepository;
 import com.techlambdas.delearmanagementapp.repository.CustomSalesRepository;
 import com.techlambdas.delearmanagementapp.repository.SalesRepository;
 import com.techlambdas.delearmanagementapp.repository.StockRepository;
-import com.techlambdas.delearmanagementapp.request.ItemDetailRequest;
-import com.techlambdas.delearmanagementapp.request.PaidDetailReq;
-import com.techlambdas.delearmanagementapp.request.SalesRequest;
-import com.techlambdas.delearmanagementapp.request.SalesUpdateReq;
+import com.techlambdas.delearmanagementapp.request.*;
 import com.techlambdas.delearmanagementapp.response.SalesResponse;
 import com.techlambdas.delearmanagementapp.utils.RandomIdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +45,8 @@ public class SalesServiceImpl implements  SalesService{
     private BookingRepository bookingRepository;
     @Autowired
     private CommonMapper commonMapper;
+    @Autowired
+    private AccountService accountService;
 
     @Override
     public SalesResponse createSales(SalesRequest salesRequest) {
@@ -63,6 +63,9 @@ public class SalesServiceImpl implements  SalesService{
             double totalCgst = 0;
             double totalSgst=0;
             double totalIgst=0;
+            double totalIncentiveAmount=0;
+            double totalInvoiceAmount=0;
+            double totalDiscountAmount=0;
             for (ItemDetail itemDetail:sales.getItemDetails())
             {
                 for (GstDetail gstDetail : itemDetail.getGstDetails()) {
@@ -79,11 +82,14 @@ public class SalesServiceImpl implements  SalesService{
 
                 for (Incentive incentive:itemDetail.getIncentives())
                 {
-                    sales.setTotalIncentiveAmount(incentive.getIncentiveAmount());
+                    totalIncentiveAmount +=incentive.getIncentiveAmount();
                 }
-                sales.setTotalInvoiceAmt(itemDetail.getFinalInvoiceValue());
-                sales.setTotalDisc(itemDetail.getDiscount());
+                totalInvoiceAmount +=itemDetail.getFinalInvoiceValue();
+                totalDiscountAmount +=itemDetail.getDiscount();
             }
+            sales.setTotalIncentiveAmount(totalIncentiveAmount);
+            sales.setTotalInvoiceAmt(totalInvoiceAmount);
+            sales.setTotalDisc(totalDiscountAmount);
             List<PaidDetail> paidDetail= new ArrayList<>();
             Booking booking=bookingRepository.findByBookingNo(salesRequest.getBookingNo());
             if (booking !=null && booking.getPaidDetail()!=null)
@@ -113,12 +119,30 @@ public class SalesServiceImpl implements  SalesService{
             sales.setTotalIgst(totalIgst);
             Sales createdSales= salesRepository.save(sales);
             stockService.updateSalesInfoToStock(createdSales);
+            generateAccount(createdSales);
             return commonMapper.toSalesResponse(createdSales);
         }
         catch (Exception ex) {
             throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex.getCause());
         }
     }
+
+
+    private void generateAccount(Sales createdSales) {
+        AccountRequest accountRequest = new AccountRequest();
+        accountRequest.setTransactDate(LocalDate.now());
+        double paidAmount = createdSales.getPaidDetails().stream()
+                .filter(paidDetail -> !paidDetail.isCancelled())
+                .mapToDouble(PaidDetail::getPaidAmount)
+                .sum();
+        accountRequest.setAmount(paidAmount);
+        accountRequest.setTransactDesc("Sales Invoice: " + createdSales.getInvoiceNo());
+        accountRequest.setAccountHeadCode("ACCSALE001");
+        accountRequest.setTransactRefNo(createdSales.getSalesId());
+        accountRequest.setTransactorId(JwtUtils.getUserIdFromToken().get());
+        accountService.createAccountEntry(accountRequest);
+    }
+
     @Override
     public List<SalesResponse> getAllSales(String invoiceNo,String customerName,String mobileNo ,String partNo, String paymentType,Boolean isCancelled,PaymentStatus paymentStatus,String billType) {
         List<Sales> sales = customSalesRepository.getAllSales(invoiceNo, customerName, mobileNo, partNo, paymentType,isCancelled,paymentStatus,billType);
@@ -131,8 +155,7 @@ public class SalesServiceImpl implements  SalesService{
                             paidAmount = paidAmount + paidDetail.getPaidAmount();
                         }
                     }
-                    balance = sale.getTotalInvoiceAmt() - paidAmount;
-
+                    balance = sale.getNetAmt() - paidAmount;
                     SalesResponse salesResponse = commonMapper.toSalesResponse(sale);
                     salesResponse.setPendingAmt(balance);
                     salesResponse.setTotalPaidAmt(paidAmount);
@@ -184,8 +207,7 @@ public class SalesServiceImpl implements  SalesService{
                             paidAmount = paidAmount + paidDetail.getPaidAmount();
                         }
                     }
-                    balance = sale.getTotalInvoiceAmt() - paidAmount;
-
+                    balance = sale.getNetAmt() - paidAmount;
                     SalesResponse salesResponse = commonMapper.toSalesResponse(sale);
                     salesResponse.setPendingAmt(balance);
                     salesResponse.setTotalPaidAmt(paidAmount);
@@ -212,7 +234,7 @@ public class SalesServiceImpl implements  SalesService{
                     .filter(pd->!pd.isCancelled())
                     .mapToDouble(pd->pd.getPaidAmount())
                     .sum();
-            if (paidAmount + paidDetailReq.getPaidAmount() > sales.getTotalInvoiceAmt()) {
+            if (paidAmount + paidDetailReq.getPaidAmount() > sales.getNetAmt()) {
                 return "Paid Amount is greater than total invoice amount";
             }
             else
@@ -231,6 +253,14 @@ public class SalesServiceImpl implements  SalesService{
         if (paidAmount == sales.getNetAmt()) {
             sales.setPaymentStatus(PaymentStatus.COMPLETED);}
         salesRepository.save(sales);
+        AccountRequest accountRequest = new AccountRequest();
+        accountRequest.setTransactDate(LocalDate.now());
+        accountRequest.setAmount(paidDetailReq.getPaidAmount());
+        accountRequest.setTransactDesc("Sales Invoice PartPayment: " + sales.getInvoiceNo());
+        accountRequest.setAccountHeadCode("ACCSALE001");
+        accountRequest.setTransactRefNo(sales.getSalesId());
+        accountRequest.setTransactorId(JwtUtils.getUserIdFromToken().get());
+        accountService.createAccountEntry(accountRequest);
         return "payment successful";
     }
 

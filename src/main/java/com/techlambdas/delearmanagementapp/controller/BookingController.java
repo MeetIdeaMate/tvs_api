@@ -1,5 +1,6 @@
 package com.techlambdas.delearmanagementapp.controller;
 
+import com.techlambdas.delearmanagementapp.constant.BookingStatus;
 import com.techlambdas.delearmanagementapp.constant.PaymentType;
 import com.techlambdas.delearmanagementapp.model.Booking;
 import com.techlambdas.delearmanagementapp.request.BookingRequest;
@@ -38,24 +39,26 @@ public class BookingController {
                                                         @RequestParam (required = false)String branchId,
                                                         @RequestParam (required = false)String branchName,
                                                         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-                                                        @RequestParam(required = false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate)
+                                                        @RequestParam(required = false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+                                                                @RequestParam(required = false)BookingStatus bookingStatus)
     {
-        List<BookingResponse> bookingResponses=bookingService.getAllBookings(bookingNo,customerName,paymentType,branchId,branchName,fromDate,toDate);
+        List<BookingResponse> bookingResponses=bookingService.getAllBookings(bookingNo,customerName,paymentType,branchId,branchName,fromDate,toDate,bookingStatus);
         return successResponse(HttpStatus.OK,"bookings",bookingResponses);
     }
     @GetMapping("/page")
     public ResponseEntity<Page<BookingResponse>> getAllBookingsWithPage(@RequestParam(required = false) String bookingNo,
-                                                                @RequestParam(required = false) String customerName,
-                                                                @RequestParam(required = false) PaymentType paymentType,
-                                                                @RequestParam (required = false)String branchId,
-                                                                @RequestParam (required = false)String branchName,
-                                                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-                                                                @RequestParam(required = false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
-                                                                @RequestParam(defaultValue = "0") int page,
-                                                                @RequestParam(defaultValue = "10") int size)
+                                                                        @RequestParam(required = false) String customerName,
+                                                                        @RequestParam(required = false) PaymentType paymentType,
+                                                                        @RequestParam (required = false)String branchId,
+                                                                        @RequestParam (required = false)String branchName,
+                                                                        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+                                                                        @RequestParam(required = false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+                                                                        @RequestParam(defaultValue = "0") int page,
+                                                                        @RequestParam(defaultValue = "10") int size,
+                                                                        @RequestParam(required = false)BookingStatus bookingStatus)
     {
         Pageable pageable= PageRequest.of(page,size);
-        Page<BookingResponse> bookingResponses=bookingService.getAllBookingsWithPage(bookingNo,customerName,paymentType,branchId,branchName,fromDate,toDate,pageable);
+        Page<BookingResponse> bookingResponses=bookingService.getAllBookingsWithPage(bookingNo,customerName,paymentType,branchId,branchName,fromDate,toDate,pageable,bookingStatus);
         return successResponse(HttpStatus.OK,"bookingsWithPage",bookingResponses);
     }
     @GetMapping("/{bookingNo}")

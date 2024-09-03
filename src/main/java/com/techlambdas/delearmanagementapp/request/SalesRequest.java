@@ -18,16 +18,11 @@ public class SalesRequest {
     private List<PaidDetail> paidDetails;
     private List<ItemDetail> itemDetails;
     private int totalQty;
-//    private double totalTaxableAmt;
-//    private double totalDisc;
-//    private double totalCgst;
-//    private double totalSgst;
-//    private double totalInvoiceAmt;
     private double roundOffAmt;
     private double netAmt;
     private PaymentStatus paymentStatus;
     private Map<String,String> mandatoryAddons;
     private Insurance insurance;
     private loanInfo loaninfo;
-    private EvBattery evBattery;
+    private Map<String,String> evBattery;
 }

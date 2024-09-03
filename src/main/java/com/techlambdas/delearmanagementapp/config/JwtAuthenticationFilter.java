@@ -1,6 +1,14 @@
 package com.techlambdas.delearmanagementapp.config;
+import com.google.gson.Gson;
+import com.google.gson.JsonParser;
+import com.techlambdas.delearmanagementapp.exception.TokenExpiredException;
+import com.techlambdas.delearmanagementapp.response.AppResponse;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +23,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -45,20 +57,43 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-        } catch (Exception e) {
+        }catch (ExpiredJwtException e) {
+            HttpServletResponse servletResponse=handleException(response,e);
+            return;
+        }
+
+        catch (MalformedJwtException e) {
+            HttpServletResponse servletResponse=handleException(response,e);
+            return;
+        }
+        catch (Exception e) {
             logger.error("Cannot set user authentication: {}");
         }
 
         filterChain.doFilter(request, response);
     }
 
+    private HttpServletResponse handleException(HttpServletResponse response, Exception e) throws IOException {
+        Map<String, Object> errorDetails = new HashMap<>();
+        errorDetails.put("timestamp", LocalDateTime.now().toString());
+        errorDetails.put("status", HttpStatus.UNAUTHORIZED.value());
+        errorDetails.put("message", "Invalid Token OR Expired Token:"+e.getMessage());
+        errorDetails.put("result", null);
+        ResponseEntity<Map<String, Object>> responseEntity = new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
+        String jsonResponse = new Gson().toJson(responseEntity.getBody());
+
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.getWriter().write("{\"result\":null,\"statusCode\":401,\"error\":" + new Gson().toJson(new JsonParser().parse(jsonResponse)) + "}");
+        response.getWriter().flush();
+        return response;
+    }
+
     private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader(HttpHeaders.AUTHORIZATION);
-
         if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
             return headerAuth.substring(7, headerAuth.length());
         }
-
         return null;
     }
 }

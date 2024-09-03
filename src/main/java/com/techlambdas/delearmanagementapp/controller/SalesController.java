@@ -1,6 +1,5 @@
 package com.techlambdas.delearmanagementapp.controller;
 
-import com.techlambdas.delearmanagementapp.model.PaidDetail;
 import com.techlambdas.delearmanagementapp.model.PaymentStatus;
 import com.techlambdas.delearmanagementapp.model.Sales;
 import com.techlambdas.delearmanagementapp.request.PaidDetailReq;

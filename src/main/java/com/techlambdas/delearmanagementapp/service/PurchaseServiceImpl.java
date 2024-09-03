@@ -1,10 +1,12 @@
 package com.techlambdas.delearmanagementapp.service;
+import com.techlambdas.delearmanagementapp.config.JwtUtils;
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.mapper.CommonMapper;
 import com.techlambdas.delearmanagementapp.mapper.PurchaseMapper;
 import com.techlambdas.delearmanagementapp.model.*;
 import com.techlambdas.delearmanagementapp.repository.CategoryRepository;
 import com.techlambdas.delearmanagementapp.repository.PurchaseRepository;
+import com.techlambdas.delearmanagementapp.request.AccountRequest;
 import com.techlambdas.delearmanagementapp.request.ItemDetailRequest;
 import com.techlambdas.delearmanagementapp.request.ItemRequest;
 import com.techlambdas.delearmanagementapp.request.PurchaseRequest;
@@ -37,6 +39,8 @@ public class PurchaseServiceImpl implements PurchaseService {
     private ItemService itemService;
     @Autowired
     private ConfigService configService;
+    @Autowired
+    private AccountService accountService;
     @Autowired
     private CategoryRepository categoryRepository;
 
@@ -96,10 +100,22 @@ public class PurchaseServiceImpl implements PurchaseService {
             updateItemRepository(purchaseRequest.getItemDetails());
             purchase.setPurchaseNo(configService.getNextPurchaseNoSequence());
             Purchase createdPurchase= purchaseRepository.save(purchase);
+            generateAccount(createdPurchase);
             return mapPurchaseToPurchaseResponse(createdPurchase);
         } catch (Exception ex) {
             throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex);
         }
+    }
+
+    private void generateAccount(Purchase createdPurchase) {
+        AccountRequest accountRequest = new AccountRequest();
+        accountRequest.setTransactDate(LocalDate.now());
+        accountRequest.setAmount(createdPurchase.getFinalTotalInvoiceAmount());
+        accountRequest.setTransactDesc("Purchase Invoice: " + createdPurchase.getPurchaseNo());
+        accountRequest.setAccountHeadCode("ACCPUR001");
+        accountRequest.setTransactRefNo(createdPurchase.getPurchaseId());
+        accountRequest.setTransactorId(JwtUtils.getUserIdFromToken().get());
+        accountService.createAccountEntry(accountRequest);
     }
 
 //    private void updateItemDetailWithCalculations(ItemDetail itemDetail, ItemDetailRequest itemDetailRequest) {
@@ -167,7 +183,6 @@ public class PurchaseServiceImpl implements PurchaseService {
                 if (Optional.ofNullable(itemDetail.getIncentives()).isPresent()) {
                     if (!itemDetail.getIncentives().isEmpty())
                      newItem.setIncentive(true);
-
                 }
                  newItem.setItemName(itemDetail.getItemName());
                  newItem.setPartNo(itemDetail.getPartNo());
