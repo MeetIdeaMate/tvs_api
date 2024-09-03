@@ -20,14 +20,13 @@ public class AccessController {
     private AccessControlService accessControlService;
 
     @PostMapping
-    public ResponseEntity<AccessControl> createAccessControl(@RequestBody AccessControlRequest accessControlRequest) {
+    public ResponseEntity createAccessControl(@RequestBody AccessControlRequest accessControlRequest) {
         AccessControl accessControl = accessControlService.createAccessControl(accessControlRequest);
-        return successResponse(HttpStatus.OK,"accessControl",accessControl);
-
+        return successResponse(HttpStatus.CREATED,"accessControl",accessControl);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AccessControl> updateAccessControl(@PathVariable String id,@RequestBody AccessControlRequest accessControlRequest) {
+    public ResponseEntity<?> updateAccessControl(@PathVariable String id,@RequestBody AccessControlRequest accessControlRequest) {
         AccessControl accessControl = accessControlService.updateAccessControl(id, accessControlRequest);
         return successResponse(HttpStatus.OK,"accessControl",accessControl);
     }

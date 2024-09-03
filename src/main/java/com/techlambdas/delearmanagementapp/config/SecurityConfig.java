@@ -1,4 +1,6 @@
 package com.techlambdas.delearmanagementapp.config;
+import com.techlambdas.delearmanagementapp.exception.TokenExpiredException;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,7 +49,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
     @Bean
     public JwtAuthenticationFilter authenticationJwtTokenFilter() {
-        return new JwtAuthenticationFilter(userDetailsService, jwtUtils);
+            return new JwtAuthenticationFilter(userDetailsService, jwtUtils);
+
     }
     @Bean
     @Override

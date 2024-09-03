@@ -1,5 +1,4 @@
 package com.techlambdas.delearmanagementapp.controller;
-
 import com.techlambdas.delearmanagementapp.model.Config;
 import com.techlambdas.delearmanagementapp.request.ConfigReq;
 import com.techlambdas.delearmanagementapp.service.ConfigService;
@@ -7,15 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-
 import static com.techlambdas.delearmanagementapp.response.AppResponse.successResponse;
-
 @RestController
 @RequestMapping("/config")
 public class ConfigController {
-
     @Autowired
     private ConfigService configService;
 

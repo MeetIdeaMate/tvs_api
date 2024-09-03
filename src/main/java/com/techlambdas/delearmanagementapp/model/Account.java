@@ -1,14 +1,11 @@
 package com.techlambdas.delearmanagementapp.model;
-
 import com.techlambdas.delearmanagementapp.constant.AccountType;
 import lombok.Data;
 import org.springframework.data.annotation.*;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 @Data
 @Document(collection = "accounts")
 public class Account {

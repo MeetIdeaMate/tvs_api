@@ -32,7 +32,6 @@ public class CustomPurchaseRepositoryImpl implements CustomPurchaseRepository {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-
     @Override
     public List<Purchase> getAllPurchases(String purchaseNo, String pInvoiceNo, String pOrderRefNo,LocalDate fromDate,LocalDate toDate,String categoryName,String branchId,Boolean isStockUpdated) {
         Query query=new Query();
