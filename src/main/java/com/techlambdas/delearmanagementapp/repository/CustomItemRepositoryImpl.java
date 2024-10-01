@@ -32,7 +32,7 @@ public class CustomItemRepositoryImpl implements CustomItemRepository{
     }
 
     @Override
-    public Page<Item> getAllItemsWithPage(String itemId, String itemName, String partNo, Pageable pageable) {
+    public Page<Item> getAllItemsWithPage(String itemId, String itemName, String partNo, Pageable pageable, String hsnCode) {
         Query query=new Query();
         if (itemId!=null)
             query.addCriteria(Criteria.where("itemId").is(itemId));
@@ -40,6 +40,11 @@ public class CustomItemRepositoryImpl implements CustomItemRepository{
             query.addCriteria(Criteria.where("itemName").regex(Pattern.compile(itemName, Pattern.CASE_INSENSITIVE)));
         if (partNo!=null)
             query.addCriteria(Criteria.where("partNo").regex(partNo));
+
+        if(hsnCode != null)
+            query.addCriteria(Criteria.where("hsnSacCode").regex(hsnCode));
+
+
         query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
         long count = mongoTemplate.count(query, Item.class);
         query.with(pageable);

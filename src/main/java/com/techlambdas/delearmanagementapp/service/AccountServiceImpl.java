@@ -44,7 +44,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
-public class AccountServiceImpl implements AccountService{
+public class AccountServiceImpl implements AccountService {
 
     @Value("${app.image.upload-dir:./bankstatement/pdffiles}")
     private String uploadPdfFile;
@@ -82,7 +82,6 @@ public class AccountServiceImpl implements AccountService{
     private UserRepository userRepository;
 
 
-
     @Override
     public Balance closingBalance(LocalDate transactDate) {
         Balance balance = accountCustomRepo.closingBalance(transactDate);
@@ -90,16 +89,16 @@ public class AccountServiceImpl implements AccountService{
     }
 
     public Account createSettlementEntry(AccountRequest accountRequest,
-                                         boolean recpay,String settlementId){
-        try{
+                                         boolean recpay, String settlementId) {
+        try {
             AccountHead accountHead = accountHeadRepository.findByAccountHeadCode(accountRequest.getAccountHeadCode());
-            if(accountHead==null)
+            if (accountHead == null)
                 throw new DataNotFoundException("AccountHead not matched");
 
             Account account = convetToAccount.apply(accountRequest);
             account.setAccountHeadName(accountHead.getAccountHeadName());
             account.setTransacId(RandomIdGenerator.getRandomId());
-            if(accountHead.getAccountType() == AccountType.CREDIT){
+            if (accountHead.getAccountType() == AccountType.CREDIT) {
                 account.setTransactType(AccountType.CREDIT);
                 account.setTransactorType("CollectionOperator");
             }
@@ -110,24 +109,24 @@ public class AccountServiceImpl implements AccountService{
             account.setTransactRefNo(settlementId);
             Account acc = accountRepository.save(account);
             return account;
-        }catch (DataNotFoundException ex) {
+        } catch (DataNotFoundException ex) {
             throw new DataNotFoundException("Data not found --" + ex.getMessage());
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex.getCause());
         }
 
     }
 
-    public Account generateAccountList(AccountRequest accountRequest){
-        try{
+    public Account generateAccountList(AccountRequest accountRequest) {
+        try {
             AccountHead accountHead = accountHeadRepository.findByAccountHeadCode(accountRequest.getAccountHeadCode());
-            if(accountHead==null)
+            if (accountHead == null)
                 throw new DataNotFoundException("AccountHead not matched");
 
             Account account = convetToAccount.apply(accountRequest);
             account.setAccountHeadName(accountHead.getAccountHeadName());
             account.setTransacId(RandomIdGenerator.getRandomId());
-            if(accountHead.getAccountType() == AccountType.CREDIT){
+            if (accountHead.getAccountType() == AccountType.CREDIT) {
                 account.setTransactType(AccountType.CREDIT);
                 account.setTransactorType("CollectionOperator");
             }
@@ -136,9 +135,9 @@ public class AccountServiceImpl implements AccountService{
             account.setEdited(false);
             account.setPrinted(false);
             return account;
-        }catch (DataNotFoundException ex) {
+        } catch (DataNotFoundException ex) {
             throw new DataNotFoundException("Data not found --" + ex.getMessage());
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex.getCause());
         }
 
@@ -150,14 +149,14 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
-    public Page<Account> getByAccType(int page, int size, String financialYear, String accountHeadCode, String accountHeadName, String transactorId, AccountType transactType, String transactorName, String transactDesc, String shortNotes, String transactRefNo, String transactDetails, LocalDate transactDate,LocalDate fromDate,LocalDate toDate) {
-        Page<Account> accounts = accountCustomRepo.getByAccType(page,size,financialYear,accountHeadCode,accountHeadName,transactorId,transactType,transactorName,transactDesc,shortNotes,transactRefNo,transactDetails,transactDate,fromDate,toDate);
+    public Page<Account> getByAccType(int page, int size, String financialYear, String accountHeadCode, String accountHeadName, String transactorId, AccountType transactType, String transactorName, String transactDesc, String shortNotes, String transactRefNo, String transactDetails, LocalDate transactDate, LocalDate fromDate, LocalDate toDate) {
+        Page<Account> accounts = accountCustomRepo.getByAccType(page, size, financialYear, accountHeadCode, accountHeadName, transactorId, transactType, transactorName, transactDesc, shortNotes, transactRefNo, transactDetails, transactDate, fromDate, toDate);
         return accounts;
     }
 
     @Override
     public List<Balance> getFilAcc(LocalDate transactDate) {
-        List <Balance> openingBalance = accountCustomRepo.filterAcc(transactDate);
+        List<Balance> openingBalance = accountCustomRepo.filterAcc(transactDate);
         return openingBalance;
     }
 
@@ -174,14 +173,13 @@ public class AccountServiceImpl implements AccountService{
         }
         ledger.setOpeningBalance(openingBalanceSum);
         //    List<Account> accounts = accountRepository.findByTransactDateBetween(transacdate, LocalDate.now());
-        List<Account> accounts = accountCustomRepo.findByTransactDateBetween(transacdate,LocalDate.now());
+        List<Account> accounts = accountCustomRepo.findByTransactDateBetween(transacdate, LocalDate.now());
         ledger.setTransaction(Transaction.fromAccounts(accounts));
 
         Balance cb = closingBalance(transacdate);
-        if(cb == null){
+        if (cb == null) {
             ledger.setClosingBalance(ledger.getOpeningBalance());
-        }
-        else {
+        } else {
             double closingBalance = cb.getClosingBalance();
             ledger.setClosingBalance(openingBalanceSum + closingBalance);
         }
@@ -191,37 +189,37 @@ public class AccountServiceImpl implements AccountService{
 
     @Override
     public Account createAccountEntry(AccountRequest accountRequest) {
-        try{
-            System.out.println("Account head code ::"+accountRequest.getAccountHeadCode());
+        try {
+            System.out.println("Account head code ::" + accountRequest.getAccountHeadCode());
             AccountHead accountHead = accountHeadRepository.findByAccountHeadCode(accountRequest.getAccountHeadCode());
-            if(accountHead==null)
+            if (accountHead == null)
                 throw new DataNotFoundException("AccountHead not matched");
             Account account = convetToAccount.apply(accountRequest);
             account.setAccountHeadName(accountHead.getAccountHeadName());
             account.setTransacId(RandomIdGenerator.getRandomId());
-            if(accountHead.getPricingFormat()== PricingFormat.FLAT)
-                if(accountHead.getMaxAmount() != account.getAmount())
+            if (accountHead.getPricingFormat() == PricingFormat.FLAT)
+                if (accountHead.getMaxAmount() < account.getAmount())
                     throw new InvalidDataException("Amount Mismatched according to AccountHead");
             //Outgoing means payments
-            if(accountHead.getAccountType()== AccountType.DEBIT){
+            if (accountHead.getAccountType() == AccountType.DEBIT) {
                 account.setTransactType(AccountType.DEBIT);
             }
             //Incoming means receipt
-            else if(accountHead.getAccountType() == AccountType.CREDIT){
+            else if (accountHead.getAccountType() == AccountType.CREDIT) {
                 account.setTransactType(AccountType.CREDIT);
-                if(accountHead.getTransferFrom().equalsIgnoreCase("User")){
-                    User user  = userRepository.findUserByUserId(account.getTransactorId());
-                    if(user==null)
+                if (accountHead.getTransferFrom().equalsIgnoreCase("User")) {
+                    User user = userRepository.findUserByUserId(account.getTransactorId());
+                    if (user == null)
                         throw new DataNotFoundException("userId Not valid");
                     account.setTransactor(user.getUserName());
                     account.setTransactorType("User");
                 }
             }
-            if(accountHead.isCashierOps())
+            if (accountHead.isCashierOps())
                 account.setOnRecPayOnly(true);
             account.setCancelled(false);
             account.setEdited(false);
-            if(accountHead.isNeedPrinting())
+            if (accountHead.isNeedPrinting())
                 account.setPrinted(true);
             Account acc = accountRepository.save(account);
             return account;
@@ -312,23 +310,29 @@ public class AccountServiceImpl implements AccountService{
     private Statement parseContent(String content) {
         Statement statement = new Statement();
         List<BankTransaction> transactions = new ArrayList<>();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         // Define patterns
-        Pattern accountNumberPattern = Pattern.compile("Statement for account number (\\d+)");
-        Pattern customerNamePattern = Pattern.compile("Name (.+)");
+        Pattern accountNumberPattern = Pattern.compile("ACCOUNT NO\\s+:([A-Z]+-\\d+)");
+        Pattern customerNamePattern = Pattern.compile("CUSTOMER DETAILS\\s*:(.+)");
         Pattern openingBalancePattern = Pattern.compile("Opening Balance\\s+([\\d,\\.]+)");
         Pattern closingBalancePattern = Pattern.compile("Closing Balance\\s+([\\d,\\.]+)");
         Pattern transactionPattern = Pattern.compile(
-                "(\\d{2}-\\w{3}-\\d{4})\\s+" +
-                        "(.+?)\\s+" +
-                        "([\\d,]*\\d+\\.\\d{2})\\s+" +
-                        "([\\d,\\.]+)"
+                "(\\d{2}/\\d{2}/\\d{4})\\s*" +          // Date
+                        "(.*?)\\s*" +                          // Description
+                        "([\\d,]+\\.\\d{2})\\s*" +             // Credit amount
+                        "([\\d,\\.\\-]+)"
         );
 
         // Match and set statement properties
+        System.out.println("Pattern: " + accountNumberPattern);
+
         Matcher matcher = accountNumberPattern.matcher(content);
+        System.out.println("matcher: " + matcher);
+
+
         if (matcher.find()) statement.setAccountNumber(matcher.group(1));
+
 
         matcher = customerNamePattern.matcher(content);
         if (matcher.find()) statement.setCustomerName(matcher.group(1).trim());
@@ -341,10 +345,11 @@ public class AccountServiceImpl implements AccountService{
         double prevBalance = statement.getOpeningBalance();
 
         for (String line : mergedTransactions) {
+            System.out.println("Processing line: " + line);
             matcher = transactionPattern.matcher(line);
             if (matcher.find()) {
                 LocalDate date = LocalDate.parse(matcher.group(1), formatter);
-                String description = matcher.group(2);
+                String description = matcher.group(2).trim();
                 double amount = Double.parseDouble(matcher.group(3).replace(",", ""));
                 double balance = Double.parseDouble(matcher.group(4).replace(",", ""));
                 double transactAmount = balance - prevBalance;
@@ -359,11 +364,15 @@ public class AccountServiceImpl implements AccountService{
                     transaction.setDebit(amount);
 
                 prevBalance = balance;
+
+                String paymentType = determinePaymentType(description);
+                transaction.setPaymentType(paymentType);
                 transactions.add(transaction);
             } else {
                 System.out.println("Unmatched line: " + line);
             }
         }
+
 
         matcher = closingBalancePattern.matcher(content);
         if (matcher.find()) statement.setClosingBalance(Double.parseDouble(matcher.group(1).replace(",", "")));
@@ -382,7 +391,7 @@ public class AccountServiceImpl implements AccountService{
         StringBuilder currentTransaction = new StringBuilder();
 
         for (String line : lines) {
-            if (line.matches("^\\d{2}-\\w{3}-\\d{4}.*")) {
+            if (line.matches("^\\d{2}/\\d{2}/\\d{4}.*")) {
                 if (currentTransaction.length() > 0) {
                     mergedTransactions.add(currentTransaction.toString().replaceAll("\\s+", " "));
                     currentTransaction.setLength(0);
@@ -398,5 +407,25 @@ public class AccountServiceImpl implements AccountService{
         }
 
         return mergedTransactions;
+    }
+
+    private String determinePaymentType(String description) {
+        description = description.toLowerCase();
+
+        if (description.contains("atm")) {
+            return "ATM";
+        } else if (description.contains("neft")) {
+            return "NEFT";
+        } else if (description.contains("imps")) {
+            return "UPI";
+        } else if (description.contains("chq")) {
+            return "CHEQUE";
+        } else if (description.contains("pos") || description.contains("swipe")) {
+            return "CARD";
+        } else if (description.contains("upi") || description.contains("gpay") || description.contains("phonepe")) {
+            return "UPI";
+        } else {
+            return "Unknown";
+        }
     }
 }

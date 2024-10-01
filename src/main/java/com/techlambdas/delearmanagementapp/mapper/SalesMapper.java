@@ -14,6 +14,7 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface SalesMapper {
     @Mapping(target = "salesId", ignore = true)
+    @Mapping(target = "insuranceId",ignore = true)
     Sales mapSalesRequestToSales(SalesRequest salesRequest);
 
     Sales mapSalesUpdateReqtoSales(SalesUpdateReq salesUpdateReq);

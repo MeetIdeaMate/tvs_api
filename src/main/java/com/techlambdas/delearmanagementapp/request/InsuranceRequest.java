@@ -1,12 +1,12 @@
-package com.techlambdas.delearmanagementapp.model;
+package com.techlambdas.delearmanagementapp.request;
 
 import lombok.Data;
-import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.time.LocalDate;
-@Document(collection = "insurance")
+import java.time.LocalDateTime;
+
 @Data
-public class Insurance {
-    private String insuranceId;
+public class InsuranceRequest {
     private String insuranceNo;
     private String InsuranceCompanyName;
     private double insuredAmt;
@@ -15,7 +15,6 @@ public class Insurance {
     private LocalDate insuredDate;
     private LocalDate ownDmgExpiryDate;
     private LocalDate thirdPartyExpiryDate;
-    private String CustomerId;
+    private String customerId;
     private String vehicleNo;
 }
-
