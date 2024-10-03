@@ -11,4 +11,5 @@ public class BankTransaction {
     private double debit;
     private double credit;
     private double balance;
+    private String PaymentType;
 }

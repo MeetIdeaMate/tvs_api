@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -47,12 +48,21 @@ public class SalesServiceImpl implements  SalesService{
     private CommonMapper commonMapper;
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private InsuranceService insuranceService;
 
     @Override
     public SalesResponse createSales(SalesRequest salesRequest) {
         try {
             Sales sales = salesMapper.mapSalesRequestToSales(salesRequest);
             sales.setInvoiceNo(configService.getNextSalesNoSequence());
+            if(salesRequest.getInsurance()!=null){
+                InsuranceRequest insuranceRequest = salesRequest.getInsurance();
+                insuranceRequest.setCustomerId(salesRequest.getCustomerId());
+                insuranceRequest.setInvoiceNo(sales.getInvoiceNo());
+               Insurance insurance = insuranceService.createInsurance(insuranceRequest);
+                sales.setInsuranceId(insurance.getInsuranceId());
+            }
             for (PaidDetail paidDetail:sales.getPaidDetails())
             {
                 List<PaidDetail> newList = new ArrayList<>();
@@ -79,11 +89,13 @@ public class SalesServiceImpl implements  SalesService{
                     }
                 }
                 sales.setTotalTaxableAmt(itemDetail.getTaxableValue());
+               if(itemDetail.getIncentives() !=null){
+                   for (Incentive incentive:itemDetail.getIncentives())
+                   {
+                       totalIncentiveAmount +=incentive.getIncentiveAmount();
+                   }
+               }
 
-                for (Incentive incentive:itemDetail.getIncentives())
-                {
-                    totalIncentiveAmount +=incentive.getIncentiveAmount();
-                }
                 totalInvoiceAmount +=itemDetail.getFinalInvoiceValue();
                 totalDiscountAmount +=itemDetail.getDiscount();
             }
@@ -120,7 +132,12 @@ public class SalesServiceImpl implements  SalesService{
             Sales createdSales= salesRepository.save(sales);
             stockService.updateSalesInfoToStock(createdSales);
             generateAccount(createdSales);
-            return commonMapper.toSalesResponse(createdSales);
+
+
+          return commonMapper.toSalesResponse(createdSales);
+
+
+
         }
         catch (Exception ex) {
             throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex.getCause());

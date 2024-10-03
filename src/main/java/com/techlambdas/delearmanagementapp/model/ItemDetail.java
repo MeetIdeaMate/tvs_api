@@ -13,6 +13,7 @@ public class ItemDetail {
     private String hsnSacCode;
     private Map<String,String> mainSpecValue;
     private Map<String,String> specificationsValue;
+    private Map<String,Double> addOns;
     private double unitRate;
     private int quantity;
     private double value;

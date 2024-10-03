@@ -1,11 +1,12 @@
-package com.techlambdas.delearmanagementapp.model;
+package com.techlambdas.delearmanagementapp.response;
 
 import lombok.Data;
-import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.time.LocalDate;
-@Document(collection = "insurance")
+import java.time.LocalDateTime;
+
 @Data
-public class Insurance {
+public class InsuranceResponse {
     private String insuranceId;
     private String insuranceNo;
     private String InsuranceCompanyName;
@@ -16,6 +17,7 @@ public class Insurance {
     private LocalDate ownDmgExpiryDate;
     private LocalDate thirdPartyExpiryDate;
     private String CustomerId;
+    private String customerName;
+    private String MobileNo;
     private String vehicleNo;
 }
-

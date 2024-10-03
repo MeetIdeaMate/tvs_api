@@ -1,5 +1,4 @@
 package com.techlambdas.delearmanagementapp.mapper;
-
 import com.techlambdas.delearmanagementapp.response.*;
 import com.techlambdas.delearmanagementapp.model.*;
 import com.techlambdas.delearmanagementapp.repository.*;
@@ -9,6 +8,7 @@ import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper(componentModel = "spring")
 public abstract class CommonMapper {
@@ -26,6 +26,8 @@ public abstract class CommonMapper {
     protected EmployeeRepository employeeRepository;
     @Autowired
     protected UserRepository userRepository;
+    @Autowired
+    protected InsuranceRepository insuranceRepository;
 
     @Mapping(target = "branchName", source = "branchId", qualifiedByName = "mapBranchName")
     @Mapping(target = "vendorName", source = "vendorId", qualifiedByName= "mapVendorName")
@@ -63,13 +65,20 @@ public abstract class CommonMapper {
         return itemRepository.getCategoryId(partNo);
     }
 
+    @Named("mapAddOns")
+    public Map<String, Double> mapAddOns(String partNo){ return itemRepository.getAddOns(partNo);}
+
 //    @Mapping(target = "categoryName", source = "categoryId", qualifiedByName = "mapCategoryName")
     @Mapping(target = "customerName", source = "customerId", qualifiedByName= "mapCustomerName")
     @Mapping(target = "mobileNo", source = "customerId", qualifiedByName= "mapMobileNo")
     @Mapping(target = "createdByName", source = "createdBy", qualifiedByName = "mapUserName")
     @Mapping(target = "branchName", source = "branchId", qualifiedByName = "mapBranchName")
+    @Mapping(target = "insurance", source = "insuranceId", qualifiedByName = "mapInsuranceList")
     public abstract SalesResponse toSalesResponse(Sales sales);
-
+    @Named("mapInsuranceList")
+    public Insurance mapInsuranceList(String insuranceId){
+        return insuranceRepository.findByInsuranceId(insuranceId);
+    }
     @Named("mapCustomerName")
     public String mapCustomerName(String customerId) {
         return customerRepository.getCustomerName(customerId);
@@ -92,6 +101,7 @@ public abstract class CommonMapper {
     @Mapping(target = "categoryName", source = "categoryId", qualifiedByName = "mapCategoryName")
     @Mapping(target = "hsnSacCode", source = "partNo", qualifiedByName = "mapHsnSacCode")
     @Mapping(target = "itemName", source = "partNo", qualifiedByName = "mapItemName")
+    @Mapping(target = "addOns", source = "partNo", qualifiedByName = "mapAddOns")
     @Mapping(target = "branchName", source = "branchId", qualifiedByName = "mapBranchName")
     public abstract StockResponse toStockResponse(Stock stock);
 
@@ -131,4 +141,11 @@ public abstract class CommonMapper {
     public abstract CustomerResponse mapToCustomerResponse(Customer createdCustomer);
     @Mapping(target = "branchName", source = "branchId", qualifiedByName = "mapBranchName")
     public abstract List<CustomerResponse> mapToCustomerResponses(List<Customer> customers);
+    @Mapping(target = "categoryName", source = "categoryId", qualifiedByName = "mapCategoryName")
+    public abstract ItemResponse mapItemToItemResponse(Item items);
+
+    @Mapping(target = "customerName", source = "customerId", qualifiedByName= "mapCustomerName")
+    @Mapping(target = "mobileNo", source = "customerId", qualifiedByName= "mapMobileNo")
+    public abstract InsuranceResponse mapInsuranceToInsuranceRes(Insurance insurance);
+
 }
