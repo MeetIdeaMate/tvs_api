@@ -11,5 +11,5 @@ import java.util.List;
 public interface CustomItemRepository {
     List<Item> getAllItems(String itemId, String itemName, String partNo);
 
-    Page<Item> getAllItemsWithPage(String itemId, String itemName, String partNo, Pageable pageable,  String hsnCode);
+    Page<Item> getAllItemsWithPage(String itemId, String itemName, String partNo, Pageable pageable,  String hsnCode, String categoryName);
 }
