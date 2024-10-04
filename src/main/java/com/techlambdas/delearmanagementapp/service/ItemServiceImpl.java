@@ -64,19 +64,15 @@ public class ItemServiceImpl implements ItemService{
             throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex.getCause());
         }
     }
-
     @Override
     public Page<ItemResponse> getAllItemsWithPage(String itemId, String itemName, String partNo, Pageable pageable, String categoryName, String hsnCode) {
-        Page<Item> items = customItemRepository.getAllItemsWithPage(itemId,itemName,partNo, pageable ,hsnCode );
+        Page<Item> items = customItemRepository.getAllItemsWithPage(itemId,itemName,partNo, pageable ,hsnCode ,categoryName);
 
         List<ItemResponse> receiptResponses = items.stream()
                 .map(commonMapper::mapItemToItemResponse)
-                .filter(itemResponse -> categoryName == null || categoryName.isEmpty() ||
-                        Objects.equals(itemResponse.getCategoryName(), categoryName))
                 .collect(Collectors.toList());
         return new PageImpl<>(receiptResponses,pageable,items.getTotalElements());
     }
-
     @Override
     public Item getItemByIdCategoryIdPartNo( String categoryId, String partNo) {
         Optional<Item> itemOptional = itemRepository.findByCategoryIdAndPartNo(categoryId, partNo);

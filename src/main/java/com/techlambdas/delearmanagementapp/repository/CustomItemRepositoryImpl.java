@@ -1,5 +1,6 @@
 package com.techlambdas.delearmanagementapp.repository;
 
+import com.techlambdas.delearmanagementapp.model.Category;
 import com.techlambdas.delearmanagementapp.model.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,7 +13,10 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 @Repository
 public class CustomItemRepositoryImpl implements CustomItemRepository{
     @Autowired
@@ -32,7 +36,7 @@ public class CustomItemRepositoryImpl implements CustomItemRepository{
     }
 
     @Override
-    public Page<Item> getAllItemsWithPage(String itemId, String itemName, String partNo, Pageable pageable, String hsnCode) {
+    public Page<Item> getAllItemsWithPage(String itemId, String itemName, String partNo, Pageable pageable, String hsnCode, String categoryName) {
         Query query=new Query();
         if (itemId!=null)
             query.addCriteria(Criteria.where("itemId").is(itemId));
@@ -43,6 +47,11 @@ public class CustomItemRepositoryImpl implements CustomItemRepository{
 
         if(hsnCode != null)
             query.addCriteria(Criteria.where("hsnSacCode").regex(hsnCode));
+        if (Optional.ofNullable(categoryName).isPresent()) {
+            List<String> categoryIdList= getCategoryNameFromCategory(categoryName);
+            query.addCriteria(Criteria.where("categoryId").in(categoryIdList));
+        }
+
 
 
         query.with(Sort.by(Sort.Direction.DESC, "createdDateTime"));
@@ -51,5 +60,14 @@ public class CustomItemRepositoryImpl implements CustomItemRepository{
         List<Item> items = mongoTemplate.find(query, Item.class);
 
         return new PageImpl<>(items, pageable, count);
+    }
+    public List<String>getCategoryNameFromCategory(String categoryName)
+    {
+        Query query=new Query();
+        if (categoryName!=null){
+            query.addCriteria(Criteria.where("categoryName").regex("^.*"+categoryName+".*","i"));
+        }
+        List<Category> categoryList=mongoTemplate.find(query, Category.class);
+        return categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
     }
 }
