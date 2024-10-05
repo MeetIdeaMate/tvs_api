@@ -32,11 +32,15 @@ public class Sales {
     private double totalSgst;
     private double totalIgst;
     private double totalIncentiveAmount;
+    private double Rto;
+    private double mandatoryFitting;
+    private double optionFitting;
+    private double others;
     private double totalInvoiceAmt;
     private double roundOffAmt;
     private double netAmt;
     private PaymentStatus paymentStatus;
-    private Insurance insurance;
+    private String insuranceId;
     private loanInfo loaninfo;
     private String branchId;
     private Map<String,String> mandatoryAddons;

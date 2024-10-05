@@ -13,6 +13,7 @@ public class StockResponse {
     private String categoryName;
     private Map<String,String> mainSpecValue;
     private Map<String,String> specificationsValue;
+    private Map<String,Double> addOns;
     private int quantity;
     private PurchaseItem purchaseItem;
     private String branchId;
