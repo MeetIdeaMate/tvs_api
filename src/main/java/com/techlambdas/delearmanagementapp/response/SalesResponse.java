@@ -29,6 +29,10 @@ public class SalesResponse {
     private double totalInvoiceAmt;
     private double totalPaidAmt;
     private double totalIncentiveAmt;
+    private double rtoCharges;
+    private double mandatoryFitting;
+    private double optionFitting;
+    private double others;
     private double roundOffAmt;
     private double netAmt;
     private Insurance insurance;
@@ -42,4 +46,5 @@ public class SalesResponse {
     private String createdByName;
     private String reason;
     private boolean isCancelled;
+
 }

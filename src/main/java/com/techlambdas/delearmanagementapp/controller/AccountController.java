@@ -103,7 +103,7 @@ public class AccountController {
         return successResponse(HttpStatus.OK,"cashpointsummary",summary);
     }
     @PostMapping("/upload")
-    public ResponseEntity<Statement> uploadFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Statement> uploadFile(@RequestPart("file") MultipartFile file) {
         Statement response=accountService.uploadFile(file);
         return ResponseEntity.ok(response);
     }
