@@ -3,7 +3,6 @@ package com.techlambdas.delearmanagementapp.controller;
 
 import com.techlambdas.delearmanagementapp.constant.AccountType;
 import com.techlambdas.delearmanagementapp.model.Account;
-import com.techlambdas.delearmanagementapp.model.Statement;
 import com.techlambdas.delearmanagementapp.request.AccountRequest;
 import com.techlambdas.delearmanagementapp.response.AccountDataSummary;
 import com.techlambdas.delearmanagementapp.response.Balance;
@@ -16,7 +15,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -88,9 +86,6 @@ public class AccountController {
         Ledger ledgers = accountService.getledger(transacdate);
         return successResponse(HttpStatus.OK,"success",ledgers);
     }
-
-
-
     @GetMapping("/summary")
     public ResponseEntity getAccountSummary(@RequestParam String operatorCode){
         List<AccountDataSummary> summary = accountService.getAccountSummaryByCollectionOperator(operatorCode);
@@ -102,10 +97,4 @@ public class AccountController {
         List<AccountDataSummary> summary = accountService.getAccountSummaryByAllCollectionOperator();
         return successResponse(HttpStatus.OK,"cashpointsummary",summary);
     }
-    @PostMapping("/upload")
-    public ResponseEntity<Statement> uploadFile(@RequestPart("file") MultipartFile file) {
-        Statement response=accountService.uploadFile(file);
-        return ResponseEntity.ok(response);
-    }
-
 }

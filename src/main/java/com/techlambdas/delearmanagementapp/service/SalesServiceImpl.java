@@ -1,6 +1,7 @@
 package com.techlambdas.delearmanagementapp.service;
 
 import com.techlambdas.delearmanagementapp.config.JwtUtils;
+import com.techlambdas.delearmanagementapp.constant.AccountType;
 import com.techlambdas.delearmanagementapp.constant.BookingStatus;
 import com.techlambdas.delearmanagementapp.constant.PaymentType;
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,6 +50,8 @@ public class SalesServiceImpl implements  SalesService{
     private CommonMapper commonMapper;
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private AccountHeadService accountHeadService;
     @Autowired
     private InsuranceService insuranceService;
 
@@ -146,19 +150,30 @@ public class SalesServiceImpl implements  SalesService{
 
 
     private void generateAccount(Sales createdSales) {
-        AccountRequest accountRequest = new AccountRequest();
-        accountRequest.setTransactDate(LocalDate.now());
-        double paidAmount = createdSales.getPaidDetails().stream()
+        createdSales.getPaidDetails().stream()
                 .filter(paidDetail -> !paidDetail.isCancelled())
-                .mapToDouble(PaidDetail::getPaidAmount)
-                .sum();
-        accountRequest.setAmount(paidAmount);
-        accountRequest.setTransactDesc("Sales Invoice: " + createdSales.getInvoiceNo());
-        accountRequest.setAccountHeadCode("ACCSALE001");
-        accountRequest.setTransactRefNo(createdSales.getSalesId());
-        accountRequest.setTransactorId(JwtUtils.getUserIdFromToken().get());
-        accountService.createAccountEntry(accountRequest);
+                .forEach(paidDetail -> {
+                    AccountRequest accountRequest = new AccountRequest();
+                    accountRequest.setTransactDate(paidDetail.getPaymentDate());  // Current transaction date
+                    accountRequest.setAmount(paidDetail.getPaidAmount());  // Set amount for this payment
+                    accountRequest.setTransactDesc("Sales Invoice: " + createdSales.getInvoiceNo());
+                    accountRequest.setAccountHeadCode(getAccountHeadCode(paidDetail.getPaymentType().toString())); // Set appropriate accountHeadCode based on payment type
+                    accountRequest.setTransactRefNo(paidDetail.getPaymentReference());  // Sales invoice reference
+                    accountRequest.setTransactorId(JwtUtils.getUserIdFromToken().get());
+                    accountService.createAccountEntry(accountRequest);
+                });
     }
+
+    private String getAccountHeadCode(String paymentType) {
+
+        List<AccountHead> accountHeadList =  accountHeadService.getAllAccHead(AccountType.CREDIT);
+        return accountHeadList.stream()
+                .filter(acc -> acc.getAccountHeadName().equalsIgnoreCase(paymentType))
+                .findFirst()
+                .map(AccountHead::getAccountHeadCode)
+                .orElseThrow(() -> new IllegalArgumentException("No account head found for payment type: " + paymentType));
+    }
+
 
     @Override
     public List<SalesResponse> getAllSales(String invoiceNo,String customerName,String mobileNo ,String partNo, String paymentType,Boolean isCancelled,PaymentStatus paymentStatus,String billType) {
@@ -271,11 +286,11 @@ public class SalesServiceImpl implements  SalesService{
             sales.setPaymentStatus(PaymentStatus.COMPLETED);}
         salesRepository.save(sales);
         AccountRequest accountRequest = new AccountRequest();
-        accountRequest.setTransactDate(LocalDate.now());
+        accountRequest.setTransactDate(paidDetailReq.getPaymentDate());
         accountRequest.setAmount(paidDetailReq.getPaidAmount());
         accountRequest.setTransactDesc("Sales Invoice PartPayment: " + sales.getInvoiceNo());
-        accountRequest.setAccountHeadCode("ACCSALE001");
-        accountRequest.setTransactRefNo(sales.getSalesId());
+        accountRequest.setAccountHeadCode(getAccountHeadCode(paidDetailReq.getPaymentType().toString()));
+        accountRequest.setTransactRefNo(paidDetailReq.getPaymentReference());
         accountRequest.setTransactorId(JwtUtils.getUserIdFromToken().get());
         accountService.createAccountEntry(accountRequest);
         return "payment successful";

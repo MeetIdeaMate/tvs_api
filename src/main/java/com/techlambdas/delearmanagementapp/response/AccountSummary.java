@@ -10,3 +10,5 @@ public class AccountSummary {
     private int receiptCount;
     private double amountCollected;
 }
+
+

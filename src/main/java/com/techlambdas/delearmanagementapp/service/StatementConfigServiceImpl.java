@@ -22,30 +22,23 @@ public class StatementConfigServiceImpl implements StatementConfigService{
 
     @Override
     public StatementConfig createStatementConfig(StatementConfigReq statementConfigReq) {
-      try{
+
    StatementConfig exsistStatementConfig = statementConfigRepository.findByStatementConfigId(statementConfigReq.getStatementConfigId());
 
            if(exsistStatementConfig!=null)
                throw new AlreadyExistException("StatementConfigId Already Exist with ID: "+ exsistStatementConfig.getStatementConfigId());
           return statementConfigRepository.save(statementConfigMapper.mapReqToEntity(statementConfigReq));
-      }
-      catch (Exception ex) {
-          throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex.getCause());
-      }
    }
 
     @Override
     public StatementConfig updateStatementConfig(StatementConfigReq statementConfigReq, String statementConfigId) {
-        try{
+
             StatementConfig exsistStatementConfig = statementConfigRepository.findByStatementConfigId(statementConfigId);
 
             if(exsistStatementConfig==null)
                 throw new DataNotFoundException("StatementConfig Not Found With Id: "+statementConfigId);
             return  statementConfigRepository.save(statementConfigMapper.updateReqToEntity(statementConfigReq,exsistStatementConfig));
-        }
-        catch (Exception ex) {
-            throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex.getCause());
-        }
+
          }
 
     @Override

@@ -19,6 +19,8 @@ public interface AccountCustomRepo {
 
     Page<Account> getByAccType(int page, int size, String financialYear, String accountHeadCode, String accountHeadName, String transactorId, AccountType transactType, String transactorName, String transactDesc, String shortNotes, String transactRefNo, String transactDetails, LocalDate transactDate, LocalDate fromDate, LocalDate toDate);
 
+
+
     List<Balance> filterAcc(LocalDate transactDate);
 
     Balance closingBalance(LocalDate transactDate);

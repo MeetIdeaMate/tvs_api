@@ -6,6 +6,7 @@ import java.time.LocalDate;
 
 @Data
 public class BankTransaction {
+    private String transactionId;
     private LocalDate date;
     private String description;
     private double debit;
