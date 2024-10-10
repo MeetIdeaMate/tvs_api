@@ -9,8 +9,8 @@ public class BankStatementSummaryDetails {
     private String description;
     private AccountType accountType;
     private double amount;
-    private String AccountHeadName;
-    private double ApplicationAmt;
+    private String accountHeadName;
+    private double applicationAmt;
     private List<StatementDetails> summaryDetails;
     private boolean isMissMatch;
 }

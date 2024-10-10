@@ -25,11 +25,9 @@ public interface AccountService {
 
         Account generateAccountList(AccountRequest accountentry);
 
-
-
         List<Account> getAllAccountEntry();
 
-         List<Account> findByTransactDateBetween(LocalDate fromDate, LocalDate toDate);
+        List<Account> getAllAccountWithFilter(LocalDate fromDate, LocalDate toDate,String accountHeadCode);
 
         Page<Account> getByAccType(int page, int size, String financialYear, String accountHeadCode, String accountHeadName, String transactorId, AccountType transactType, String transactorName, String transactDesc, String shortNotes, String transactRefNo, String transactDetails, LocalDate transactDate,LocalDate fromDate, LocalDate toDate);
 

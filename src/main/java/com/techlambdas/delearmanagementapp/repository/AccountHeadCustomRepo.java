@@ -11,4 +11,6 @@ public interface AccountHeadCustomRepo {
     Page<AccountHead> searchAccountHead(int page, int size, String accountHeadCode, String accountHeadName, PricingFormat pricingFormat, Boolean isCashierOps, boolean activeStatus, AccountType accountType, String transferFrom);
 
     List<AccountHead> getAccessAccountHeads();
+
+    AccountHead getAccountHeadByAccTypeAndName(AccountType accountType,String accountHeadName);
 }

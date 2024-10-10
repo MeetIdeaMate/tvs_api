@@ -27,4 +27,9 @@ public interface AccountCustomRepo {
 
 
     List<Account> findByTransactDateBetween(LocalDate transacDate, LocalDate endDate);
+
+
+    List<Account> getAllAccountByFilter(LocalDate transactDate, LocalDate endDate, String AccountHeadCode);
+
+
 }

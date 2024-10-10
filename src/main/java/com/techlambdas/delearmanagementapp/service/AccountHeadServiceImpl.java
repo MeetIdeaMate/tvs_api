@@ -6,6 +6,7 @@ import com.techlambdas.delearmanagementapp.exception.AlreadyExistException;
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.mapper.AccountHeadMapper;
 import com.techlambdas.delearmanagementapp.model.AccountHead;
+import com.techlambdas.delearmanagementapp.repository.AccountHeadCustomRepoImpl;
 import com.techlambdas.delearmanagementapp.repository.AccountHeadRepository;
 import com.techlambdas.delearmanagementapp.request.AccountHeadRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class AccountHeadServiceImpl implements AccountHeadService {
 
     @Autowired
     private AccountHeadRepository accountHeadRepository;
+
+    @Autowired
+    private AccountHeadCustomRepoImpl accountHeadCustomRepo;
 
 
     @Override
@@ -112,6 +116,11 @@ public class AccountHeadServiceImpl implements AccountHeadService {
         {
             return accountHeadRepository.findByAccountType(accountType);
         }
+    }
+
+    @Override
+    public AccountHead getAccountByAccountTypeAndAccountHeadName(AccountType accountType, String AccountHeadName) {
+        return accountHeadCustomRepo.getAccountHeadByAccTypeAndName(accountType,AccountHeadName);
     }
 
 }

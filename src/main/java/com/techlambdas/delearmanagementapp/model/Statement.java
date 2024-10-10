@@ -19,4 +19,5 @@ public class Statement {
     private List<BankTransaction> transactions;
     private double closingBalance;
     private String statementDate;
+    private String fileName;
 }

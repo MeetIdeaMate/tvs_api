@@ -1,5 +1,6 @@
 package com.techlambdas.delearmanagementapp.service;
 import com.techlambdas.delearmanagementapp.model.Statement;
+import com.techlambdas.delearmanagementapp.response.StatementFileDetailsRes;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -13,7 +14,7 @@ public interface StatementService {
 
    List<Statement> getAllStatement();
 
-
+   List<StatementFileDetailsRes> getStatementFileInfo();
 
 
 }

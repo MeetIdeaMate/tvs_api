@@ -1,6 +1,7 @@
 package com.techlambdas.delearmanagementapp.controller;
 import com.techlambdas.delearmanagementapp.model.Statement;
 import com.techlambdas.delearmanagementapp.response.AppResponse;
+import com.techlambdas.delearmanagementapp.response.StatementFileDetailsRes;
 import com.techlambdas.delearmanagementapp.service.StatementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,5 +24,17 @@ public class StatementController {
     public ResponseEntity getAllStatement() {
         List<Statement> statement= statementService.getAllStatement();
         return AppResponse.successResponse(HttpStatus.OK,"statement", statement);
+    }
+
+
+    @GetMapping("/{statementId}")
+    public ResponseEntity getStatementById(@PathVariable String statementId){
+        Statement statement= statementService.getByStatementId(statementId);
+        return AppResponse.successResponse(HttpStatus.OK,"statement", statement);
+    }
+
+    @GetMapping("/fileInfo")
+    public ResponseEntity getAllStatementFileInfo(){
+        return AppResponse.successResponse(HttpStatus.OK,"StatementList",statementService.getStatementFileInfo());
     }
 }

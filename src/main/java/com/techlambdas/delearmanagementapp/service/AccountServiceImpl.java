@@ -133,13 +133,14 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<Account> getAllAccountEntry() {
-        return accountRepository.findAll();
+       return accountRepository.findAll();
     }
 
     @Override
-    public List<Account> findByTransactDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return accountCustomRepo.findByTransactDateBetween(fromDate,toDate);
+    public List<Account> getAllAccountWithFilter(LocalDate fromDate, LocalDate toDate, String accountHeadCode) {
+        return accountCustomRepo.getAllAccountByFilter(fromDate,toDate,accountHeadCode);
     }
+
 
     @Override
     public Page<Account> getByAccType(int page, int size, String financialYear, String accountHeadCode, String accountHeadName, String transactorId, AccountType transactType, String transactorName, String transactDesc, String shortNotes, String transactRefNo, String transactDetails, LocalDate transactDate, LocalDate fromDate, LocalDate toDate) {

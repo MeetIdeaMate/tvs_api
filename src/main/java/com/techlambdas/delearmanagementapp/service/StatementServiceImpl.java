@@ -1,9 +1,12 @@
 package com.techlambdas.delearmanagementapp.service;
 
 
+import com.techlambdas.delearmanagementapp.exception.AlreadyExistException;
 import com.techlambdas.delearmanagementapp.model.*;
 import com.techlambdas.delearmanagementapp.model.submodel.BankTransaction;
+import com.techlambdas.delearmanagementapp.repository.StatementCustomRepo;
 import com.techlambdas.delearmanagementapp.repository.StatementRepository;
+import com.techlambdas.delearmanagementapp.response.StatementFileDetailsRes;
 import com.techlambdas.delearmanagementapp.utils.FileUploadUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -25,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 import static com.techlambdas.delearmanagementapp.utils.RandomIdGenerator.getRandomId;
@@ -39,6 +43,9 @@ public class StatementServiceImpl implements StatementService {
     private StatementRepository statementRepository;
 
     @Autowired
+    private StatementCustomRepo statementCustomRepo;
+
+    @Autowired
     private AccountService accountService;
 
     @Autowired
@@ -50,7 +57,6 @@ public class StatementServiceImpl implements StatementService {
         String originalFileName = FilenameUtils.removeExtension(file.getOriginalFilename());
         String currentDateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
         String filename = originalFileName + "_" + currentDateTime + "." + extension;
-
         try {
             FileUploadUtils.uploadFiletoVps(uploadPdfFile, filename, file);
         } catch (IOException e) {
@@ -70,8 +76,25 @@ public class StatementServiceImpl implements StatementService {
         return statementRepository.findAll();
     }
 
+    @Override
+    public List<StatementFileDetailsRes> getStatementFileInfo() {
+       List<Statement>  statementList = getAllStatement();
+        return statementList.stream()
+                .map(st -> {
+                    StatementFileDetailsRes statementFileDetailsRes = new StatementFileDetailsRes();
+                    statementFileDetailsRes.setFileName(st.getFileName());
+                    statementFileDetailsRes.setStatementId(st.getStatementId());
+                    statementFileDetailsRes.setFromDate(st.getFromDate());
+                    statementFileDetailsRes.setToDate(st.getToDate());
+                    return statementFileDetailsRes;
+                })
+                .collect(Collectors.toList());
+    }
+
+
 
     private Statement readTxtFile(String fileName) {
+
         String filePath = uploadPdfFile + "/" + fileName;
         File pdfFile = new File(filePath);
         StringBuilder allPages = new StringBuilder();
@@ -90,15 +113,14 @@ public class StatementServiceImpl implements StatementService {
             e.printStackTrace();
         }
 
-        return parseContent(allPages.toString());
+        return parseContent(allPages.toString(),fileName);
     }
 
-    private Statement parseContent(String content) {
+    private Statement parseContent(String content,String fileName) {
         Statement statement = new Statement();
+        statement.setFileName(fileName);
         java.util.List<BankTransaction> transactions = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-
         Pattern accountNumberPattern = Pattern.compile("ACCOUNT NO\\s+:([A-Z]+-\\d+)");
         Pattern customerNamePattern = Pattern.compile("CUSTOMER DETAILS\\s*:(.+)");
         Pattern openingBalancePattern = Pattern.compile("Opening Balance\\s+([\\d,\\.]+)");
@@ -109,7 +131,8 @@ public class StatementServiceImpl implements StatementService {
                         "([\\d,]+\\.\\d{2})\\s*" +
                         "([\\d,\\.\\-]+)"
         );
-        System.out.println("Pattern: " + accountNumberPattern);
+        Pattern statementDatePattern = Pattern.compile("Statement Date\\s*:(.+)");
+        System.out.println("Pattern: " + statementDatePattern);
 
         Matcher matcher = accountNumberPattern.matcher(content);
         System.out.println("matcher: " + matcher);
@@ -117,7 +140,12 @@ public class StatementServiceImpl implements StatementService {
 
         if (matcher.find()) statement.setAccountNumber(matcher.group(1));
 
+        matcher = statementDatePattern.matcher(content);
+        if(matcher.find())  statement.setStatementDate(matcher.group(1));
 
+       Statement existStatement =statementRepository.findByStatementDate(matcher.group(1));
+        if(existStatement!=null)
+            throw new AlreadyExistException("Statement Already Exist");
         matcher = customerNamePattern.matcher(content);
         if (matcher.find()) statement.setCustomerName(matcher.group(1).trim());
 
@@ -161,8 +189,14 @@ public class StatementServiceImpl implements StatementService {
         if (matcher.find()) statement.setClosingBalance(Double.parseDouble(matcher.group(1).replace(",", "")));
         statement.setTransactions(transactions);
         if (!transactions.isEmpty()) {
-            statement.setFromDate(transactions.get(0).getDate());
-            statement.setToDate(transactions.get(transactions.size() - 1).getDate());
+            LocalDate fromDate = transactions.get(0).getDate();
+            LocalDate toDate = transactions.get(transactions.size() - 1).getDate();
+
+            boolean isExistDate = statementCustomRepo.existStatementByDate(fromDate,toDate);
+            if(isExistDate)
+                throw new AlreadyExistException("Already Exist Between the FromDate And To Date"+ fromDate + " to " +toDate + ". Please Upload New Statement.");
+            statement.setFromDate(fromDate);
+            statement.setToDate(toDate);
         }
         statement.setStatementId(getRandomId());
         Statement CreateStatement = statementRepository.save(statement);
@@ -231,24 +265,7 @@ public class StatementServiceImpl implements StatementService {
 //        createAccountEntry(accountRequest);
 //    }
 //
-
-
-
 }
 
 
 
-//  for (SalesResponse sale : salesList) {
-//        for (PaidDetail paidDetail : sale.getPaidDetails()) {
-//        if (!paidDetail.isCancelled()) {
-//        if (account.getAccountHeadName() != null && paidDetail.getPaymentType() != null) {
-//        if (account.getAccountHeadName().equals(paidDetail.getPaymentType().name()) &&
-//        paidDetail.getPaymentDate().isEqual(account.getTransactDate()) && paidDetail.getPaymentReference().contains(account.getTransactDesc())  )  {
-//applicationAmt += paidDetail.getPaidAmount();
-//                                    summaryDetailsRes.setSalesBillNo(sale.getInvoiceNo());
-//        summaryDetailsRes.setPartyName(sale.getCustomerName());
-//        }
-//        }
-//        }
-//        }
-//        }
