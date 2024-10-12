@@ -18,7 +18,7 @@ public class StatementController {
     @PostMapping("/upload")
     public ResponseEntity uploadFile(@RequestPart("file") MultipartFile file) {
         Statement response= statementService.uploadFile(file);
-        return ResponseEntity.ok(response);
+        return AppResponse.successResponse(HttpStatus.OK,"statement", response);
     }
     @GetMapping
     public ResponseEntity getAllStatement() {
