@@ -6,6 +6,7 @@ import com.techlambdas.delearmanagementapp.exception.AlreadyExistException;
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.mapper.AccountHeadMapper;
 import com.techlambdas.delearmanagementapp.model.AccountHead;
+import com.techlambdas.delearmanagementapp.repository.AccountHeadCustomRepoImpl;
 import com.techlambdas.delearmanagementapp.repository.AccountHeadRepository;
 import com.techlambdas.delearmanagementapp.request.AccountHeadRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public class AccountHeadServiceImpl implements AccountHeadService {
     @Autowired
     private AccountHeadRepository accountHeadRepository;
 
+    @Autowired
+    private AccountHeadCustomRepoImpl accountHeadCustomRepo;
+
 
     @Override
     public AccountHead createAccountHead(AccountHeadRequest accountHeadRequest) {
@@ -37,11 +41,7 @@ public class AccountHeadServiceImpl implements AccountHeadService {
         } catch (Exception ex) {
             throw new RuntimeException("Internal Server Error --" + ex.getMessage(), ex.getCause());
         }
-
     }
-
-
-
     @Override
     public Page<AccountHead> searchAccountHead(int page, int size, String accountHeadCode, String accountHeadName, PricingFormat pricingFormat, Boolean isCashierOps, boolean activeStatus, AccountType accountType, String transferFrom) {
        Page<AccountHead> accountHeads =  accountHeadRepository.searchAccountHead(page,size,accountHeadCode,accountHeadName,pricingFormat,isCashierOps,activeStatus,accountType,transferFrom);
@@ -118,5 +118,9 @@ public class AccountHeadServiceImpl implements AccountHeadService {
         }
     }
 
+    @Override
+    public AccountHead getAccountByAccountTypeAndAccountHeadName(AccountType accountType, String AccountHeadName) {
+        return accountHeadCustomRepo.getAccountHeadByAccTypeAndName(accountType,AccountHeadName);
+    }
 
 }

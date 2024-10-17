@@ -1,50 +1,38 @@
 package com.techlambdas.delearmanagementapp.service;
 
 
-import com.google.common.io.Files;
 import com.techlambdas.delearmanagementapp.constant.AccountType;
 import com.techlambdas.delearmanagementapp.constant.PricingFormat;
 import com.techlambdas.delearmanagementapp.exception.DataNotFoundException;
 import com.techlambdas.delearmanagementapp.exception.InvalidDataException;
-import com.techlambdas.delearmanagementapp.model.Account;
-import com.techlambdas.delearmanagementapp.model.AccountHead;
-import com.techlambdas.delearmanagementapp.model.Statement;
-import com.techlambdas.delearmanagementapp.model.User;
-import com.techlambdas.delearmanagementapp.model.submodel.BankTransaction;
+import com.techlambdas.delearmanagementapp.model.*;
 import com.techlambdas.delearmanagementapp.repository.AccountCustomRepo;
 import com.techlambdas.delearmanagementapp.repository.AccountHeadRepository;
 import com.techlambdas.delearmanagementapp.repository.AccountRepository;
 import com.techlambdas.delearmanagementapp.repository.UserRepository;
 import com.techlambdas.delearmanagementapp.request.AccountRequest;
-import com.techlambdas.delearmanagementapp.response.AccountDataSummary;
-import com.techlambdas.delearmanagementapp.response.Balance;
-import com.techlambdas.delearmanagementapp.response.Ledger;
-import com.techlambdas.delearmanagementapp.response.Transaction;
-import com.techlambdas.delearmanagementapp.utils.FileUploadUtils;
-import com.techlambdas.delearmanagementapp.utils.RandomIdGenerator;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripperByArea;
+import com.techlambdas.delearmanagementapp.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import static com.techlambdas.delearmanagementapp.utils.RandomIdGenerator.getRandomId;
 
 @Service
 public class AccountServiceImpl implements AccountService {
+
+    @Autowired
+    private StatementConfigService statementConfigService;
+
+    @Autowired
+    private AccountHeadService accountHeadService;
+
+    @Autowired
+    private SalesService salesService;
+
 
     @Value("${app.image.upload-dir:./bankstatement/pdffiles}")
     private String uploadPdfFile;
@@ -97,7 +85,7 @@ public class AccountServiceImpl implements AccountService {
 
             Account account = convetToAccount.apply(accountRequest);
             account.setAccountHeadName(accountHead.getAccountHeadName());
-            account.setTransacId(RandomIdGenerator.getRandomId());
+            account.setTransacId(getRandomId());
             if (accountHead.getAccountType() == AccountType.CREDIT) {
                 account.setTransactType(AccountType.CREDIT);
                 account.setTransactorType("CollectionOperator");
@@ -125,7 +113,7 @@ public class AccountServiceImpl implements AccountService {
 
             Account account = convetToAccount.apply(accountRequest);
             account.setAccountHeadName(accountHead.getAccountHeadName());
-            account.setTransacId(RandomIdGenerator.getRandomId());
+            account.setTransacId(getRandomId());
             if (accountHead.getAccountType() == AccountType.CREDIT) {
                 account.setTransactType(AccountType.CREDIT);
                 account.setTransactorType("CollectionOperator");
@@ -145,8 +133,14 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<Account> getAllAccountEntry() {
-        return accountRepository.findAll();
+       return accountRepository.findAll();
     }
+
+    @Override
+    public List<Account> getAllAccountWithFilter(LocalDate fromDate, LocalDate toDate, String accountHeadCode) {
+        return accountCustomRepo.getAllAccountByFilter(fromDate,toDate,accountHeadCode);
+    }
+
 
     @Override
     public Page<Account> getByAccType(int page, int size, String financialYear, String accountHeadCode, String accountHeadName, String transactorId, AccountType transactType, String transactorName, String transactDesc, String shortNotes, String transactRefNo, String transactDetails, LocalDate transactDate, LocalDate fromDate, LocalDate toDate) {
@@ -196,7 +190,7 @@ public class AccountServiceImpl implements AccountService {
                 throw new DataNotFoundException("AccountHead not matched");
             Account account = convetToAccount.apply(accountRequest);
             account.setAccountHeadName(accountHead.getAccountHeadName());
-            account.setTransacId(RandomIdGenerator.getRandomId());
+            account.setTransacId(getRandomId());
             if (accountHead.getPricingFormat() == PricingFormat.FLAT)
                 if (accountHead.getMaxAmount() < account.getAmount())
                     throw new InvalidDataException("Amount Mismatched according to AccountHead");
@@ -268,164 +262,4 @@ public class AccountServiceImpl implements AccountService {
         return accountCustomRepo.getAggregateResultByAllOperator();
     }
 
-
-    @Override
-    public Statement uploadFile(MultipartFile file) {
-        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-        String originalFileName = FilenameUtils.removeExtension(file.getOriginalFilename());
-        String currentDateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
-        String filename = originalFileName + "_" + currentDateTime + "." + extension;
-
-        try {
-            FileUploadUtils.uploadFiletoVps(uploadPdfFile, filename, file);
-        } catch (IOException e) {
-            throw new RuntimeException("Error uploading file", e);
-        }
-
-        return readTxtFile(filename);
-    }
-
-    private Statement readTxtFile(String fileName) {
-        String filePath = uploadPdfFile + "/" + fileName;
-        File pdfFile = new File(filePath);
-        StringBuilder allPages = new StringBuilder();
-
-        try (PDDocument document = PDDocument.load(pdfFile)) {
-            PDFTextStripperByArea stripper = new PDFTextStripperByArea();
-            stripper.setSortByPosition(true);
-            Rectangle rect = new Rectangle(0, 0, 2200, 2200);
-            stripper.addRegion("region", rect);
-
-            for (int page = 0; page < document.getNumberOfPages(); page++) {
-                stripper.extractRegions(document.getPage(page));
-                allPages.append(stripper.getTextForRegion("region"));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return parseContent(allPages.toString());
-    }
-
-    private Statement parseContent(String content) {
-        Statement statement = new Statement();
-        List<BankTransaction> transactions = new ArrayList<>();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-        // Define patterns
-        Pattern accountNumberPattern = Pattern.compile("ACCOUNT NO\\s+:([A-Z]+-\\d+)");
-        Pattern customerNamePattern = Pattern.compile("CUSTOMER DETAILS\\s*:(.+)");
-        Pattern openingBalancePattern = Pattern.compile("Opening Balance\\s+([\\d,\\.]+)");
-        Pattern closingBalancePattern = Pattern.compile("Closing Balance\\s+([\\d,\\.]+)");
-        Pattern transactionPattern = Pattern.compile(
-                "(\\d{2}/\\d{2}/\\d{4})\\s*" +          // Date
-                        "(.*?)\\s*" +                          // Description
-                        "([\\d,]+\\.\\d{2})\\s*" +             // Credit amount
-                        "([\\d,\\.\\-]+)"
-        );
-
-        // Match and set statement properties
-        System.out.println("Pattern: " + accountNumberPattern);
-
-        Matcher matcher = accountNumberPattern.matcher(content);
-        System.out.println("matcher: " + matcher);
-
-
-        if (matcher.find()) statement.setAccountNumber(matcher.group(1));
-
-
-        matcher = customerNamePattern.matcher(content);
-        if (matcher.find()) statement.setCustomerName(matcher.group(1).trim());
-
-        matcher = openingBalancePattern.matcher(content);
-        if (matcher.find()) statement.setOpeningBalance(Double.parseDouble(matcher.group(1).replace(",", "")));
-
-        // Merge transaction lines
-        List<String> mergedTransactions = mergeTransactionLines(content.split("\\r?\\n"));
-        double prevBalance = statement.getOpeningBalance();
-
-        for (String line : mergedTransactions) {
-            System.out.println("Processing line: " + line);
-            matcher = transactionPattern.matcher(line);
-            if (matcher.find()) {
-                LocalDate date = LocalDate.parse(matcher.group(1), formatter);
-                String description = matcher.group(2).trim();
-                double amount = Double.parseDouble(matcher.group(3).replace(",", ""));
-                double balance = Double.parseDouble(matcher.group(4).replace(",", ""));
-                double transactAmount = balance - prevBalance;
-
-                BankTransaction transaction = new BankTransaction();
-                transaction.setDate(date);
-                transaction.setDescription(description);
-                transaction.setBalance(balance);
-                if (transactAmount > 0)
-                    transaction.setCredit(amount);
-                else
-                    transaction.setDebit(amount);
-
-                prevBalance = balance;
-
-                String paymentType = determinePaymentType(description);
-                transaction.setPaymentType(paymentType);
-                transactions.add(transaction);
-            } else {
-                System.out.println("Unmatched line: " + line);
-            }
-        }
-
-
-        matcher = closingBalancePattern.matcher(content);
-        if (matcher.find()) statement.setClosingBalance(Double.parseDouble(matcher.group(1).replace(",", "")));
-
-        statement.setTransactions(transactions);
-        if (!transactions.isEmpty()) {
-            statement.setFromDate(transactions.get(0).getDate());
-            statement.setToDate(transactions.get(transactions.size() - 1).getDate());
-        }
-
-        return statement;
-    }
-
-    private List<String> mergeTransactionLines(String[] lines) {
-        List<String> mergedTransactions = new ArrayList<>();
-        StringBuilder currentTransaction = new StringBuilder();
-
-        for (String line : lines) {
-            if (line.matches("^\\d{2}/\\d{2}/\\d{4}.*")) {
-                if (currentTransaction.length() > 0) {
-                    mergedTransactions.add(currentTransaction.toString().replaceAll("\\s+", " "));
-                    currentTransaction.setLength(0);
-                }
-                currentTransaction.append(line);
-            } else {
-                currentTransaction.append(" ").append(line);
-            }
-        }
-
-        if (currentTransaction.length() > 0) {
-            mergedTransactions.add(currentTransaction.toString().replaceAll("\\s+", " "));
-        }
-
-        return mergedTransactions;
-    }
-
-    private String determinePaymentType(String description) {
-        description = description.toLowerCase();
-
-        if (description.contains("atm")) {
-            return "ATM";
-        } else if (description.contains("neft")) {
-            return "NEFT";
-        } else if (description.contains("imps")) {
-            return "UPI";
-        } else if (description.contains("chq")) {
-            return "CHEQUE";
-        } else if (description.contains("pos") || description.contains("swipe")) {
-            return "CARD";
-        } else if (description.contains("upi") || description.contains("gpay") || description.contains("phonepe")) {
-            return "UPI";
-        } else {
-            return "Unknown";
-        }
-    }
 }

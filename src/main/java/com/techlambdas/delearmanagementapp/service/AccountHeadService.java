@@ -24,4 +24,6 @@ public interface AccountHeadService {
 
 
     List<AccountHead> getAllAccHead(AccountType accountType);
+
+    AccountHead getAccountByAccountTypeAndAccountHeadName(AccountType accountType,String AccountHeadName);
 }

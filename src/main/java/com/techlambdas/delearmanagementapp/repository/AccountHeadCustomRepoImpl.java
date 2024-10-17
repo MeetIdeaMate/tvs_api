@@ -90,5 +90,16 @@ public class AccountHeadCustomRepoImpl implements AccountHeadCustomRepo{
         return accHeadResponse;
     }
 
+    @Override
+    public AccountHead getAccountHeadByAccTypeAndName(AccountType accountType, String accountHeadName) {
+       Query query = new Query();
+       if(accountType!=null && accountHeadName!=null){
+           query.addCriteria(Criteria.where("accountType").is(accountType));
+           query.addCriteria(Criteria.where("accountHeadName").is(accountHeadName));
+       }
+       return mongoTemplate.findOne(query,AccountHead.class);
+    }
+
+
 
 }

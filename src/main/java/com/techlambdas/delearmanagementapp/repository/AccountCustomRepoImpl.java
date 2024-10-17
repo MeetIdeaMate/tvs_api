@@ -80,6 +80,18 @@ public class AccountCustomRepoImpl implements AccountCustomRepo{
          Balance accounts = mongoTemplate.aggregate(aggregation,Account.class, Balance.class).getUniqueMappedResult();
         return accounts;
     }
+    @Override
+    public List<Account> getAllAccountByFilter(LocalDate transactDate, LocalDate endDate, String accountHeadCode) {
+        Query query = new Query();
+        if(transactDate!=null && endDate!=null){
+            query.addCriteria(Criteria.where("transactDate").gte(transactDate).lte(endDate));
+
+        }
+        if(accountHeadCode!=null)
+            query.addCriteria(Criteria.where("accountHeadCode").is(accountHeadCode));
+        return mongoTemplate.find(query, Account.class);
+    }
+
 
 
     public List<AccountDataSummary> getAggregateResultByOperator(String operatorCode) {
