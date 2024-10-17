@@ -67,8 +67,19 @@ public class StatementServiceImpl implements StatementService {
     }
 
     @Override
-    public Statement getByStatementId(String statementId) {
-        return statementRepository.findByStatementId(statementId);
+    public Statement getByStatementId(String statementId, LocalDate fromDate, LocalDate toDate) {
+        Statement statement = statementRepository.findByStatementId(statementId);
+        List<BankTransaction> filteredTransactions = statement.getTransactions().stream()
+                .filter(transaction -> {
+                    LocalDate transactionDate = transaction.getDate();
+                    return (fromDate == null || !transactionDate.isBefore(fromDate)) &&
+                            (toDate == null || !transactionDate.isAfter(toDate));
+                })
+                .collect(Collectors.toList());
+
+        statement.setTransactions(filteredTransactions);
+        return  statement;
+
     }
 
     @Override
