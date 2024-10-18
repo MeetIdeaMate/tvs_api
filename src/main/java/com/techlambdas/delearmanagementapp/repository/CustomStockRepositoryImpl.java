@@ -195,7 +195,7 @@ public class CustomStockRepositoryImpl implements CustomStockRepository{
                 Aggregation.unwind("branch", true),
                 Aggregation.lookup("category", "categoryId", "categoryId", "category"),
                 Aggregation.unwind("category", true),
-                Aggregation.group("partNo", "branchId")
+                Aggregation.group("partNo", "branchId","stockStatus")
                         .sum("quantity").as("totalQuantity")
                         .first("categoryId").as("categoryId")
                         .first("stockStatus").as("stockStatus")
